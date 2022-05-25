@@ -1,0 +1,96 @@
+.schedule_container {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 100px;
+  .schedule_header {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding-left: 46px;
+    .hours_cube_wrap {
+      display: flex;
+      justify-content: center;
+      .hours_cube {
+        min-width: 36px;
+        height: 36px;
+        color: #2a8ab6;
+        margin: 3px 3px 3px 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+      }
+    }
+  }
+  .schedule_body {
+    display: flex;
+    justify-content: center;
+    .days_cube_wrap {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      margin: 0 6px 0 0;
+      .days_cube {
+        min-width: 36px;
+        height: 36px;
+        color: #2a8ab6;
+        margin: 3px 3px 3px 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+    .wrap {
+      display: flex;
+      justify-content: center;
+      border: 1px solid #2a8ab6;
+      position: relative;
+      padding: 3px;
+      box-sizing: border-box;
+      .hour {
+        margin: 0;
+        .cube {
+          min-width: 36px;
+          height: 36px;
+          background-color: #2a8ab6;
+          margin: 3px 3px 6px 3px;
+          transition: 0.1s;
+        //   cursor: pointer;
+          &.selected {
+            background-color: rgb(0, 255, 136);
+          }
+        }
+      }
+      #selectArea {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+
+  .reset_btn {
+    width: 80px;
+    height: 30px;
+    color: #2a8ab6;
+    font-size: 16px;
+    font-weight: 500;
+    border: 1px solid #2a8ab6;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    line-height: 25px;
+    transition: 0.3s;
+    cursor: pointer;
+    &:hover {
+      background-color: #2a8ab6;
+      color: #0c1a2a;
+    }
+  }
+}
