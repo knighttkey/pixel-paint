@@ -31,8 +31,8 @@ export default () => {
     cancelDefault(e);
   };
 
-  const allList = new Array(50).fill(0).map((item, key) => {
-    return new Array(11).fill(0).map((key) => {
+  const allList = new Array(33).fill(0).map((item, key) => {
+    return new Array(13).fill(0).map((key) => {
       return key + 1;
     });
   });
@@ -492,9 +492,101 @@ export default () => {
     "cube_47-10"
   ];
 
+  const oneSpot = [
+    "cube_4-7",
+    "cube_5-7",
+    "cube_6-7",
+    "cube_7-7",
+    "cube_8-7",
+    "cube_9-7",
+    "cube_10-7",
+    "cube_11-7",
+    "cube_12-7",
+    "cube_13-7",
+    "cube_14-7",
+    "cube_17-2",
+    "cube_17-3",
+    "cube_17-4",
+    "cube_17-5",
+    "cube_17-6",
+    "cube_18-2",
+    "cube_19-2",
+    "cube_20-2",
+    "cube_21-2",
+    "cube_22-2",
+    "cube_23-2",
+    "cube_24-2",
+    "cube_25-2",
+    "cube_25-3",
+    "cube_25-4",
+    "cube_25-5",
+    "cube_25-6",
+    "cube_19-4",
+    "cube_20-5",
+    "cube_23-4",
+    "cube_22-5",
+    "cube_18-6",
+    "cube_19-6",
+    "cube_20-6",
+    "cube_21-6",
+    "cube_22-6",
+    "cube_23-6",
+    "cube_24-6",
+    "cube_18-8",
+    "cube_19-8",
+    "cube_20-8",
+    "cube_21-8",
+    "cube_22-8",
+    "cube_23-8",
+    "cube_24-8",
+    "cube_21-3",
+    "cube_21-4",
+    "cube_21-5",
+    "cube_21-7",
+    "cube_21-9",
+    "cube_21-10",
+    "cube_17-10",
+    "cube_18-10",
+    "cube_19-10",
+    "cube_20-10",
+    "cube_22-10",
+    "cube_23-10",
+    "cube_24-10",
+    "cube_25-10",
+    "cube_18-11",
+    "cube_17-12",
+    "cube_20-11",
+    "cube_20-12",
+    "cube_22-11",
+    "cube_22-12",
+    "cube_24-11",
+    "cube_25-12",
+    "cube_28-2",
+    "cube_28-3",
+    "cube_28-4",
+    "cube_28-5",
+    "cube_28-6",
+    "cube_28-7",
+    "cube_28-8",
+    "cube_29-5",
+    "cube_30-5",
+    "cube_27-9",
+    "cube_27-10",
+    "cube_27-11",
+    "cube_27-12",
+    "cube_28-9",
+    "cube_29-9",
+    "cube_30-9",
+    "cube_30-10",
+    "cube_30-11",
+    "cube_30-12",
+    "cube_28-12",
+    "cube_29-12"
+]
+
   useEffect(() => {
     if (showText) {
-      worldNekoDay.forEach((item, key) => {
+      oneSpot.forEach((item, key) => {
         setTimeout(() => {
           tempList.push(item);
           setList([...tempList]);
@@ -509,9 +601,9 @@ export default () => {
 
   return (
     <div className="schedule_container">
-      <div className="schedule_header">{renderHoursName()}</div>
+      {/* <div className="schedule_header">{renderHoursName()}</div> */}
       <div className="schedule_body">
-        {renderDaysName()}
+        {/* {renderDaysName()} */}
         <div
           className="wrap"
           onDragEnter={(e) => cancelDefault(e)}
