@@ -9,19 +9,19 @@
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
-    padding-left: 46px;
+    padding-left: 30px;
     .hours_cube_wrap {
       display: flex;
       justify-content: center;
       .hours_cube {
-        min-width: 36px;
-        height: 36px;
+        min-width: 20px;
+        height: 20px;
         color: #2a8ab6;
-        margin: 3px 3px 3px 3px;
+        margin: 2px 2px 2px 2px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 18px;
+        font-size: 14px;
         font-weight: 500;
       }
     }
@@ -35,10 +35,10 @@
       flex-direction: column;
       margin: 0 6px 0 0;
       .days_cube {
-        min-width: 36px;
-        height: 36px;
+        min-width: 20px;
+        height: 20px;
         color: #2a8ab6;
-        margin: 3px 3px 3px 3px;
+        margin: 2px 2px 2px 2px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -56,10 +56,10 @@
       .hour {
         margin: 0;
         .cube {
-          min-width: 36px;
-          height: 36px;
+          min-width: 20px;
+          height: 20px;
           background-color: #2a8ab6;
-          margin: 3px 3px 6px 3px;
+          margin: 2px 2px 4px 2px;
           transition: 0.1s;
         //   cursor: pointer;
           &.selected {
@@ -73,24 +73,30 @@
       }
     }
   }
-
-  .reset_btn {
-    width: 80px;
-    height: 30px;
-    color: #2a8ab6;
-    font-size: 16px;
-    font-weight: 500;
-    border: 1px solid #2a8ab6;
-    border-radius: 5px;
+  .btn_area {
     display: flex;
-    justify-content: center;
-    margin-top: 15px;
-    line-height: 25px;
-    transition: 0.3s;
-    cursor: pointer;
-    &:hover {
-      background-color: #2a8ab6;
-      color: #0c1a2a;
+    .show_btn, .reset_btn {
+      width: 80px;
+      height: 30px;
+      color: #2a8ab6;
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid #2a8ab6;
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+      line-height: 28px;
+      transition: 0.3s;
+      cursor: pointer;
+      &:hover {
+        background-color: #2a8ab6;
+        color: #0c1a2a;
+      }
+      &:first-child {
+        margin-right: 20px;
+      }
     }
+
   }
 }
