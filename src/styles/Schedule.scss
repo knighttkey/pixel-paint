@@ -5,6 +5,10 @@
   align-items: center;
   flex-direction: column;
   padding-top: 100px;
+  @media screen and (max-width: 1920px) {
+    
+      width: calc(var(--main-width) / 1920);
+  }
   .schedule_header {
     display: flex;
     justify-content: flex-start;
@@ -70,6 +74,7 @@
       #selectArea {
         position: absolute;
         background-color: rgba(0, 0, 0, 0.5);
+        opacity: 0;
       }
     }
   }

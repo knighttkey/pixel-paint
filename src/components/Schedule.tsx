@@ -11,15 +11,18 @@ type DragPoint = {
 interface ClickEventTarget extends EventTarget {
   id: string;
 }
+interface TouchEventTarget extends EventTarget {
+  id: string;
+}
 
 export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [lastPoint, setLastPoint] = useState<DragPoint>();
   const [list, setList] = useState<string[]>([]);
   const [showText, setShowText] = useState<boolean>(false);
-  console.log("list", list);
+  // console.log("list", list);
 
-  const cancelDefault = (e: DragEvent) => {
+  const cancelDefault = (e: DragEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     return false;
@@ -31,8 +34,8 @@ export default () => {
     cancelDefault(e);
   };
 
-  const allList = new Array(50).fill(0).map((item, key) => {
-    return new Array(11).fill(0).map((key) => {
+  const allList = new Array(20).fill(0).map((item, key) => {
+    return new Array(20).fill(0).map((key) => {
       return key + 1;
     });
   });
@@ -51,17 +54,21 @@ export default () => {
 
   //框選選取
   const moveStart = (
-    e: DragEvent,
+    // e: DragEvent| React.TouchEvent,
+    e: any,
     accordingX: number,
     accordingY: number,
     eventType: string
   ) => {
     e.stopPropagation();
-    if (eventType === "dragstart") {
-      e.dataTransfer.effectAllowed = "move";
-      var img = new Image();
-      img.src = "./images/transparent.png";
-      e.dataTransfer.setDragImage(img, 0, 0);
+    if(eventType === "dragstart") {
+      // if (e instanceof DragEvent && e.dataTransfer) {
+          e.dataTransfer.effectAllowed = "move";
+          var img = new Image();
+          img.src = "./images/transparent.png";
+          e.dataTransfer.setDragImage(img, 0, 0);
+      // }
+
     }
     if (!wrapRef.current) return;
     const parentRect = wrapRef.current.getBoundingClientRect();
@@ -78,7 +85,16 @@ export default () => {
     selectAreaEle.dataset.patchY = rectPatchY.toString();
   };
 
-  const move = (e: DragEvent, accordingX: number, accordingY: number) => {
+  // const touchOver = (eventTarget:TouchEventTarget) => {
+  //   console.log('eventTarget.id', eventTarget.id)
+  //   if(eventTarget) {
+  //     tempList.push(eventTarget.id);
+  //     console.log('tempList', tempList)
+  //     setList(R.uniq(tempList));
+  //   }
+  // }
+
+  const move = (e: DragEvent | React.TouchEvent, accordingX: number, accordingY: number, eventType: string) => {
     if (!accordingX && !accordingY) return;
     if (!wrapRef.current) return;
     const parentRect = wrapRef.current.getBoundingClientRect();
@@ -106,6 +122,19 @@ export default () => {
       let moveX = dragPositionX - Number(patchX);
       let moveY = dragPositionY - Number(patchY);
 
+
+      let direction = "";
+        if (moveX > 0 && moveY > 0) {
+          direction = "x+y+";
+        } else if (moveX > 0 && moveY < 0) {
+          direction = "x+y-";
+        } else if (moveX < 0 && moveY > 0) {
+          direction = "x-y+";
+        } else if (moveX < 0 && moveY < 0) {
+          direction = "x-y-";
+        }
+
+
       if (moveX < 0) {
         targetEle.style.left = "unset";
         targetEle.style.right = parentRect.width - Number(patchX) + "px";
@@ -129,45 +158,55 @@ export default () => {
       }
 
       targetEle.style.width = Math.abs(moveX) + "px";
+      // targetEle.style.height = Math.abs(moveY) + "px";
       targetEle.style.height = Math.abs(moveY) + "px";
+
+      //---------------------------------------------------------------------------
+      detectBeSelect(
+        { x: Number(patchX), y: Number(patchY) },
+        { x: dragPositionX, y: dragPositionY },
+        parentRect,
+        direction,
+        eventType
+      );
     }
 
     setLastPoint({ x: dragPositionX, y: dragPositionY });
   };
 
-  const moveEnd = (e: DragEvent) => {
-    cancelDefault(e);
-    let targetEle = document.getElementById("selectArea");
-    if (targetEle) {
-      if (wrapRef.current && lastPoint) {
-        const parentRect = wrapRef.current.getBoundingClientRect();
-        const patchX = targetEle.dataset.patchX;
-        const patchY = targetEle.dataset.patchY;
-        let moveX = lastPoint.x - Number(patchX);
-        let moveY = lastPoint.y - Number(patchY);
-        let direction = "";
-        if (moveX > 0 && moveY > 0) {
-          direction = "x+y+";
-        } else if (moveX > 0 && moveY < 0) {
-          direction = "x+y-";
-        } else if (moveX < 0 && moveY > 0) {
-          direction = "x-y+";
-        } else if (moveX < 0 && moveY < 0) {
-          direction = "x-y-";
-        }
-        detectBeSelect(
-          { x: Number(patchX), y: Number(patchY) },
-          { x: lastPoint.x, y: lastPoint.y },
-          parentRect,
-          direction
-        );
-        if (targetEle) {
-          targetEle.remove();
-          targetEle.dataset.patchX = "";
-          targetEle.dataset.patchY = "";
+  const moveEnd = (e: DragEvent | React.TouchEvent) => {
+      cancelDefault(e);
+      let targetEle = document.getElementById("selectArea");
+      if (targetEle) {
+        if (wrapRef.current && lastPoint) {
+          const parentRect = wrapRef.current.getBoundingClientRect();
+          const patchX = targetEle.dataset.patchX;
+          const patchY = targetEle.dataset.patchY;
+          let moveX = lastPoint.x - Number(patchX);
+          let moveY = lastPoint.y - Number(patchY);
+          // let direction = "";
+          // if (moveX > 0 && moveY > 0) {
+          //   direction = "x+y+";
+          // } else if (moveX > 0 && moveY < 0) {
+          //   direction = "x+y-";
+          // } else if (moveX < 0 && moveY > 0) {
+          //   direction = "x-y+";
+          // } else if (moveX < 0 && moveY < 0) {
+          //   direction = "x-y-";
+          // }
+          // detectBeSelect(
+          //   { x: Number(patchX), y: Number(patchY) },
+          //   { x: lastPoint.x, y: lastPoint.y },
+          //   parentRect,
+          //   direction
+          // );
+          if (targetEle) {
+            targetEle.remove();
+            targetEle.dataset.patchX = "";
+            targetEle.dataset.patchY = "";
+          }
         }
       }
-    }
   };
 
   //判斷被選取的時刻方塊
@@ -175,9 +214,11 @@ export default () => {
     startPoint: DragPoint,
     lastPoint: DragPoint,
     parentRect: DOMRect,
-    direction: string
-  ) => {
-    let cubeList = [...document.querySelectorAll(".cube")];
+    direction: string,
+    eventType: string
+    ) => {
+      let cubeList = [...document.querySelectorAll(".cube")];
+      console.log('lastPoint', lastPoint)
 
     cubeList.forEach((cubeItem, cubeIndex) => {
       let cubeRect = cubeItem.getBoundingClientRect();
@@ -296,6 +337,7 @@ export default () => {
                     id: `cube_${key + 1}-${cubeKey + 1}`
                   })
                 }
+                // onTouchMove={(e)=>touchOver({...e.target, id: `cube_${key + 1}-${cubeKey + 1}`})}
               ></div>
             );
           })}
@@ -492,16 +534,16 @@ export default () => {
     "cube_47-10"
   ];
 
-  useEffect(() => {
-    if (showText) {
-      worldNekoDay.forEach((item, key) => {
-        setTimeout(() => {
-          tempList.push(item);
-          setList([...tempList]);
-        }, 100 * key);
-      });
-    }
-  }, [showText]);
+  // useEffect(() => {
+  //   if (showText) {
+  //     worldNekoDay.forEach((item, key) => {
+  //       setTimeout(() => {
+  //         tempList.push(item);
+  //         setList([...tempList]);
+  //       }, 100 * key);
+  //     });
+  //   }
+  // }, [showText]);
 
   const show = () => {
     setShowText(true);
@@ -517,8 +559,11 @@ export default () => {
           onDragEnter={(e) => cancelDefault(e)}
           onDragOver={(e) => dragover(e)}
           onDragStart={(e) => moveStart(e, e.clientX, e.clientY, e.type)}
-          onDrag={(e) => move(e, e.clientX, e.clientY)}
+          onDrag={(e) => move(e, e.clientX, e.clientY,  e.type)}
           onDragEnd={(e) => moveEnd(e)}
+          onTouchStart={e => moveStart(e, e.touches[0].clientX, e.touches[0].clientY, e.type)}
+          onTouchMove={e => move(e, e.touches[0].clientX, e.touches[0].clientY,  e.type)}
+          onTouchEnd={e => moveEnd(e)}
           draggable={true}
           ref={wrapRef}
         >
