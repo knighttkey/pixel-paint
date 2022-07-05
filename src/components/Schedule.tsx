@@ -1,4 +1,4 @@
-import { DragEvent, useRef, useState, MouseEvent, useEffect } from "react";
+import React, { DragEvent, useRef, useState, MouseEvent, useEffect } from "react";
 import "./../styles/Schedule.scss";
 import * as R from "ramda";
 import moment from "moment";
@@ -15,12 +15,28 @@ interface TouchEventTarget extends EventTarget {
   id: string;
 }
 
+
 export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [lastPoint, setLastPoint] = useState<DragPoint>();
   const [list, setList] = useState<string[]>([]);
   const [showText, setShowText] = useState<boolean>(false);
+  const [selectMode, setSelectMode] = useState<Boolean>(true);
   // console.log("list", list);
+
+  const pickAll = () => {
+    let allCubeId: string[] = [];
+    allList.forEach((hourItem, hourKey: number) => {
+      hourItem.forEach((daysItem, daysKey: number) => {
+        allCubeId.push(`cube_${hourKey + 1}-${daysKey + 1}`);
+      });
+    });
+    if (selectMode) {
+      setList(allCubeId);
+    } else {
+      setList([]);
+    }
+  };
 
   const cancelDefault = (e: DragEvent | React.TouchEvent) => {
     e.preventDefault();
@@ -42,11 +58,11 @@ export default () => {
 
   //點擊選取
   const pickCube = (eventTarget: ClickEventTarget) => {
-    if (R.includes(eventTarget.id, list)) {
-      tempList = R.without([eventTarget.id], list);
+    if (selectMode) {
+      tempList.push(eventTarget.id);
       setList(tempList);
     } else {
-      tempList.push(eventTarget.id);
+      tempList = R.without([eventTarget.id], list);
       setList(tempList);
     }
   };
@@ -54,52 +70,44 @@ export default () => {
 
   //框選選取
   const moveStart = (
-    // e: DragEvent| React.TouchEvent,
-    e: any,
+    e: DragEvent | React.TouchEvent,
     accordingX: number,
     accordingY: number,
-    eventType: string
+    eventType: string,
   ) => {
     e.stopPropagation();
-    if(eventType === "dragstart") {
-      // if (e instanceof DragEvent && e.dataTransfer) {
-          e.dataTransfer.effectAllowed = "move";
-          var img = new Image();
-          img.src = "./images/transparent.png";
-          e.dataTransfer.setDragImage(img, 0, 0);
-      // }
-
-    }
+      function isDragEvent(e: DragEvent | React.TouchEvent): e is DragEvent {
+        return (e as DragEvent).dataTransfer !== undefined;
+      }
+      if (isDragEvent(e)) {
+        e.dataTransfer.effectAllowed = 'move';
+        var img = new Image();
+        img.src = '/images/transparent.png';
+        e.dataTransfer.setDragImage(img, 0, 0);
+      }
     if (!wrapRef.current) return;
     const parentRect = wrapRef.current.getBoundingClientRect();
-    let rectPatchX = accordingX - parentRect.left;
-    let rectPatchY = accordingY - parentRect.top;
+    let rectStartX = accordingX - parentRect.left;
+    let rectStartY = accordingY - parentRect.top;
 
-    let selectAreaEle = document.createElement("div");
-    selectAreaEle.id = "selectArea";
-    selectAreaEle.style.left = rectPatchX + "px";
-    selectAreaEle.style.top = rectPatchY + "px";
+    let selectAreaEle = document.createElement('div');
+    selectAreaEle.id = 'selectArea';
+    selectAreaEle.style.position = 'absolute';
+    selectAreaEle.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    selectAreaEle.style.left = rectStartX + 'px';
+    selectAreaEle.style.top = rectStartY + 'px';
 
     wrapRef.current.appendChild(selectAreaEle);
-    selectAreaEle.dataset.patchX = rectPatchX.toString();
-    selectAreaEle.dataset.patchY = rectPatchY.toString();
+    selectAreaEle.dataset.startX = rectStartX.toString();
+    selectAreaEle.dataset.startY = rectStartY.toString();
   };
 
-  // const touchOver = (eventTarget:TouchEventTarget) => {
-  //   console.log('eventTarget.id', eventTarget.id)
-  //   if(eventTarget) {
-  //     tempList.push(eventTarget.id);
-  //     console.log('tempList', tempList)
-  //     setList(R.uniq(tempList));
-  //   }
-  // }
-
-  const move = (e: DragEvent | React.TouchEvent, accordingX: number, accordingY: number, eventType: string) => {
+  const move = (e: DragEvent | React.TouchEvent, accordingX: number, accordingY: number) => {
     if (!accordingX && !accordingY) return;
     if (!wrapRef.current) return;
     const parentRect = wrapRef.current.getBoundingClientRect();
 
-    let targetEle = document.getElementById("selectArea");
+    let targetEle = document.getElementById('selectArea');
 
     let dragPositionX = accordingX - parentRect.left;
     if (dragPositionX < 0) {
@@ -117,96 +125,73 @@ export default () => {
       dragPositionY = parentRect.height;
     }
     if (targetEle) {
-      const patchX = targetEle.dataset.patchX;
-      const patchY = targetEle.dataset.patchY;
-      let moveX = dragPositionX - Number(patchX);
-      let moveY = dragPositionY - Number(patchY);
-
-
-      let direction = "";
-        if (moveX > 0 && moveY > 0) {
-          direction = "x+y+";
-        } else if (moveX > 0 && moveY < 0) {
-          direction = "x+y-";
-        } else if (moveX < 0 && moveY > 0) {
-          direction = "x-y+";
-        } else if (moveX < 0 && moveY < 0) {
-          direction = "x-y-";
-        }
-
+      const startX = targetEle.dataset.startX;
+      const startY = targetEle.dataset.startY;
+      let moveX = dragPositionX - Number(startX);
+      let moveY = dragPositionY - Number(startY);
 
       if (moveX < 0) {
-        targetEle.style.left = "unset";
-        targetEle.style.right = parentRect.width - Number(patchX) + "px";
+        targetEle.style.left = 'unset';
+        targetEle.style.right = parentRect.width - Number(startX) + 'px';
       } else {
-        targetEle.style.left = Number(patchX) + "px";
-        targetEle.style.right = "unset";
+        targetEle.style.left = Number(startX) + 'px';
+        targetEle.style.right = 'unset';
         if (moveX >= parentRect.width) {
-          moveX = parentRect.right - Number(patchX);
+          moveX = parentRect.right - Number(startX);
         }
       }
 
       if (moveY < 0) {
-        targetEle.style.top = "unset";
-        targetEle.style.bottom = parentRect.height - Number(patchY) + "px";
+        targetEle.style.top = 'unset';
+        targetEle.style.bottom = parentRect.height - Number(startY) + 'px';
       } else {
-        targetEle.style.top = Number(patchY) + "px";
-        targetEle.style.bottom = "unset";
+        targetEle.style.top = Number(startY) + 'px';
+        targetEle.style.bottom = 'unset';
         if (moveY >= parentRect.height) {
-          moveY = parentRect.bottom - Number(patchY);
+          moveY = parentRect.bottom - Number(startY);
         }
       }
 
-      targetEle.style.width = Math.abs(moveX) + "px";
-      // targetEle.style.height = Math.abs(moveY) + "px";
-      targetEle.style.height = Math.abs(moveY) + "px";
-
-      //---------------------------------------------------------------------------
-      detectBeSelect(
-        { x: Number(patchX), y: Number(patchY) },
-        { x: dragPositionX, y: dragPositionY },
-        parentRect,
-        direction,
-        eventType
-      );
+      targetEle.style.width = Math.abs(moveX) + 'px';
+      targetEle.style.height = Math.abs(moveY) + 'px';
     }
 
     setLastPoint({ x: dragPositionX, y: dragPositionY });
   };
 
   const moveEnd = (e: DragEvent | React.TouchEvent) => {
-      cancelDefault(e);
-      let targetEle = document.getElementById("selectArea");
-      if (targetEle) {
-        if (wrapRef.current && lastPoint) {
-          const parentRect = wrapRef.current.getBoundingClientRect();
-          const patchX = targetEle.dataset.patchX;
-          const patchY = targetEle.dataset.patchY;
-          let moveX = lastPoint.x - Number(patchX);
-          let moveY = lastPoint.y - Number(patchY);
-          // let direction = "";
-          // if (moveX > 0 && moveY > 0) {
-          //   direction = "x+y+";
-          // } else if (moveX > 0 && moveY < 0) {
-          //   direction = "x+y-";
-          // } else if (moveX < 0 && moveY > 0) {
-          //   direction = "x-y+";
-          // } else if (moveX < 0 && moveY < 0) {
-          //   direction = "x-y-";
-          // }
-          // detectBeSelect(
-          //   { x: Number(patchX), y: Number(patchY) },
-          //   { x: lastPoint.x, y: lastPoint.y },
-          //   parentRect,
-          //   direction
-          // );
-          if (targetEle) {
-            targetEle.remove();
-            targetEle.dataset.patchX = "";
-            targetEle.dataset.patchY = "";
-          }
+    cancelDefault(e);
+    let targetEle = document.getElementById('selectArea');
+    if (targetEle) {
+      if (wrapRef.current && lastPoint) {
+        const parentRect = wrapRef.current.getBoundingClientRect();
+        const startX = targetEle.dataset.startX;
+        const startY = targetEle.dataset.startY;
+        let moveX = lastPoint.x - Number(startX);
+        let moveY = lastPoint.y - Number(startY);
+        let direction = '';
+        if (moveX > 0 && moveY > 0) {
+          direction = 'x+y+';
+        } else if (moveX > 0 && moveY < 0) {
+          direction = 'x+y-';
+        } else if (moveX < 0 && moveY > 0) {
+          direction = 'x-y+';
+        } else if (moveX < 0 && moveY < 0) {
+          direction = 'x-y-';
+        }
+        detectBeSelect(
+          { x: Number(startX), y: Number(startY) },
+          { x: lastPoint.x, y: lastPoint.y },
+          parentRect,
+          direction,
+        );
+        if (targetEle) {
+          targetEle.remove();
+          targetEle.dataset.startX = '';
+          targetEle.dataset.startY = '';
         }
       }
+    }
   };
 
   //判斷被選取的時刻方塊
@@ -215,11 +200,8 @@ export default () => {
     lastPoint: DragPoint,
     parentRect: DOMRect,
     direction: string,
-    eventType: string
-    ) => {
-      let cubeList = [...document.querySelectorAll(".cube")];
-      console.log('lastPoint', lastPoint)
-
+  ) => {
+    let cubeList = [...document.querySelectorAll('.cube')];
     cubeList.forEach((cubeItem, cubeIndex) => {
       let cubeRect = cubeItem.getBoundingClientRect();
 
@@ -229,47 +211,78 @@ export default () => {
       let cubeBottom = cubeRect.bottom - parentRect.top;
 
       switch (direction) {
-        case "x+y+":
+        case 'x+y+':
           if (
             startPoint.x <= cubeRight &&
             cubeLeft <= lastPoint.x &&
             startPoint.y <= cubeBottom &&
             cubeTop <= lastPoint.y
           ) {
-            tempList.push(cubeItem.id);
-            setList(R.uniq(tempList));
+            if (selectMode) {
+              tempList.push(cubeItem.id);
+              setList(R.uniq(tempList));
+            } else {
+              let targetIndex = tempList.indexOf(cubeItem.id);
+              if (targetIndex >= 0) {
+                tempList.splice(targetIndex, 1);
+                setList(R.uniq(tempList));
+              } else {
+                console.log('cubeItem.id', cubeItem.id);
+              }
+            }
           }
           break;
-        case "x+y-":
+        case 'x+y-':
           if (
             startPoint.x <= cubeRight &&
             cubeLeft <= lastPoint.x &&
             startPoint.y >= cubeTop &&
             cubeBottom >= lastPoint.y
           ) {
-            tempList.push(cubeItem.id);
+            if (selectMode) {
+              tempList.push(cubeItem.id);
+            } else {
+              let targetIndex = tempList.indexOf(cubeItem.id);
+              if (targetIndex >= 0) {
+                tempList.splice(targetIndex, 1);
+              }
+            }
             setList(R.uniq(tempList));
           }
           break;
-        case "x-y+":
+        case 'x-y+':
           if (
             startPoint.x >= cubeLeft &&
             cubeRight >= lastPoint.x &&
             startPoint.y <= cubeBottom &&
             cubeTop <= lastPoint.y
           ) {
-            tempList.push(cubeItem.id);
+            if (selectMode) {
+              tempList.push(cubeItem.id);
+            } else {
+              let targetIndex = tempList.indexOf(cubeItem.id);
+              if (targetIndex >= 0) {
+                tempList.splice(targetIndex, 1);
+              }
+            }
             setList(R.uniq(tempList));
           }
           break;
-        case "x-y-":
+        case 'x-y-':
           if (
             startPoint.x >= cubeLeft &&
             cubeRight >= lastPoint.x &&
             startPoint.y >= cubeTop &&
             cubeBottom >= lastPoint.y
           ) {
-            tempList.push(cubeItem.id);
+            if (selectMode) {
+              tempList.push(cubeItem.id);
+            } else {
+              let targetIndex = tempList.indexOf(cubeItem.id);
+              if (targetIndex >= 0) {
+                tempList.splice(targetIndex, 1);
+              }
+            }
             setList(R.uniq(tempList));
           }
           break;
@@ -559,10 +572,10 @@ export default () => {
           onDragEnter={(e) => cancelDefault(e)}
           onDragOver={(e) => dragover(e)}
           onDragStart={(e) => moveStart(e, e.clientX, e.clientY, e.type)}
-          onDrag={(e) => move(e, e.clientX, e.clientY,  e.type)}
+          onDrag={(e) => move(e, e.clientX, e.clientY)}
           onDragEnd={(e) => moveEnd(e)}
           onTouchStart={e => moveStart(e, e.touches[0].clientX, e.touches[0].clientY, e.type)}
-          onTouchMove={e => move(e, e.touches[0].clientX, e.touches[0].clientY,  e.type)}
+          onTouchMove={e => move(e, e.touches[0].clientX, e.touches[0].clientY)}
           onTouchEnd={e => moveEnd(e)}
           draggable={true}
           ref={wrapRef}
@@ -577,6 +590,23 @@ export default () => {
         <div className="show_btn" onClick={show}>
           Show
         </div>
+        <div className="mode_switch_panel">
+            <div className="panel_title">排程設定</div>
+            <div className="panel_inner">
+              <div className="button_text">開</div>
+              <div
+                className={`mode_switch_button ${selectMode ? 'enable' : ''}`}
+                style={{ backgroundColor: '#42c6fc' }}
+                onClick={() => setSelectMode(true)}
+              ></div>
+              <div
+                className={`mode_switch_button ${!selectMode ? 'disable' : ''}`}
+                style={{ backgroundColor: 'black' }}
+                onClick={() => setSelectMode(false)}
+              ></div>
+              <div className="button_text">關</div>
+            </div>
+          </div>
       </div>
     </div>
   );
