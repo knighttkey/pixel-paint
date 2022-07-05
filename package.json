@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@types/ramda": "^0.28.13",
     "moment": "^2.29.3",
     "ramda": "^0.28.0",

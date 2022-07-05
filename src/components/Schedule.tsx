@@ -2,7 +2,7 @@ import { DragEvent, useRef, useState, MouseEvent, useEffect } from "react";
 import "./../styles/Schedule.scss";
 import * as R from "ramda";
 import moment from "moment";
-
+import transparent from '/images/transparent.png';
 type DragPoint = {
   x: number;
   y: number;
@@ -65,7 +65,7 @@ export default () => {
       // if (e instanceof DragEvent && e.dataTransfer) {
           e.dataTransfer.effectAllowed = "move";
           var img = new Image();
-          img.src = "./images/transparent.png";
+          img.src = transparent;
           e.dataTransfer.setDragImage(img, 0, 0);
       // }
 
