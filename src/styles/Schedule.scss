@@ -59,10 +59,10 @@
       .hour {
         margin: 0;
         .cube {
-          min-width: 20px;
-          height: 20px;
+          min-width: 10px;
+          height: 10px;
           background-color: #2a8ab6;
-          margin: 2px 2px 4px 2px;
+          // margin: 2px 2px 4px 2px;
           transition: 0.1s;
           //   cursor: pointer;
           &.selected {
@@ -144,6 +144,42 @@
             border: solid 1px #42c6fc;
           }
         }
+      }
+    }
+  }
+  .list_panel {
+    margin-top: 20px;
+    border: 1px solid #2a8ab6;
+    box-sizing: border-box;
+    padding: 10px 10px 0 10px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    .each_row {
+      display: flex;
+      margin: 8px 0;
+      border-bottom: 1px dashed #2a8ab6;
+      padding-bottom: 8px;
+      box-sizing: border-box;
+      &:last-child {
+        border-bottom: none;
+      }
+      .data_id {
+        color: #2a8ab6;
+      }
+      .delete_btn {
+        width: 40px;
+        height: 20px;
+        color: #2a8ab6;
+        font-size: 16px;
+        font-weight: 500;
+        border: 1px solid #2a8ab6;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        line-height: 20px;
+        transition: 0.3s;
+        cursor: pointer;
+        margin-left: 10px;
       }
     }
   }
