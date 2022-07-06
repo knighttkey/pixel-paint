@@ -133,7 +133,7 @@ export default () => {
         //     tempList[index].color = lastChanged.color;
         //   }
         // } else {
-          tempList.push({ coor: lastChanged.id, color: lastChanged.color });
+        tempList.push({ coor: lastChanged.id, color: lastChanged.color });
         // }
         setList(tempList);
       }
@@ -253,14 +253,25 @@ export default () => {
   const saveThumbnail = () => {
     return new Promise<string>((resolve, reject) => {
       if (!wrapRef.current) return;
+      // htmlToImage
+      //   .toBlob(wrapRef.current, { pixelRatio: 0.1, quality: 0.1 })
+      //   .then((blob: any) => {
+      //     // console.log("blob", blob);
+      //     let urlCreator = window.URL || window.webkitURL;
+      //     let imageUrl = urlCreator.createObjectURL(blob);
+      //     // console.log("imageUrl", imageUrl);
+      //     resolve(imageUrl);
+      //   })
+      //   .catch(function (error) {
+      //     console.error("oops, something went wrong!", error);
+      //     reject();
+      //   });
       htmlToImage
-        .toBlob(wrapRef.current, { pixelRatio: 0.1, quality: 0.1 })
-        .then((blob: any) => {
-          // console.log("blob", blob);
-          let urlCreator = window.URL || window.webkitURL;
-          let imageUrl = urlCreator.createObjectURL(blob);
-          // console.log("imageUrl", imageUrl);
-          resolve(imageUrl);
+        .toPng(wrapRef.current, { pixelRatio: 0.1, quality: 0.1 })
+        .then(function (dataUrl) {
+          var img = new Image();
+          // img.src = dataUrl;
+          resolve(dataUrl);
         })
         .catch(function (error) {
           console.error("oops, something went wrong!", error);
@@ -285,14 +296,14 @@ export default () => {
             type="color"
             id="head"
             name="head"
-            value="#ccff66"
+            value={currentColor}
             className="color_picker"
             onChange={(e) => changeColor(e.target)}
           />
           <input
             type="number"
             className="speed_input"
-            onChange={(e)=>setSpeed(Number(e.target.value))}
+            onChange={(e) => setSpeed(Number(e.target.value))}
           ></input>
           <div className="reset_btn" onClick={resetList}>
             Reset
