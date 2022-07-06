@@ -27,7 +27,6 @@ interface paintDataFromLocal {
 
 export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [lastPoint, setLastPoint] = useState<DragPoint>();
   const [list, setList] = useState<string[]>([]);
   const [showText, setShowText] = useState<boolean>(false);
   const [selectMode, setSelectMode] = useState<Boolean>(true);
@@ -35,6 +34,8 @@ export default () => {
     paintDataFromLocal[]
   >([]);
   const [detectList, setDetectList] = useState<DragPoint[]>([]);
+  const [currentColor, setCurrentColor] = useState<string>('');
+  const [currentPicked, setCurrentPicked] = useState<paintDataFromLocal>();
   // console.log("detectList", detectList);
   // console.log("list", list);
   // console.log("prevDataFromLocal", prevDataFromLocal);
@@ -61,8 +62,8 @@ export default () => {
     console.log("刪除且寫入");
   };
 
-  const allList = new Array(50).fill(0).map((item, key) => {
-    return new Array(50).fill(0).map((key) => {
+  const allList = new Array(35).fill(0).map((item, key) => {
+    return new Array(35).fill(0).map((key) => {
       return key + 1;
     });
   });
@@ -186,19 +187,35 @@ export default () => {
     console.log("儲存");
     setTimeout(() => {
       getDataAgain();
+      temp = [];
+      tempList = [];
+      setDetectList([]);
+      setList([]);
     }, 200);
   };
 
-  // useEffect(() => {
-  //   if (showText) {
-  //     worldNekoDay.forEach((item, key) => {
-  //       setTimeout(() => {
-  //         tempList.push(item);
-  //         setList([...tempList]);
-  //       }, 100 * key);
-  //     });
-  //   }
-  // }, [showText]);
+  useEffect(() => {
+    if (showText) {
+      tempList = [];
+      console.log('currentPicked', currentPicked)
+      currentPicked?.listData.forEach((item, key) => {
+        setTimeout(() => {
+          tempList.push(item);
+          setList([...tempList]);
+        }, 30 * key);
+        setCurrentPicked(undefined);
+        setShowText(false)
+      });
+    }
+  }, [showText]);
+
+  const play = (item:paintDataFromLocal) => {
+    console.log('item', item)
+    console.log('play')
+    // setList([]);
+    setCurrentPicked(item);
+    setShowText(true);
+  }
 
   return (
     <div className="schedule_container">
@@ -251,7 +268,13 @@ export default () => {
                 className="delete_btn"
                 onClick={() => deleteThisPaint(item.id)}
               >
-                刪除
+                delete
+              </div>
+              <div
+                className="play_btn"
+                onClick={() => play(item)}
+              >
+                Play
               </div>
               <div></div>
             </div>

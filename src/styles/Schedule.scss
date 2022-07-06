@@ -59,8 +59,8 @@
       .hour {
         margin: 0;
         .cube {
-          min-width: 10px;
-          height: 10px;
+          min-width: 15px;
+          height: 15px;
           // background-color: #2a8ab6;
           // margin: 2px 2px 4px 2px;
           // transition: 0.1s;
@@ -151,12 +151,13 @@
     margin-top: 20px;
     border: 1px solid #2a8ab6;
     box-sizing: border-box;
-    padding: 10px 10px 0 10px;
+    padding: 5px 10px 0 10px;
     overflow-x: hidden;
     overflow-y: scroll;
     .each_row {
       display: flex;
-      margin: 8px 0;
+      justify-content: space-between;
+      margin: 5px 0 0 0;
       border-bottom: 1px dashed #2a8ab6;
       padding-bottom: 8px;
       box-sizing: border-box;
@@ -166,8 +167,8 @@
       .data_id {
         color: #2a8ab6;
       }
-      .delete_btn {
-        width: 40px;
+      .delete_btn,.play_btn {
+        width: 60px;
         height: 20px;
         color: #2a8ab6;
         font-size: 16px;
