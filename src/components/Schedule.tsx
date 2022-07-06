@@ -268,12 +268,12 @@ export default () => {
       //   });
       htmlToImage
         .toPng(wrapRef.current, { pixelRatio: 0.1, quality: 0.1 })
-        .then(function (dataUrl) {
+        .then(function (dataUrl:string) {
           var img = new Image();
           // img.src = dataUrl;
           resolve(dataUrl);
         })
-        .catch(function (error) {
+        .catch(function (error:any) {
           console.error("oops, something went wrong!", error);
           reject();
         });

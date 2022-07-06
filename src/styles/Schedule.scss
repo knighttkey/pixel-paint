@@ -1,13 +1,14 @@
 .pixel_canva_container {
   width: 100vw;
+  height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  // flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
   padding-top: 50px;
-  @media screen and (max-width: 1920px) {
-    width: calc(var(--main-width) / 1920);
-  }
+  // @media screen and (max-width: 1920px) {
+  //   width: calc(var(--main-width) / 1920);
+  // }
 
   .paint_body {
     display: flex;
@@ -54,8 +55,7 @@
       outline: none;
       width: 30px;
       height: 20px;
-      margin:0 20px 0 0;
-
+      margin: 0 20px 0 0;
     }
     .show_btn,
     .reset_btn {
@@ -81,18 +81,17 @@
         margin-right: 20px;
       }
     }
-
   }
   .list_panel {
-    margin: 0 0 0 20px;
+    margin: 50px 0 0 0;
     border: 1px solid #2a8ab6;
     .list_panel_header {
       color: #2a8ab6;
       font-size: 16px;
       font-weight: 600;
       height: 35px;
-      border-bottom:1px dashed #42c6fc;
-      margin:0 0 0 0;
+      border-bottom: 1px dashed #42c6fc;
+      margin: 0 0 0 0;
       line-height: 33px;
     }
     .list_panel_wrap {
@@ -111,19 +110,19 @@
       &::-webkit-scrollbar-track-piece {
         background: transparent;
       }
-    
+
       &::-webkit-scrollbar-thumb {
         border-radius: 4px;
         background-color: #2a8ab6;
       }
-    
+
       &::-webkit-scrollbar-track {
         box-shadow: transparent;
       }
-  
+
       .list_panel_inner {
-  
         width: 100%;
+
         .each_row {
           // height: 60px;
           display: flex;
@@ -147,7 +146,8 @@
             // border: 1px solid #42c6fc;
             margin: 0 10px 0 10px;
           }
-          .delete_btn,.play_btn {
+          .delete_btn,
+          .play_btn {
             width: 60px;
             height: 20px;
             color: #2a8ab6;
@@ -165,16 +165,14 @@
           .delete_icon {
             width: 20px;
             height: 20px;
-            background-image: url('images/icon_delete.svg');
+            background-image: url("images/icon_delete.svg");
             background-repeat: no-repeat;
             background-size: 80%;
             background-position: center;
-            margin:0 0 0 10px;
+            margin: 0 0 0 10px;
           }
         }
-  
       }
     }
   }
-
 }
