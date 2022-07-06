@@ -1,54 +1,18 @@
-.schedule_container {
+.pixel_canva_container {
   width: 100vw;
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding-top: 100px;
+  align-items: flex-start;
+  // flex-direction: column;
+  padding-top: 50px;
   @media screen and (max-width: 1920px) {
     width: calc(var(--main-width) / 1920);
   }
-  .schedule_header {
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: column;
-    padding-left: 30px;
-    .hours_cube_wrap {
-      display: flex;
-      justify-content: center;
-      .hours_cube {
-        min-width: 20px;
-        height: 20px;
-        color: #2a8ab6;
-        margin: 2px 2px 2px 2px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 14px;
-        font-weight: 500;
-      }
-    }
-  }
-  .schedule_body {
+
+  .paint_body {
     display: flex;
     justify-content: center;
-    .days_cube_wrap {
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      margin: 0 6px 0 0;
-      .days_cube {
-        min-width: 20px;
-        height: 20px;
-        color: #2a8ab6;
-        margin: 2px 2px 2px 2px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 12px;
-        font-weight: bold;
-      }
-    }
+    flex-direction: column;
     .wrap {
       display: flex;
       justify-content: center;
@@ -70,15 +34,24 @@
           }
         }
       }
-      #selectArea {
-        position: absolute;
-        background-color: rgba(0, 0, 0, 0.5);
-        opacity: 1;
-      }
     }
   }
   .btn_area {
     display: flex;
+    align-items: center;
+    margin-top: 15px;
+    .color_picker {
+      opacity: 1;
+      width: 30px;
+      height: 30px;
+      // position: absolute;
+      cursor: pointer;
+      margin-right: 15px;
+      // border: none;
+      border-radius: 5px;
+      background-color: transparent;
+      border-color: #42c6fc;
+    }
     .show_btn,
     .reset_btn {
       width: 80px;
@@ -90,9 +63,10 @@
       border-radius: 5px;
       display: flex;
       justify-content: center;
-      margin-top: 15px;
+      // margin-top: 15px;
       line-height: 28px;
       transition: 0.3s;
+      margin-right: 15px;
       cursor: pointer;
       &:hover {
         background-color: #2a8ab6;
@@ -102,86 +76,77 @@
         margin-right: 20px;
       }
     }
-    .mode_switch_panel {
-      width: 205px;
-      height: 105px;
-      background-color: rgba(22, 62, 82, 0.3);
-      border: 1px solid rgba(52, 86, 118, 0.6);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 1;
-      .panel_title {
-        font-size: 18px;
-        color: #2a8ab6;
-        display: flex;
-        justify-content: center;
-      }
-      .panel_inner {
-        display: flex;
-        justify-content: center;
-        height: 100%;
-        min-width: 100%;
-        .button_text {
-          font-size: 20px;
-          color: #2a8ab6;
-          height: 60px;
-          width: 30px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .mode_switch_button {
-          width: 50px;
-          height: 63px;
-          border-radius: 5px;
-          margin: 3px 8px 0 8px;
-          cursor: pointer;
-          &.enable {
-            border: solid 1px #000;
-          }
-          &.disable {
-            border: solid 1px #42c6fc;
-          }
-        }
-      }
-    }
+
   }
   .list_panel {
-    margin-top: 20px;
+    margin: 0 0 0 20px;
+    max-height: 220px;
     border: 1px solid #2a8ab6;
     box-sizing: border-box;
     padding: 5px 10px 0 10px;
     overflow-x: hidden;
     overflow-y: scroll;
-    .each_row {
-      display: flex;
-      justify-content: space-between;
-      margin: 5px 0 0 0;
-      border-bottom: 1px dashed #2a8ab6;
-      padding-bottom: 8px;
-      box-sizing: border-box;
-      &:last-child {
-        border-bottom: none;
-      }
-      .data_id {
-        color: #2a8ab6;
-      }
-      .delete_btn,.play_btn {
-        width: 60px;
-        height: 20px;
-        color: #2a8ab6;
-        font-size: 16px;
-        font-weight: 500;
-        border: 1px solid #2a8ab6;
-        border-radius: 5px;
+    &::-webkit-scrollbar {
+      width: 5px;
+      // background-color: #152637;
+    }
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+    &::-webkit-scrollbar-track-piece {
+      background: transparent;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: #2a8ab6;
+    }
+  
+    &::-webkit-scrollbar-track {
+      box-shadow: transparent;
+    }
+    .list_panel_inner {
+
+      width: 100%;
+      .each_row {
         display: flex;
-        justify-content: center;
-        line-height: 20px;
-        transition: 0.3s;
-        cursor: pointer;
-        margin-left: 10px;
+        justify-content: space-between;
+        margin: 5px 0 0 0;
+        border-bottom: 1px dashed #2a8ab6;
+        padding-bottom: 8px;
+        box-sizing: border-box;
+        &:last-child {
+          border-bottom: none;
+        }
+        .data_id {
+          color: #2a8ab6;
+        }
+        .delete_btn,.play_btn {
+          width: 60px;
+          height: 20px;
+          color: #2a8ab6;
+          font-size: 16px;
+          font-weight: 500;
+          border: 1px solid #2a8ab6;
+          border-radius: 5px;
+          display: flex;
+          justify-content: center;
+          line-height: 20px;
+          transition: 0.3s;
+          cursor: pointer;
+          margin-left: 10px;
+        }
+        .delete_icon {
+          width: 20px;
+          height: 20px;
+          background-image: url('images/icon_delete.svg');
+          background-repeat: no-repeat;
+          background-size: 80%;
+          background-position: center;
+          margin:0 0 0 10px;
+        }
       }
+
     }
   }
 }
