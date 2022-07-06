@@ -18,17 +18,14 @@
       justify-content: center;
       border: 1px solid #2a8ab6;
       position: relative;
-      padding: 3px;
+      // padding: 3px;
       box-sizing: border-box;
+      width: 100%;
       .hour {
         margin: 0;
         .cube {
           min-width: 15px;
           height: 15px;
-          // background-color: #2a8ab6;
-          // margin: 2px 2px 4px 2px;
-          // transition: 0.1s;
-          //   cursor: pointer;
           &.selected {
             background-color: rgb(0, 255, 136);
           }
@@ -51,6 +48,14 @@
       border-radius: 5px;
       background-color: transparent;
       border-color: #42c6fc;
+    }
+    .speed_input {
+      border: none;
+      outline: none;
+      width: 30px;
+      height: 20px;
+      margin:0 20px 0 0;
+
     }
     .show_btn,
     .reset_btn {
@@ -80,73 +85,96 @@
   }
   .list_panel {
     margin: 0 0 0 20px;
-    max-height: 220px;
     border: 1px solid #2a8ab6;
-    box-sizing: border-box;
-    padding: 5px 10px 0 10px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    &::-webkit-scrollbar {
-      width: 5px;
-      // background-color: #152637;
+    .list_panel_header {
+      color: #2a8ab6;
+      font-size: 16px;
+      font-weight: 600;
+      height: 35px;
+      border-bottom:1px dashed #42c6fc;
+      margin:0 0 0 0;
+      line-height: 33px;
     }
-    &::-webkit-scrollbar-button {
-      display: none;
-    }
-    &::-webkit-scrollbar-track-piece {
-      background: transparent;
-    }
-  
-    &::-webkit-scrollbar-thumb {
-      border-radius: 4px;
-      background-color: #2a8ab6;
-    }
-  
-    &::-webkit-scrollbar-track {
-      box-shadow: transparent;
-    }
-    .list_panel_inner {
-
-      width: 100%;
-      .each_row {
-        display: flex;
-        justify-content: space-between;
-        margin: 5px 0 0 0;
-        border-bottom: 1px dashed #2a8ab6;
-        padding-bottom: 8px;
-        box-sizing: border-box;
-        &:last-child {
-          border-bottom: none;
-        }
-        .data_id {
-          color: #2a8ab6;
-        }
-        .delete_btn,.play_btn {
-          width: 60px;
-          height: 20px;
-          color: #2a8ab6;
-          font-size: 16px;
-          font-weight: 500;
-          border: 1px solid #2a8ab6;
-          border-radius: 5px;
-          display: flex;
-          justify-content: center;
-          line-height: 20px;
-          transition: 0.3s;
-          cursor: pointer;
-          margin-left: 10px;
-        }
-        .delete_icon {
-          width: 20px;
-          height: 20px;
-          background-image: url('images/icon_delete.svg');
-          background-repeat: no-repeat;
-          background-size: 80%;
-          background-position: center;
-          margin:0 0 0 10px;
-        }
+    .list_panel_wrap {
+      max-height: 400px;
+      box-sizing: border-box;
+      padding: 5px 10px 0 10px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      &::-webkit-scrollbar {
+        width: 5px;
+        // background-color: #152637;
       }
-
+      &::-webkit-scrollbar-button {
+        display: none;
+      }
+      &::-webkit-scrollbar-track-piece {
+        background: transparent;
+      }
+    
+      &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: #2a8ab6;
+      }
+    
+      &::-webkit-scrollbar-track {
+        box-shadow: transparent;
+      }
+  
+      .list_panel_inner {
+  
+        width: 100%;
+        .each_row {
+          // height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 5px 0 0 0;
+          border-bottom: 1px dashed #2a8ab6;
+          padding-bottom: 8px;
+          box-sizing: border-box;
+          &:last-child {
+            border-bottom: none;
+          }
+          .data_id {
+            color: #2a8ab6;
+            width: 30px;
+          }
+          .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            // border: 1px solid #42c6fc;
+            margin: 0 10px 0 10px;
+          }
+          .delete_btn,.play_btn {
+            width: 60px;
+            height: 20px;
+            color: #2a8ab6;
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid #2a8ab6;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            line-height: 20px;
+            transition: 0.3s;
+            cursor: pointer;
+            margin: 0 10px;
+          }
+          .delete_icon {
+            width: 20px;
+            height: 20px;
+            background-image: url('images/icon_delete.svg');
+            background-repeat: no-repeat;
+            background-size: 80%;
+            background-position: center;
+            margin:0 0 0 10px;
+          }
+        }
+  
+      }
     }
   }
+
 }

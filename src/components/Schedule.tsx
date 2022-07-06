@@ -7,24 +7,18 @@ import React, {
 } from "react";
 import "./../styles/Schedule.scss";
 import * as R from "ramda";
-
+import * as htmlToImage from "html-to-image";
 type DragPoint = {
   x: number;
   y: number;
 };
-
-interface ClickEventTarget extends EventTarget {
-  id: string;
-}
-interface TouchEventTarget extends EventTarget {
-  id: string;
-}
 interface ColorPickTarget extends EventTarget {
   value: string;
 }
 interface paintDataFromLocal {
   id: string;
   listData: coordinateData[];
+  thumbnail: string;
 }
 
 interface coordinateData {
@@ -37,13 +31,13 @@ export default () => {
   const listPanelRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<coordinateData[]>([]);
   const [showText, setShowText] = useState<boolean>(false);
-  const [selectMode, setSelectMode] = useState<Boolean>(true);
   const [prevDataFromLocal, setPrevDataFromLocal] = useState<
     paintDataFromLocal[]
   >([]);
   const [detectList, setDetectList] = useState<DragPoint[]>([]);
-  const [currentColor, setCurrentColor] = useState<string>("");
+  const [currentColor, setCurrentColor] = useState<string>("#ccff00");
   const [currentPicked, setCurrentPicked] = useState<paintDataFromLocal>();
+  const [speed, setSpeed] = useState<number>(15);
   // console.log("detectList", detectList);
   // console.log("list", list);
   // console.log("prevDataFromLocal", prevDataFromLocal);
@@ -56,7 +50,7 @@ export default () => {
     let prevData = window.localStorage.getItem("pixelData");
     // console.log('prevData', prevData)
     let prevList = prevData ? JSON.parse(prevData) : [];
-    console.log("prevList", prevList);
+    // console.log("prevList", prevList);
     setPrevDataFromLocal(prevList);
   };
 
@@ -67,7 +61,7 @@ export default () => {
     });
     setPrevDataFromLocal(modified);
     window.localStorage.setItem("pixelData", JSON.stringify(modified));
-    console.log("刪除且寫入");
+    // console.log("刪除且寫入");
   };
 
   const allList = new Array(35).fill(0).map((item, key) => {
@@ -76,16 +70,6 @@ export default () => {
     });
   });
 
-  // //點擊選取
-  // const pickCube = (eventTarget: ClickEventTarget) => {
-  //   if (selectMode) {
-  //     tempList.push({coor:eventTarget.id, color:'#ccff00'});
-  //     setList(tempList);
-  //   } else {
-  //     tempList = R.without([eventTarget.id], list);
-  //     setList(tempList);
-  //   }
-  // };
   let tempList = [...list];
 
   const resetList = () => {
@@ -95,10 +79,18 @@ export default () => {
   const handleReturnCubeId = (coorItem: DragPoint) => {
     // console.log("coorItem", coorItem);
     if (!wrapRef.current) return;
-    let cubeList = [...document.querySelectorAll(".cube")];
     let parentRect = wrapRef.current.getBoundingClientRect();
+    if (
+      coorItem.x <= 0 ||
+      coorItem.y <= 0 ||
+      coorItem.x > parentRect.width ||
+      coorItem.y > parentRect.height
+    )
+      return;
+    let cubeList = [...document.querySelectorAll(".cube")];
+    // console.log("parentRect", parentRect);
     try {
-      return cubeList.filter((cubeItem, cubeIndex) => {
+      let targetEle = cubeList.filter((cubeItem, cubeIndex) => {
         let cubeRect: DOMRect = cubeItem.getBoundingClientRect();
         // console.log('cubeRect', cubeRect)
         let cubeLeft = cubeRect.left - parentRect.left;
@@ -111,7 +103,9 @@ export default () => {
           coorItem.y <= cubeBottom &&
           cubeTop <= coorItem.y
         );
-      })[0].id;
+      })[0];
+      if (!targetEle.id) return;
+      return { ele: targetEle, id: targetEle.id, color: currentColor };
     } catch (err) {
       console.log("err", err);
     }
@@ -119,19 +113,29 @@ export default () => {
   useEffect(() => {
     if (detectList.length) {
       let lastChanged = handleReturnCubeId(detectList[detectList.length - 1]);
+      // console.log("lastChanged", lastChanged);
       if (lastChanged) {
-        if (
-          R.includes(
-            lastChanged,
-            tempList.map((item) => {
-              return item.coor;
-            })
-          )
-        ) {
-        } else {
-          tempList.push({ coor: lastChanged, color: "#ccff00" });
-          setList(tempList);
-        }
+        // if (
+        //   R.includes(
+        //     lastChanged.id,
+        //     tempList.map((item) => {
+        //       return item.coor;
+        //     })
+        //   )
+        // ) {
+        //   let index = tempList
+        //     .map((item) => {
+        //       return item.coor;
+        //     })
+        //     .indexOf(lastChanged.id);
+        //   // console.log("index", index);
+        //   if (index >= 0) {
+        //     tempList[index].color = lastChanged.color;
+        //   }
+        // } else {
+          tempList.push({ coor: lastChanged.id, color: lastChanged.color });
+        // }
+        setList(tempList);
       }
     }
   }, [detectList]);
@@ -151,24 +155,19 @@ export default () => {
     setDetectList(temp);
   };
 
-  const renderScheduleCube = () => {
+  useEffect(() => {
+    paintCube();
+  }, [list]);
+
+  const renderCube = () => {
     return allList.map((dayItem, key) => {
       return (
         <div key={key} className="hour">
           {dayItem.map((cubeItem, cubeKey) => {
             return (
               <div
-                className={`cube ${
-                  R.includes(
-                    `cube_${key + 1}-${cubeKey + 1}`,
-                    list.map((item) => {
-                      return item.coor;
-                    })
-                  )
-                    ? "selected"
-                    : ""
-                }`}
-                id={`cube_${key + 1}-${cubeKey + 1}`}
+                className={`cube`}
+                id={`${key + 1}-${cubeKey + 1}`}
                 key={cubeKey}
               ></div>
             );
@@ -178,14 +177,38 @@ export default () => {
     });
   };
 
-  const save = () => {
+  const paintCube = () => {
+    if (list.length) {
+      list.forEach((item, index) => {
+        let cubeEle = document.getElementById(item.coor);
+        if (cubeEle) {
+          cubeEle.style.backgroundColor = item.color;
+        }
+      });
+    } else {
+      let cubeList = [...document.querySelectorAll(".cube")];
+      cubeList.forEach((item, index) => {
+        let cubeEle = document.getElementById(item.id);
+        if (cubeEle) {
+          cubeEle.style.backgroundColor = "transparent";
+        }
+      });
+    }
+  };
+
+  const save = async () => {
+    let thumbnail = await saveThumbnail();
     let prepare = [
       ...prevDataFromLocal,
-      { listData: list, id: new Date().getTime().toString() }
+      {
+        listData: list,
+        id: new Date().getTime().toString(),
+        thumbnail: thumbnail
+      }
     ];
-    console.log("prepare", prepare);
+    // console.log("prepare", prepare);
     window.localStorage.setItem("pixelData", JSON.stringify(prepare));
-    console.log("儲存");
+
     setTimeout(() => {
       getDataAgain();
       temp = [];
@@ -206,12 +229,12 @@ export default () => {
   useEffect(() => {
     if (showText) {
       tempList = [];
-      console.log("currentPicked", currentPicked);
+      // console.log("currentPicked", currentPicked);
       currentPicked?.listData.forEach((item, key) => {
         setTimeout(() => {
-          tempList.push({ coor: item.coor, color: "#ccff00" });
+          tempList.push({ coor: item.coor, color: item.color });
           setList([...tempList]);
-        }, 30 * key);
+        }, speed * key);
         setCurrentPicked(undefined);
         setShowText(false);
       });
@@ -219,14 +242,31 @@ export default () => {
   }, [showText]);
 
   const play = (item: paintDataFromLocal) => {
-    console.log("item", item);
-    console.log("play");
-    // setList([]);
+    setList([]);
     setCurrentPicked(item);
     setShowText(true);
   };
   const changeColor = (eventTarget: ColorPickTarget) => {
     setCurrentColor(eventTarget.value);
+  };
+
+  const saveThumbnail = () => {
+    return new Promise<string>((resolve, reject) => {
+      if (!wrapRef.current) return;
+      htmlToImage
+        .toBlob(wrapRef.current, { pixelRatio: 0.1, quality: 0.1 })
+        .then((blob: any) => {
+          // console.log("blob", blob);
+          let urlCreator = window.URL || window.webkitURL;
+          let imageUrl = urlCreator.createObjectURL(blob);
+          // console.log("imageUrl", imageUrl);
+          resolve(imageUrl);
+        })
+        .catch(function (error) {
+          console.error("oops, something went wrong!", error);
+          reject();
+        });
+    });
   };
 
   return (
@@ -238,7 +278,7 @@ export default () => {
           ref={wrapRef}
           onTouchMove={(e) => handleTouchMove(e)}
         >
-          {renderScheduleCube()}
+          {renderCube()}
         </div>
         <div className="btn_area">
           <input
@@ -249,6 +289,11 @@ export default () => {
             className="color_picker"
             onChange={(e) => changeColor(e.target)}
           />
+          <input
+            type="number"
+            className="speed_input"
+            onChange={(e)=>setSpeed(Number(e.target.value))}
+          ></input>
           <div className="reset_btn" onClick={resetList}>
             Reset
           </div>
@@ -257,27 +302,31 @@ export default () => {
           </div>
         </div>
       </div>
-
-      <div className="list_panel" ref={listPanelRef}>
-        <div className="list_panel_inner" >
-          {prevDataFromLocal.map((item, index) => {
-            return (
-              <div className="each_row" key={index}>
-                {/* <div className="data_id">{item.id}</div> */}
-                <div className="data_id">{index + 1}</div>
-
-                <div className="play_btn" onClick={() => play(item)}>
-                  Play
-                </div>
-                <div
-                  className="delete_icon"
-                  onClick={() => deleteThisPaint(item.id)}
-                ></div>
-              </div>
-            );
-          })}
+      {prevDataFromLocal.length ? (
+        <div className="list_panel">
+          <div className="list_panel_header">筆跡紀錄</div>
+          <div className="list_panel_wrap" ref={listPanelRef}>
+            <div className="list_panel_inner">
+              {prevDataFromLocal.map((item, index) => {
+                return (
+                  <div className="each_row" key={index}>
+                    {/* <div className="data_id">{item.id}</div> */}
+                    <div className="data_id">{index + 1}</div>
+                    <img className="thumbnail" src={item.thumbnail}></img>
+                    <div className="play_btn" onClick={() => play(item)}>
+                      Play
+                    </div>
+                    <div
+                      className="delete_icon"
+                      onClick={() => deleteThisPaint(item.id)}
+                    ></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 };
