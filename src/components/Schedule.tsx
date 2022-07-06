@@ -8,6 +8,7 @@ import React, {
 import "./../styles/Schedule.scss";
 import * as R from "ramda";
 import * as htmlToImage from "html-to-image";
+import deleteIcon from '/images/icon_delete.svg';
 type DragPoint = {
   x: number;
   y: number;
@@ -41,6 +42,23 @@ export default () => {
   // console.log("detectList", detectList);
   // console.log("list", list);
   // console.log("prevDataFromLocal", prevDataFromLocal);
+
+  const reportWindowSize = (event:any) => {
+    let rootContainer:HTMLDivElement | null = document.querySelector(".pixel_canva_container");
+    console.log('rootContainer', rootContainer)
+    if(!rootContainer) return;
+    if (event.type === "load") {
+      rootContainer.style.setProperty("--main-width", window.outerWidth.toString());
+    } else {
+      rootContainer.style.setProperty("--main-width", window.innerWidth.toString());
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("load", reportWindowSize);
+    window.addEventListener("resize", reportWindowSize);
+  }, []);
+
 
   useEffect(() => {
     getDataAgain();
@@ -285,7 +303,7 @@ export default () => {
       <div className="paint_body">
         <div
           className="wrap"
-          draggable={true}
+          // draggable={true}
           ref={wrapRef}
           onTouchMove={(e) => handleTouchMove(e)}
         >
@@ -329,6 +347,7 @@ export default () => {
                     </div>
                     <div
                       className="delete_icon"
+                      style={{backgroundImage:`url(${deleteIcon})`}}
                       onClick={() => deleteThisPaint(item.id)}
                     ></div>
                   </div>

@@ -6,14 +6,16 @@
   align-items: center;
   flex-direction: column;
   padding-top: 50px;
-  // @media screen and (max-width: 1920px) {
-  //   width: calc(var(--main-width) / 1920);
-  // }
+  // transform: scale(calc(var(--main-width) / 100vw));
 
   .paint_body {
     display: flex;
     justify-content: center;
     flex-direction: column;
+    // width: 80%;
+    // aspect-ratio: 16 / 9;
+    // height: auto;
+    // transform: scale(calc(var(--main-width) / 100%));
     .wrap {
       display: flex;
       justify-content: center;
@@ -22,6 +24,8 @@
       // padding: 3px;
       box-sizing: border-box;
       width: 100%;
+
+      // transform: scale(0.8);
       .hour {
         margin: 0;
         .cube {
@@ -37,6 +41,7 @@
   .btn_area {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-top: 15px;
     .color_picker {
       opacity: 1;
@@ -83,7 +88,7 @@
     }
   }
   .list_panel {
-    margin: 50px 0 0 0;
+    margin: 35px 0 0 0;
     border: 1px solid #2a8ab6;
     .list_panel_header {
       color: #2a8ab6;
@@ -165,7 +170,7 @@
           .delete_icon {
             width: 20px;
             height: 20px;
-            background-image: url("images/icon_delete.svg");
+            // background-image: url("images/icon_delete.svg");
             background-repeat: no-repeat;
             background-size: 80%;
             background-position: center;
