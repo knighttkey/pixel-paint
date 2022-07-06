@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import "./../styles/Schedule.scss";
 import * as R from "ramda";
-import moment from "moment";
 
 type DragPoint = {
   x: number;
@@ -32,12 +31,13 @@ export default () => {
   const [list, setList] = useState<string[]>([]);
   const [showText, setShowText] = useState<boolean>(false);
   const [selectMode, setSelectMode] = useState<Boolean>(true);
-  const [touchEnable, setTouchEnable] = useState<Boolean>(true);
   const [prevDataFromLocal, setPrevDataFromLocal] = useState<
     paintDataFromLocal[]
   >([]);
+  const [detectList, setDetectList] = useState<DragPoint[]>([]);
+  // console.log("detectList", detectList);
   // console.log("list", list);
-  console.log("prevDataFromLocal", prevDataFromLocal);
+  // console.log("prevDataFromLocal", prevDataFromLocal);
 
   useEffect(() => {
     getDataAgain();
@@ -83,58 +83,65 @@ export default () => {
     setList([]);
   };
 
+  const handleReturnCubeId = (coorItem: DragPoint) => {
+    // console.log("coorItem", coorItem);
+    if (!wrapRef.current) return;
+    let cubeList = [...document.querySelectorAll(".cube")];
+    let parentRect = wrapRef.current.getBoundingClientRect();
+    try {
+      return cubeList.filter((cubeItem, cubeIndex) => {
+        let cubeRect = cubeItem.getBoundingClientRect();
+        let cubeLeft = cubeRect.left - parentRect.left;
+        let cubeRight = cubeRect.right - parentRect.left;
+        let cubeTop = cubeRect.top - parentRect.top;
+        let cubeBottom = cubeRect.bottom - parentRect.top;
+        return (
+          coorItem.x <= cubeRight &&
+          cubeLeft <= coorItem.x &&
+          coorItem.y <= cubeBottom &&
+          cubeTop <= coorItem.y
+        );
+      })[0].id;
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+  useEffect(() => {
+    if (detectList.length) {
+      let lastChanged = handleReturnCubeId(detectList[detectList.length - 1]);
+      if (lastChanged) {
+        if (R.includes(lastChanged, tempList)) {
+          return;
+        } else {
+          tempList.push(lastChanged);
+          setList(tempList);
+        }
+      }
+    }
+  }, [detectList]);
+
+  let temp = [...detectList];
   const handleTouchMove = (
-    eventTarget: TouchEventTarget,
+    // eventTarget: TouchEventTarget,
     e: React.TouchEvent
   ) => {
     if (!wrapRef.current) return;
 
+    // console.log("eventTarget", eventTarget);
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
+    // console.log('clientXX', clientXX)
     let clientYY = e.touches[0].clientY - parentRect.top;
+    // console.log('clientYY', clientYY)
     let cubeList = [...document.querySelectorAll(".cube")];
+    let coor = { x: clientXX, y: clientYY }
+    
+    if (R.includes(coor, temp)) {
+    } else {
+      temp.push(coor);
+    }
+    setDetectList(temp);
 
-    // let rrr = cubeList.filter((cubeItem) => {
-    //   let cubeRect = cubeItem.getBoundingClientRect();
-    //   let cubeLeft = cubeRect.left - parentRect.left;
-    //   let cubeRight = cubeRect.right - parentRect.left;
-    //   let cubeTop = cubeRect.top - parentRect.top;
-    //   let cubeBottom = cubeRect.bottom - parentRect.top;
-    //   return (
-    //     clientXX <= cubeRight &&
-    //     cubeLeft <= clientXX &&
-    //     clientYY <= cubeBottom &&
-    //     cubeTop <= clientYY
-    //   );
-    // })[0].id;
-    // if(rrr) {
-    //   setTouchEnable(false);
-    // }
-    // tempList.push(rrr);
-    // setList([...R.uniq(tempList)]);
-    // setTouchEnable(true);
-
-    // console.log("rrr", rrr);
-
-    cubeList.forEach((cubeItem, cubeIndex) => {
-      let cubeRect = cubeItem.getBoundingClientRect();
-      let cubeLeft = cubeRect.left - parentRect.left;
-      let cubeRight = cubeRect.right - parentRect.left;
-      let cubeTop = cubeRect.top - parentRect.top;
-      let cubeBottom = cubeRect.bottom - parentRect.top;
-      if (
-        clientXX <= cubeRight &&
-        cubeLeft <= clientXX &&
-        clientYY <= cubeBottom &&
-        cubeTop <= clientYY
-      ) {
-        // console.log("cubeItem.id", cubeItem.id);
-        tempList.push(cubeItem.id);
-        setList(tempList);
-        setTouchEnable(false);
-      }
-    });
-    setTouchEnable(true);
   };
 
   const renderScheduleCube = () => {
@@ -157,17 +164,6 @@ export default () => {
                     id: `cube_${key + 1}-${cubeKey + 1}`
                   })
                 }
-                onTouchMove={(e) => {
-                  touchEnable
-                    ? handleTouchMove(
-                        {
-                          ...e.target,
-                          id: `cube_${key + 1}-${cubeKey + 1}`
-                        },
-                        e
-                      )
-                    : null;
-                }}
               ></div>
             );
           })}
@@ -207,7 +203,14 @@ export default () => {
   return (
     <div className="schedule_container">
       <div className="schedule_body">
-        <div className="wrap" draggable={true} ref={wrapRef}>
+        <div
+          className="wrap"
+          draggable={true}
+          ref={wrapRef}
+          onTouchMove={(e) => 
+            handleTouchMove(e)
+          }
+        >
           {renderScheduleCube()}
         </div>
       </div>
