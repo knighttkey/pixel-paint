@@ -5,10 +5,11 @@ import React, {
   MouseEvent,
   useEffect
 } from "react";
-import "./../styles/Schedule.scss";
+import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
-import * as htmlToImage from "html-to-image";
-import deleteIcon from '/images/icon_delete.svg';
+// import * as htmlToImage from "html-to-image";
+import deleteIcon from "/images/icon_delete.svg";
+import html2canvas from "html2canvas";
 type DragPoint = {
   x: number;
   y: number;
@@ -20,6 +21,7 @@ interface paintDataFromLocal {
   id: string;
   listData: coordinateData[];
   thumbnail: string;
+  canvaColor: string;
 }
 
 interface coordinateData {
@@ -38,27 +40,31 @@ export default () => {
   const [detectList, setDetectList] = useState<DragPoint[]>([]);
   const [currentColor, setCurrentColor] = useState<string>("#ccff00");
   const [currentPicked, setCurrentPicked] = useState<paintDataFromLocal>();
-  const [speed, setSpeed] = useState<number>(15);
-  // console.log("detectList", detectList);
-  // console.log("list", list);
-  // console.log("prevDataFromLocal", prevDataFromLocal);
+  const [speed, setSpeed] = useState<number>(300);
+  const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
 
-  const reportWindowSize = (event:any) => {
-    let rootContainer:HTMLDivElement | null = document.querySelector(".pixel_canva_container");
-    console.log('rootContainer', rootContainer)
-    if(!rootContainer) return;
+  const reportWindowSize = (event: any) => {
+    let rootContainer: HTMLDivElement | null = document.querySelector(
+      ".pixel_canva_container"
+    );
+    if (!rootContainer) return;
     if (event.type === "load") {
-      rootContainer.style.setProperty("--main-width", window.outerWidth.toString());
+      rootContainer.style.setProperty(
+        "--main-width",
+        window.innerWidth.toString()
+      );
     } else {
-      rootContainer.style.setProperty("--main-width", window.innerWidth.toString());
+      rootContainer.style.setProperty(
+        "--main-width",
+        window.innerWidth.toString()
+      );
     }
   };
 
   useEffect(() => {
     window.addEventListener("load", reportWindowSize);
-    window.addEventListener("resize", reportWindowSize);
+    // window.addEventListener("resize", reportWindowSize);
   }, []);
-
 
   useEffect(() => {
     getDataAgain();
@@ -79,7 +85,6 @@ export default () => {
     });
     setPrevDataFromLocal(modified);
     window.localStorage.setItem("pixelData", JSON.stringify(modified));
-    // console.log("刪除且寫入");
   };
 
   const allList = new Array(35).fill(0).map((item, key) => {
@@ -221,10 +226,11 @@ export default () => {
       {
         listData: list,
         id: new Date().getTime().toString(),
-        thumbnail: thumbnail
+        thumbnail: thumbnail,
+        canvaColor: canvaColor
       }
     ];
-    // console.log("prepare", prepare);
+    console.log("prepare", prepare);
     window.localStorage.setItem("pixelData", JSON.stringify(prepare));
 
     setTimeout(() => {
@@ -244,15 +250,35 @@ export default () => {
     }, 250);
   };
 
+  const importList = () => {};
+
+  const readFile = (e: any) => {
+    let files = e.target.files;
+    // console.log(files);
+    let reader = new FileReader();
+    reader.onload = (r: any) => {
+      //  console.log(r.target.result);
+      try {
+        let toParse = JSON.parse(r.target.result);
+        // console.log("toParse", toParse);
+        // console.log("toParse.listData", toParse.listData);
+        setList(toParse.listData);
+        setCanvaColor(toParse.canvaColor);
+      } catch (parseErr) {
+        console.log("parseErr", parseErr);
+      }
+    };
+    reader.readAsText(files[0]);
+  };
+
   useEffect(() => {
     if (showText) {
       tempList = [];
-      // console.log("currentPicked", currentPicked);
       currentPicked?.listData.forEach((item, key) => {
         setTimeout(() => {
           tempList.push({ coor: item.coor, color: item.color });
           setList([...tempList]);
-        }, speed * key);
+        }, (speed / 10) * key);
         setCurrentPicked(undefined);
         setShowText(false);
       });
@@ -264,36 +290,41 @@ export default () => {
     setCurrentPicked(item);
     setShowText(true);
   };
+
+  const exportData = (item: paintDataFromLocal) => {
+    const content = JSON.stringify({
+      listData: item.listData,
+      canvaColor: item.canvaColor
+    });
+    let a = document.createElement("a");
+    let file = new Blob([content], { type: "text/json" });
+    a.href = URL.createObjectURL(file);
+    a.download = `jsonFile_${Math.floor(Number(item.id) / 100000)}.json`;
+    a.click();
+  };
+
   const changeColor = (eventTarget: ColorPickTarget) => {
     setCurrentColor(eventTarget.value);
+  };
+  const changeCanvaColor = (eventTarget: ColorPickTarget) => {
+    setCanvaColor(eventTarget.value);
   };
 
   const saveThumbnail = () => {
     return new Promise<string>((resolve, reject) => {
       if (!wrapRef.current) return;
-      // htmlToImage
-      //   .toBlob(wrapRef.current, { pixelRatio: 0.1, quality: 0.1 })
-      //   .then((blob: any) => {
-      //     // console.log("blob", blob);
-      //     let urlCreator = window.URL || window.webkitURL;
-      //     let imageUrl = urlCreator.createObjectURL(blob);
-      //     // console.log("imageUrl", imageUrl);
-      //     resolve(imageUrl);
-      //   })
-      //   .catch(function (error) {
-      //     console.error("oops, something went wrong!", error);
-      //     reject();
-      //   });
-      htmlToImage
-        .toPng(wrapRef.current, { pixelRatio: 0.1, quality: 0.1 })
-        .then(function (dataUrl:string) {
-          var img = new Image();
-          // img.src = dataUrl;
+
+      html2canvas(wrapRef.current)
+        .then((canvas) => {
+          let dataUrl = canvas
+            .toDataURL("image/jpeg")
+            .replace("image/jpeg", "image/octet-stream");
+
           resolve(dataUrl);
         })
-        .catch(function (error:any) {
-          console.error("oops, something went wrong!", error);
-          reject();
+        .catch((err) => {
+          console.log("err", err);
+          reject(err);
         });
     });
   };
@@ -301,32 +332,57 @@ export default () => {
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
+        <div className="header">Pixel Painter</div>
         <div
           className="wrap"
           // draggable={true}
           ref={wrapRef}
           onTouchMove={(e) => handleTouchMove(e)}
+          style={{ backgroundColor: canvaColor }}
         >
           {renderCube()}
         </div>
         <div className="btn_area">
-          <input
-            type="color"
-            id="head"
-            name="head"
-            value={currentColor}
-            className="color_picker"
-            onChange={(e) => changeColor(e.target)}
-          />
-          <input
-            type="number"
-            className="speed_input"
-            onChange={(e) => setSpeed(Number(e.target.value))}
-          ></input>
+          <div className="color_area">
+            <div className="color_tip">Canva Color</div>
+            <input
+              type="color"
+              value={canvaColor}
+              className="color_picker"
+              onChange={(e) => changeCanvaColor(e.target)}
+            />
+          </div>
+          <div className="color_area">
+            <div className="color_tip">Color</div>
+            <input
+              type="color"
+              value={currentColor}
+              className="color_picker"
+              onChange={(e) => changeColor(e.target)}
+            />
+          </div>
+          <div className="speed_area">
+            <div className="speed_tip">Speed</div>
+            <input
+              type="number"
+              className="speed_input"
+              onChange={(e) => setSpeed(Number(e.target.value))}
+              placeholder="300"
+            ></input>
+          </div>
+          <div className="import_btn" onClick={importList}>
+            <input
+              type="file"
+              name="inputFile"
+              className="file_input"
+              onChange={(e) => readFile(e)}
+            />
+            Import
+          </div>
           <div className="reset_btn" onClick={resetList}>
             Reset
           </div>
-          <div className="show_btn" onClick={save}>
+          <div className="save_btn" onClick={save}>
             Save
           </div>
         </div>
@@ -347,9 +403,16 @@ export default () => {
                     </div>
                     <div
                       className="delete_icon"
-                      style={{backgroundImage:`url(${deleteIcon})`}}
+                      style={{ backgroundImage: `url(${deleteIcon})` }}
                       onClick={() => deleteThisPaint(item.id)}
                     ></div>
+
+                    <div
+                      className="export_btn"
+                      onClick={() => exportData(item)}
+                    >
+                      Export
+                    </div>
                   </div>
                 );
               })}
