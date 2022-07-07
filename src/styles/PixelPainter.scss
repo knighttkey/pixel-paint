@@ -80,87 +80,107 @@
     align-items: center;
     justify-content: center;
     margin-top: 15px;
-    .color_area {
+    flex-direction: column;
+    .btn_first_row,.btn_second_row {
       display: flex;
-      .color_tip {
-        color:var(--main);
-        font-weight: 600;
-        margin: 0 10px 0 0;
-        height: 30px;
-        line-height: 30px;
-      }
-      .color_picker {
-        opacity: 1;
-        width: 30px;
-        height: 30px;
-        // position: absolute;
-        cursor: pointer;
-        margin-right: 15px;
-        // border: none;
-        border-radius: 5px;
-        background-color: transparent;
-        border-color: var(--border);
-      }
-    }
-
-    .speed_area {
-      display: flex;
-      .speed_tip {
-        color:var(--main);
-        font-weight: 600;
-        margin: 0 10px 0 0;
-        height: 30px;
-        line-height: 30px;
-      }
-      .speed_input {
-        border: none;
-        outline: none;
-        width: 60px;
-        height: 30px;
-        margin: 0 20px 0 0;
-        padding: 5px;
-        box-sizing: border-box;
-        font-size: 18px;
-        background-color: transparent;
-        border: 1px solid var(--main);
-        border-radius: 5px;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      margin: 0 0 10px 0;
+      border-bottom: 1px dashed var(--main);
+      box-sizing: border-box;
+      padding: 0 0 10px 0;
+      .tip_text {
         color: var(--main);
-        line-height: 30px;
-        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        margin:0 20px 0 0;
       }
-    }
-
-    .save_btn,
-    .reset_btn,
-    .import_btn {
-      width: 80px;
-      height: 30px;
-      color: var(--main);
-      font-size: 16px;
-      font-weight: 500;
-      border: 1px solid var(--main);
-      border-radius: 5px;
-      display: flex;
-      justify-content: center;
-      // margin-top: 15px;
-      line-height: 28px;
-      transition: 0.3s;
-      margin-left: 15px;
-      // margin-right: 15px;
-      position: relative;
-      cursor: pointer;
-      &:hover {
-        background-color: var(--main);
-        color: #0c1a2a;
+      .color_area {
+        display: flex;
+        margin: 0 20px 0 0;
+        border-right: 1px dashed var(--main);
+        // width: 25%;
+        justify-content: center;
+        .color_tip {
+          color:var(--main);
+          font-weight: 600;
+          margin: 0 10px 0 0;
+          height: 30px;
+          line-height: 30px;
+        }
+        .color_picker {
+          opacity: 1;
+          width: 30px;
+          height: 30px;
+          // position: absolute;
+          cursor: pointer;
+          margin-right: 15px;
+          // border: none;
+          border-radius: 5px;
+          background-color: transparent;
+          border-color: var(--border);
+        }
       }
-      &:first-child {
-        margin-right: 20px;
+  
+      .speed_area {
+        display: flex;
+        width: 25%;
+        .speed_tip {
+          color:var(--main);
+          font-weight: 600;
+          margin: 0 10px 0 0;
+          height: 30px;
+          line-height: 30px;
+        }
+        .speed_input {
+          border: none;
+          outline: none;
+          width: 60px;
+          height: 30px;
+          margin: 0 20px 0 0;
+          padding: 5px;
+          box-sizing: border-box;
+          font-size: 18px;
+          background-color: transparent;
+          border: 1px solid var(--main);
+          border-radius: 5px;
+          color: var(--main);
+          line-height: 30px;
+          text-align: center;
+        }
       }
-      .file_input {
+  
+      .save_btn,
+      .reset_btn,
+      .import_btn {
         width: 80px;
         height: 30px;
-        opacity: 0;
-        position: absolute;
+        color: var(--main);
+        font-size: 16px;
+        font-weight: 500;
+        border: 1px solid var(--main);
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        line-height: 28px;
+        transition: 0.3s;
+        margin:0 10px;
+        position: relative;
+        cursor: pointer;
+        &:hover {
+          background-color: var(--main);
+          color: #0c1a2a;
+        }
+        &.import_btn {
+          margin: 0 10px 0 0;
+        }
+        .file_input {
+          width: 80px;
+          height: 30px;
+          opacity: 0;
+          position: absolute;
+        }
       }
     }
   }

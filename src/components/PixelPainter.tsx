@@ -274,7 +274,9 @@ export default () => {
   useEffect(() => {
     if (showText) {
       tempList = [];
-      currentPicked?.listData.forEach((item, key) => {
+      if(!currentPicked) return;
+      setCanvaColor(currentPicked.canvaColor);
+      currentPicked.listData.forEach((item, key) => {
         setTimeout(() => {
           tempList.push({ coor: item.coor, color: item.color });
           setList([...tempList]);
@@ -343,47 +345,53 @@ export default () => {
           {renderCube()}
         </div>
         <div className="btn_area">
-          <div className="color_area">
-            <div className="color_tip">Canva Color</div>
-            <input
-              type="color"
-              value={canvaColor}
-              className="color_picker"
-              onChange={(e) => changeCanvaColor(e.target)}
-            />
+          <div className="btn_first_row">
+            <div className="tip_text">畫布參數</div>
+            <div className="color_area">
+              <div className="color_tip">Canva Color</div>
+              <input
+                type="color"
+                value={canvaColor}
+                className="color_picker"
+                onChange={(e) => changeCanvaColor(e.target)}
+              />
+            </div>
+            <div className="color_area">
+              <div className="color_tip">Color</div>
+              <input
+                type="color"
+                value={currentColor}
+                className="color_picker"
+                onChange={(e) => changeColor(e.target)}
+              />
+            </div>
+            <div className="speed_area">
+              <div className="speed_tip">Speed</div>
+              <input
+                type="number"
+                className="speed_input"
+                onChange={(e) => setSpeed(Number(e.target.value))}
+                placeholder="300"
+              ></input>
+            </div>
           </div>
-          <div className="color_area">
-            <div className="color_tip">Color</div>
-            <input
-              type="color"
-              value={currentColor}
-              className="color_picker"
-              onChange={(e) => changeColor(e.target)}
-            />
-          </div>
-          <div className="speed_area">
-            <div className="speed_tip">Speed</div>
-            <input
-              type="number"
-              className="speed_input"
-              onChange={(e) => setSpeed(Number(e.target.value))}
-              placeholder="300"
-            ></input>
-          </div>
-          <div className="import_btn" onClick={importList}>
-            <input
-              type="file"
-              name="inputFile"
-              className="file_input"
-              onChange={(e) => readFile(e)}
-            />
-            Import
-          </div>
-          <div className="reset_btn" onClick={resetList}>
-            Reset
-          </div>
-          <div className="save_btn" onClick={save}>
-            Save
+          <div className="btn_second_row">
+          <div className="tip_text">功能操作</div>
+            <div className="import_btn" onClick={importList}>
+              <input
+                type="file"
+                name="inputFile"
+                className="file_input"
+                onChange={(e) => readFile(e)}
+              />
+              Import
+            </div>
+            <div className="reset_btn" onClick={resetList}>
+              Reset
+            </div>
+            <div className="save_btn" onClick={save}>
+              Save
+            </div>
           </div>
         </div>
       </div>
