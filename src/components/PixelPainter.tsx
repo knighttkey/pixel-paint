@@ -32,6 +32,7 @@ interface coordinateData {
 export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const listPanelRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [list, setList] = useState<coordinateData[]>([]);
   const [showText, setShowText] = useState<boolean>(false);
   const [prevDataFromLocal, setPrevDataFromLocal] = useState<
@@ -40,8 +41,9 @@ export default () => {
   const [detectList, setDetectList] = useState<DragPoint[]>([]);
   const [currentColor, setCurrentColor] = useState<string>("#ccff00");
   const [currentPicked, setCurrentPicked] = useState<paintDataFromLocal>();
-  const [speed, setSpeed] = useState<number>(300);
+  const [speed, setSpeed] = useState<number>(10);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
+  const [enable, setEnable] = useState<Boolean>(true);
 
   const reportWindowSize = (event: any) => {
     let rootContainer: HTMLDivElement | null = document.querySelector(
@@ -250,7 +252,9 @@ export default () => {
     }, 250);
   };
 
-  const importList = () => {};
+  const importList = () => {
+    setList([]);
+  };
 
   const readFile = (e: any) => {
     let files = e.target.files;
@@ -270,20 +274,30 @@ export default () => {
     };
     reader.readAsText(files[0]);
   };
+  
+  // console.log('enable', enable)
 
   useEffect(() => {
     if (showText) {
       tempList = [];
       if(!currentPicked) return;
       setCanvaColor(currentPicked.canvaColor);
+      setEnable(false);
       currentPicked.listData.forEach((item, key) => {
         setTimeout(() => {
           tempList.push({ coor: item.coor, color: item.color });
           setList([...tempList]);
-        }, (speed / 10) * key);
+        }, speed * key);
         setCurrentPicked(undefined);
         setShowText(false);
       });
+      let count = currentPicked.listData.length;
+      // console.log('count', count)
+      // console.log('count*speed', count*speed)
+      setTimeout(() => {
+        setEnable(true);
+        
+      }, count*speed);
     }
   }, [showText]);
 
@@ -371,25 +385,29 @@ export default () => {
                 type="number"
                 className="speed_input"
                 onChange={(e) => setSpeed(Number(e.target.value))}
-                placeholder="300"
+                placeholder={speed.toString()}
               ></input>
             </div>
           </div>
           <div className="btn_second_row">
           <div className="tip_text">功能操作</div>
-            <div className="import_btn" onClick={importList}>
+            <div className={`import_btn ${ enable ? '' : 'disable'}`} 
+            onClick={importList}
+            >
               <input
+              ref={fileInputRef}
                 type="file"
+                id="inputFile"
                 name="inputFile"
                 className="file_input"
                 onChange={(e) => readFile(e)}
               />
               Import
             </div>
-            <div className="reset_btn" onClick={resetList}>
+            <div className={`reset_btn ${ enable ? '' : 'disable'}`} onClick={resetList}>
               Reset
             </div>
-            <div className="save_btn" onClick={save}>
+            <div className={`save_btn ${ enable ? '' : 'disable'}`} onClick={save}>
               Save
             </div>
           </div>
@@ -406,17 +424,17 @@ export default () => {
                     {/* <div className="data_id">{item.id}</div> */}
                     <div className="data_id">{index + 1}</div>
                     <img className="thumbnail" src={item.thumbnail}></img>
-                    <div className="play_btn" onClick={() => play(item)}>
+                    <div className={`play_btn ${ enable ? '' : 'disable'}`} onClick={() => play(item)}>
                       Play
                     </div>
                     <div
-                      className="delete_icon"
+                      className={`delete_icon  ${ enable ? '' : 'disable'}`}
                       style={{ backgroundImage: `url(${deleteIcon})` }}
                       onClick={() => deleteThisPaint(item.id)}
                     ></div>
 
                     <div
-                      className="export_btn"
+                      className={`export_btn  ${ enable ? '' : 'disable'}`}
                       onClick={() => exportData(item)}
                     >
                       Export
