@@ -31,6 +31,12 @@ interface coordinateData {
   color: string;
 }
 
+interface WholeData {
+  ele: HTMLDivElement;
+  id: string;
+  color: string;
+}
+
 export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const listPanelRef = useRef<HTMLDivElement>(null);
@@ -46,6 +52,11 @@ export default () => {
   const [speed, setSpeed] = useState<number>(10);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
+  const [penWidth, setPenWidth] = useState<number>(2);
+  const [showMenu, setShowMenu] = useState<Boolean>(false);
+
+  // console.log('navigator.userAgent', navigator.userAgent)
+  const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
 
   const reportWindowSize = (event: any) => {
     let rootContainer: HTMLDivElement | null = document.querySelector(
@@ -63,6 +74,13 @@ export default () => {
         window.innerWidth.toString()
       );
     }
+    // let appEle:any = document.querySelector('.App');
+    // if(!appEle) return;
+    // if(isMobile) {
+    //   appEle.style.height = 'unset';
+    // } else {
+    //   appEle.style.height = 'unset';
+    // }
   };
 
   useEffect(() => {
@@ -91,8 +109,8 @@ export default () => {
     window.localStorage.setItem("pixelData", JSON.stringify(modified));
   };
 
-  const allList = new Array(35).fill(0).map((item, key) => {
-    return new Array(35).fill(0).map((key) => {
+  const allList = new Array(70).fill(0).map((item, key) => {
+    return new Array(70).fill(0).map((key) => {
       return key + 1;
     });
   });
@@ -101,6 +119,28 @@ export default () => {
 
   const resetList = () => {
     setList([]);
+  };
+
+  const resizeStroke = (cubeId: string, scale: number) => {
+    let itemX = Number(cubeId.split("-")[0]);
+    let itemY = Number(cubeId.split("-")[1]);
+
+    let scaledPenWidth = scale;
+
+    const newList = new Array(scaledPenWidth).fill(0).map((item, key) => {
+      return new Array(scaledPenWidth).fill(0).map((innerItem, innerKey) => {
+        return { accordingX: innerKey, accordingY: key };
+      });
+    });
+
+    let scaledCubeList = R.flatten(newList).map((item, index) => {
+      let prepareCubeId = `${itemX + item.accordingX}-${
+        itemY + item.accordingY
+      }`;
+      let prepareEle = document.getElementById(prepareCubeId);
+      return { ele: prepareEle, id: prepareCubeId, color: currentColor };
+    });
+    return scaledCubeList;
   };
 
   const handleReturnCubeId = (coorItem: DragPoint) => {
@@ -132,13 +172,19 @@ export default () => {
         );
       })[0];
       if (!targetEle.id) return;
-      return { ele: targetEle, id: targetEle.id, color: currentColor };
+      // console.log("targetEle.id", targetEle.id);
+
+      //--------------------------------------------------------------------------------
+
+      // return { ele: targetEle, id: targetEle.id, color: currentColor };
+      return resizeStroke(targetEle.id, penWidth);
     } catch (err) {
       console.log("err", err);
     }
   };
   useEffect(() => {
     if (detectList.length) {
+      // console.log("detectList", detectList);
       let lastChanged = handleReturnCubeId(detectList[detectList.length - 1]);
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
@@ -160,12 +206,21 @@ export default () => {
         //     tempList[index].color = lastChanged.color;
         //   }
         // } else {
-        tempList.push({ coor: lastChanged.id, color: lastChanged.color });
+        // let fla = R.flatten(lastChanged);
+        // console.log('fla', fla)
+
+        lastChanged.forEach((item: any, key) => {
+          // console.log("___________item", item);
+          tempList.push({ coor: item.id, color: item.color });
+        });
+        // tempList.push({ coor: lastChanged.id, color: lastChanged.color });
         // }
         setList(tempList);
       }
     }
   }, [detectList]);
+
+  // console.log('list', list)
 
   let temp = [...detectList];
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -173,7 +228,9 @@ export default () => {
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
     let clientYY = e.touches[0].clientY - parentRect.top;
-    let coor = { x: clientXX, y: clientYY };
+    // let coor = { x: 8*Math.floor(clientXX/8), y: 8*Math.floor(clientYY/8) };
+    let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
+    // console.log("coor", coor);
 
     if (R.includes(coor, temp)) {
     } else {
@@ -295,7 +352,7 @@ export default () => {
       });
       let count = currentPicked.listData.length;
       // console.log('count', count)
-      // console.log('count*speed', count*speed)
+      console.log("count*speed", count * speed);
       setTimeout(() => {
         setEnable(true);
       }, count * speed);
@@ -334,9 +391,8 @@ export default () => {
 
       html2canvas(wrapRef.current)
         .then((canvas) => {
-          let dataUrl = canvas
-            .toDataURL("image/jpeg")
-            .replace("image/jpeg", "image/octet-stream");
+          let dataUrl = canvas.toDataURL("image/jpeg");
+          // .replace("image/jpeg", "image/octet-stream");
 
           resolve(dataUrl);
         })
@@ -347,14 +403,60 @@ export default () => {
     });
   };
 
-  // console.log('navigator.userAgent', navigator.userAgent)
-  // const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
-
-
   const demoPlay = () => {
     let prevSpeed = speed;
-    // console.log('wantItAll', wantItAll)
-    let tempObj = {...wantItAll, id:'', thumbnail:''}
+    // console.log("wantItAll", wantItAll);
+    // console.log("wantItAll.listData", wantItAll.listData);
+    let coordinateList = wantItAll.listData;
+    let scale = penWidth;
+    // let modified = coordinateList.map((item, index) => {
+    // let innerList = resizeStroke(item.coor, scale, 'pureCoordinate', item.color);
+    // console.log('innerList', innerList)
+    // return innerList.map((innerItem, innerIndex)=>{
+    //   return (
+    //     innerItem.id
+    //   )
+    // })
+    //   let itemX = Number(item.coor.split('-')[0]);
+    //   let itemY = Number(item.coor.split('-')[1]);
+    //
+    //   let newCoor = `${itemX*scale}-${itemY*scale}`;
+    //   let origin = `${itemX*scale-1}-${itemY*scale-1}`;
+    //   let bottom = `${itemX*scale-1}-${itemY*scale}`;
+    //   let right = `${itemX*scale}-${itemY*scale-1}`;
+    //   return [{coor:newCoor, color:item.color},{coor:origin, color:item.color}, {coor:bottom, color:item.color}, {coor:right, color:item.color}]
+
+    //   let itemX = Number(item.coor.split("-")[0]);
+    //   let itemY = Number(item.coor.split("-")[1]);
+
+    //   let scale = 2;
+
+    //   const newList = new Array(scale).fill(0).map((item, key) => {
+    //     return new Array(scale).fill(0).map((innerItem, innerKey) => {
+    //       return { accordingX: innerKey, accordingY: key };
+    //     });
+    //   });
+    //   console.log("newList", newList);
+
+    //   let scaledCubeList = R.flatten(newList).map((accordingItem, index) => {
+    //     let prepareCubeId = `${itemX + accordingItem.accordingX}-${
+    //       itemY + accordingItem.accordingY
+    //     }`;
+    //     console.log("prepareCubeId", prepareCubeId);
+
+    //     return { coor: prepareCubeId, color: item.color };
+    //   });
+    //   // console.log('scaledCubeList', scaledCubeList)
+
+    //   return scaledCubeList;
+    // });
+    // console.log("modified________", modified);
+    // let flattenLsit = R.flatten(modified);
+    // console.log("flattenLsit", flattenLsit);
+
+    // wantItAll.listData = R.flatten(flattenLsit);
+
+    let tempObj = { ...wantItAll, id: "", thumbnail: "" };
     setList([]);
     setCurrentPicked(tempObj);
     setShowText(true);
@@ -363,8 +465,9 @@ export default () => {
       // console.log('prevSpeed', prevSpeed)
       setSpeed(prevSpeed);
     }, 7303);
-  }
+  };
 
+  const srokeWidthList = [1, 2, 3, 4, 5, 6];
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
@@ -407,6 +510,34 @@ export default () => {
                 onChange={(e) => setSpeed(Number(e.target.value))}
                 placeholder={speed.toString()}
               ></input>
+            </div>
+            <div className="stroke_area">
+              <div className="stroke_tip">Stroke</div>
+              {/* //setPenWidth */}
+              <div className="dropdown_container">
+                <div
+                  className="default_area"
+                  onClick={() => setShowMenu(!showMenu)}
+                >
+                  {/* <div className="icon_area">
+                    <div className={`arrow_down ${showMenu ? 'unfold':''}`}></div>
+                  </div> */}
+                  {penWidth}
+                </div>
+                <div className={`unfold_area ${showMenu ? "unfold" : ""}`}>
+                  {srokeWidthList.map((item, index) => {
+                    return (
+                      <div
+                        className="each_row"
+                        key={index}
+                        onClick={() => setPenWidth(item)}
+                      >
+                        {item}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
           <div className="btn_second_row">

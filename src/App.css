@@ -1,7 +1,7 @@
 .App {
   text-align: center;
   width: 100vw;
-  height: 100vh;
+  /* height: 100vh; */
   background-color: #0c1a2a;
   touch-action: none;
 }
