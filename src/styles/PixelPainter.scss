@@ -15,11 +15,14 @@
   transform:scale(1);
   transition: .1s;
   transform-origin: top;
-  @media screen and (max-width:800px) {
+  @media screen and(min-width:600px) and (max-width:800px) {
     transform:scale(0.8);
   }
   @media screen and (min-width:300px) and (max-width:600px) {
-    transform:scale(0.6);
+    transform:scale(0.5);
+  }
+  @media screen and (max-width:300px) {
+    transform:scale(0.35);
   }
   ::-webkit-scrollbar {
     width: 5px;
@@ -150,10 +153,7 @@
           text-align: center;
         }
       }
-  
-      .save_btn,
-      .reset_btn,
-      .import_btn {
+      .btn {
         width: 80px;
         height: 30px;
         color: var(--main);
@@ -173,7 +173,10 @@
           color: #0c1a2a;
         }
         &.import_btn {
-          margin: 0 10px 0 0;
+          // margin: 0 10px 0 0;
+        }
+        &.demo_btn {
+          margin:0 10px 0 0;
         }
         &.disable {
           pointer-events: none;

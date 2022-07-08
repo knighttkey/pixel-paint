@@ -10,6 +10,8 @@ import * as R from "ramda";
 // import * as htmlToImage from "html-to-image";
 import deleteIcon from "/images/icon_delete.svg";
 import html2canvas from "html2canvas";
+import wantItAll from "./../../jsonFile_wantItAll.json";
+
 type DragPoint = {
   x: number;
   y: number;
@@ -65,7 +67,7 @@ export default () => {
 
   useEffect(() => {
     window.addEventListener("load", reportWindowSize);
-    // window.addEventListener("resize", reportWindowSize);
+    window.addEventListener("resize", reportWindowSize);
   }, []);
 
   useEffect(() => {
@@ -274,13 +276,13 @@ export default () => {
     };
     reader.readAsText(files[0]);
   };
-  
+
   // console.log('enable', enable)
 
   useEffect(() => {
     if (showText) {
       tempList = [];
-      if(!currentPicked) return;
+      if (!currentPicked) return;
       setCanvaColor(currentPicked.canvaColor);
       setEnable(false);
       currentPicked.listData.forEach((item, key) => {
@@ -296,8 +298,8 @@ export default () => {
       // console.log('count*speed', count*speed)
       setTimeout(() => {
         setEnable(true);
-        
-      }, count*speed);
+      }, count * speed);
+      // console.log('count * speed', count * speed)
     }
   }, [showText]);
 
@@ -345,6 +347,24 @@ export default () => {
     });
   };
 
+  // console.log('navigator.userAgent', navigator.userAgent)
+  // const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
+
+
+  const demoPlay = () => {
+    let prevSpeed = speed;
+    // console.log('wantItAll', wantItAll)
+    let tempObj = {...wantItAll, id:'', thumbnail:''}
+    setList([]);
+    setCurrentPicked(tempObj);
+    setShowText(true);
+    setSpeed(1);
+    setTimeout(() => {
+      // console.log('prevSpeed', prevSpeed)
+      setSpeed(prevSpeed);
+    }, 7303);
+  }
+
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
@@ -390,12 +410,19 @@ export default () => {
             </div>
           </div>
           <div className="btn_second_row">
-          <div className="tip_text">功能操作</div>
-            <div className={`import_btn ${ enable ? '' : 'disable'}`} 
-            onClick={importList}
+            <div className="tip_text">功能操作</div>
+            <div
+              className={`btn demo_btn ${enable ? "" : "disable"}`}
+              onClick={demoPlay}
+            >
+              Demo
+            </div>
+            <div
+              className={`btn import_btn ${enable ? "" : "disable"}`}
+              onClick={importList}
             >
               <input
-              ref={fileInputRef}
+                ref={fileInputRef}
                 type="file"
                 id="inputFile"
                 name="inputFile"
@@ -404,10 +431,16 @@ export default () => {
               />
               Import
             </div>
-            <div className={`reset_btn ${ enable ? '' : 'disable'}`} onClick={resetList}>
+            <div
+              className={`btn reset_btn ${enable ? "" : "disable"}`}
+              onClick={resetList}
+            >
               Reset
             </div>
-            <div className={`save_btn ${ enable ? '' : 'disable'}`} onClick={save}>
+            <div
+              className={`btn save_btn ${enable ? "" : "disable"}`}
+              onClick={save}
+            >
               Save
             </div>
           </div>
@@ -424,21 +457,24 @@ export default () => {
                     {/* <div className="data_id">{item.id}</div> */}
                     <div className="data_id">{index + 1}</div>
                     <img className="thumbnail" src={item.thumbnail}></img>
-                    <div className={`play_btn ${ enable ? '' : 'disable'}`} onClick={() => play(item)}>
+                    <div
+                      className={`play_btn ${enable ? "" : "disable"}`}
+                      onClick={() => play(item)}
+                    >
                       Play
                     </div>
-                    <div
-                      className={`delete_icon  ${ enable ? '' : 'disable'}`}
-                      style={{ backgroundImage: `url(${deleteIcon})` }}
-                      onClick={() => deleteThisPaint(item.id)}
-                    ></div>
 
                     <div
-                      className={`export_btn  ${ enable ? '' : 'disable'}`}
+                      className={`export_btn  ${enable ? "" : "disable"}`}
                       onClick={() => exportData(item)}
                     >
                       Export
                     </div>
+                    <div
+                      className={`delete_icon  ${enable ? "" : "disable"}`}
+                      style={{ backgroundImage: `url(${deleteIcon})` }}
+                      onClick={() => deleteThisPaint(item.id)}
+                    ></div>
                   </div>
                 );
               })}
