@@ -118,7 +118,7 @@ export default () => {
   };
 
   const allList = new Array(70).fill(0).map((item, key) => {
-    return new Array(70).fill(0).map((key) => {
+    return new Array(35).fill(0).map((key) => {
       return key + 1;
     });
   });
@@ -457,6 +457,45 @@ export default () => {
 
   const demoPlay = () => {
     let prevSpeed = speed;
+    // console.log("wantItAll", wantItAll);
+    // console.log("wantItAll.listData", wantItAll.listData);
+    // let coordinateList = wantItAll.listData;
+
+    // let scale = penWidth;
+    // console.log('coordinateList', coordinateList)
+    // let modified = coordinateList.map((item, index) => {
+  
+    //   let itemX = Number(item.coor.split("-")[0]);
+    //   let itemY = Number(item.coor.split("-")[1]);
+
+    //   let scale = 2;
+
+    //   const newList = new Array(scale).fill(0).map((item, key) => {
+    //     return new Array(scale).fill(0).map((innerItem, innerKey) => {
+    //       return { accordingX: innerKey, accordingY: key };
+    //     });
+    //   });
+    //   // console.log("newList", newList);
+
+    //   let scaledCubeList = R.flatten(newList).map((accordingItem, index) => {
+    //     let prepareCubeId = `${itemX + accordingItem.accordingX}-${
+    //       itemY + accordingItem.accordingY
+    //     }`;
+    //     // console.log("prepareCubeId", prepareCubeId);
+
+    //     return { coor: prepareCubeId, color: item.color };
+    //   });
+    //   // console.log('scaledCubeList', scaledCubeList)
+
+    //   return scaledCubeList;
+    // });
+    // console.log("modified________", modified);
+    // let flattenLsit = R.flatten(modified[0]);
+    // console.log("flattenLsit", flattenLsit);
+
+    // wantItAll.listData = flattenLsit;
+
+
 
     let tempObj = { ...wantItAll, id: "", thumbnail: "" };
     setList([]);
@@ -467,7 +506,7 @@ export default () => {
       // console.log('prevSpeed', prevSpeed)
       setSpeed(prevSpeed);
     }, 7303);
-  };
+    }
 
   const changePenWidth = (item: number) => {
     setPenWidth(item);
