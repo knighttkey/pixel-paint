@@ -1,10 +1,3 @@
-import React, {
-  DragEvent,
-  useRef,
-  useState,
-  MouseEvent,
-  useEffect
-} from "react";
 import "./../styles/Dropdown.scss";
 
 type Props = {

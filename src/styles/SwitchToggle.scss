@@ -1,0 +1,46 @@
+.switch_toggle_container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    .toggle_wrap {
+        width: 36px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content:flex-end;
+        border-radius: 20px;
+        background-color: #bbbbbb;
+        border: #0088ff;
+        cursor: pointer;
+        transition: .3s;
+        user-select: none;
+        &.on {
+            background-color: #2a8ab6;
+            border:#d2d2d2;
+        }
+        .toggle_button {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: #fff;
+            transition: 0.3s;
+            transform: translateX(-4px);
+            pointer-events: none;
+            &.on {
+                transform:translateX(-18px);
+            }
+        }
+    }
+    .status_text {
+        width: 30px;
+        display: flex;
+        justify-content: center;
+        transition: 0.3s;
+        color: #2f99dd;
+        font-size: 14px;
+        margin-left: 10px;
+        &.on {
+            color:#163e52;
+        }
+    }
+}

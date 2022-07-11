@@ -12,6 +12,7 @@ import deleteIcon from "/images/icon_delete.svg";
 import html2canvas from "html2canvas";
 import wantItAll from "./../../jsonFile_wantItAll.json";
 import Dropdown from "./Dropdown";
+import SwitchToggle from "./SwitchToggle";
 
 type DragPoint = {
   x: number;
@@ -43,19 +44,24 @@ export default () => {
   const listPanelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [list, setList] = useState<coordinateData[]>([]);
+  // console.log('list', list)
+
   const [showText, setShowText] = useState<boolean>(false);
   const [prevDataFromLocal, setPrevDataFromLocal] = useState<
     paintDataFromLocal[]
   >([]);
   const [detectList, setDetectList] = useState<DragPoint[]>([]);
+  // console.log('detectList', detectList)
   const [currentColor, setCurrentColor] = useState<string>("#ccff00");
   const [currentPicked, setCurrentPicked] = useState<paintDataFromLocal>();
-  const [speed, setSpeed] = useState<number>(10);
+  const [speed, setSpeed] = useState<number>(5);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
-  const [penWidth, setPenWidth] = useState<number>(2);
+  const [penWidth, setPenWidth] = useState<number>(4);
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
+  const [eraseMode, setEraseMode] = useState(false);
+  // console.log('eraseMode', eraseMode)
 
   // console.log('navigator.userAgent', navigator.userAgent)
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
@@ -140,6 +146,7 @@ export default () => {
         itemY + item.accordingY
       }`;
       let prepareEle = document.getElementById(prepareCubeId);
+      if(!prepareEle) return;
       return { ele: prepareEle, id: prepareCubeId, color: currentColor };
     });
     return scaledCubeList;
@@ -174,9 +181,6 @@ export default () => {
         );
       })[0];
       if (!targetEle.id) return;
-      // console.log("targetEle.id", targetEle.id);
-
-      //--------------------------------------------------------------------------------
 
       // return { ele: targetEle, id: targetEle.id, color: currentColor };
       return resizeStroke(targetEle.id, penWidth);
@@ -184,6 +188,42 @@ export default () => {
       console.log("err", err);
     }
   };
+
+  const eraseCube = (e: React.TouchEvent) => {
+
+    if (!wrapRef.current) return;
+    let parentRect = wrapRef.current.getBoundingClientRect();
+    let clientXX = e.touches[0].clientX - parentRect.left;
+    let clientYY = e.touches[0].clientY - parentRect.top;
+    let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
+    // console.log('coor', coor)
+
+    let currentChanged = handleReturnCubeId(coor);
+    if(!currentChanged) return;
+    let lightCurrentChanged = currentChanged.map((item:any, index)=>{
+      return {coor:item.id};
+    })
+    // console.log('lightCurrentChanged', lightCurrentChanged)
+    if(!lightCurrentChanged) return;
+    let withoutColor = list.map((i)=>{
+      return {coor:i.coor};
+    })
+    // console.log('withoutColor', withoutColor)
+    let compareResult = lightCurrentChanged.filter(x => R.includes(x, withoutColor));
+    // console.log('compareResult', compareResult)
+    compareResult.forEach((item)=>{
+      let ele = document.getElementById(item.coor);
+      if(!ele) return;
+        let targetIndex = tempList.map((i)=>{return i.coor}).indexOf(item.coor);
+        if (targetIndex >= 0) {
+          tempList.splice(targetIndex, 1);
+        }
+
+      setList(tempList);
+        
+    })
+  }
+
   useEffect(() => {
     if (detectList.length) {
       // console.log("detectList", detectList);
@@ -212,17 +252,15 @@ export default () => {
         // console.log('fla', fla)
 
         lastChanged.forEach((item: any, key) => {
-          // console.log("___________item", item);
           tempList.push({ coor: item.id, color: item.color });
         });
-        // tempList.push({ coor: lastChanged.id, color: lastChanged.color });
-        // }
-        setList(tempList);
+        setList(R.uniq(tempList));
+        setDetectList([]);
       }
     }
   }, [detectList]);
 
-  // console.log('list', list)
+
 
   let temp = [...detectList];
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -234,10 +272,10 @@ export default () => {
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
     // console.log("coor", coor);
 
-    if (R.includes(coor, temp)) {
-    } else {
-      temp.push(coor);
-    }
+      if (R.includes(coor, temp)) {
+      } else {
+        temp.push(coor);
+      }
     setDetectList(temp);
   };
 
@@ -265,19 +303,31 @@ export default () => {
 
   const paintCube = () => {
     if (list.length) {
-      list.forEach((item, index) => {
+      if(eraseMode) {
+        let cubeList = [...document.querySelectorAll(".cube")];
+        let withoutColor = list.map((i)=>{
+          return i.coor;
+        })
+        let modifiedCubeList = cubeList.filter((i)=>{
+          return !R.includes(i.id, withoutColor);
+        })
+        modifiedCubeList.forEach((item) => {
+          let cubeEle = document.getElementById(item.id);
+          if (!cubeEle) return;
+            cubeEle.style.backgroundColor = "transparent";
+        });
+      }
+      list.forEach((item) => {
         let cubeEle = document.getElementById(item.coor);
-        if (cubeEle) {
+        if (!cubeEle) return;
           cubeEle.style.backgroundColor = item.color;
-        }
       });
     } else {
       let cubeList = [...document.querySelectorAll(".cube")];
-      cubeList.forEach((item, index) => {
+      cubeList.forEach((item) => {
         let cubeEle = document.getElementById(item.id);
-        if (cubeEle) {
+        if (!cubeEle) return;
           cubeEle.style.backgroundColor = "transparent";
-        }
       });
     }
   };
@@ -354,7 +404,7 @@ export default () => {
       });
       let count = currentPicked.listData.length;
       // console.log('count', count)
-      console.log("count*speed", count * speed);
+      // console.log("count*speed", count * speed);
       setTimeout(() => {
         setEnable(true);
       }, count * speed);
@@ -440,7 +490,7 @@ export default () => {
             className="wrap"
             // draggable={true}
             ref={wrapRef}
-            onTouchMove={(e) => handleTouchMove(e)}
+            onTouchMove={(e) => eraseMode ? eraseCube(e) : handleTouchMove(e)}
             style={{ backgroundColor: canvaColor }}
           >
             {renderCube()}
@@ -487,6 +537,11 @@ export default () => {
                 menuList={srokeWidthList}
                 action={changePenWidth}
               ></Dropdown>
+            </div>
+            <div className="erase_area">
+            <div className="erase_tip">Erase</div>
+              <SwitchToggle toggleOn={eraseMode} switchAction={()=>{}} setToggleOn={setEraseMode}></SwitchToggle>
+              {/* <button onClick={()=>setEraseMode(!eraseMode)}>Erase {eraseMode ? '開啟':'關閉'}</button> */}
             </div>
           </div>
           <div className="btn_second_row">
