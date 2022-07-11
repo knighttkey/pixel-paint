@@ -467,25 +467,33 @@ export default () => {
     }, 7303);
   };
 
+  const changePenWidth = (item: number) => {
+    setPenWidth(item);
+    setShowMenu(false);
+  };
+
   const srokeWidthList = [1, 2, 3, 4, 5, 6];
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
         <div className="header">Pixel Painter</div>
-        <div
-          className="wrap"
-          // draggable={true}
-          ref={wrapRef}
-          onTouchMove={(e) => handleTouchMove(e)}
-          style={{ backgroundColor: canvaColor }}
-        >
-          {renderCube()}
+        <div className="wrap_outer">
+          <div
+            className="wrap"
+            // draggable={true}
+            ref={wrapRef}
+            onTouchMove={(e) => handleTouchMove(e)}
+            style={{ backgroundColor: canvaColor }}
+          >
+            {renderCube()}
+          </div>
+
         </div>
         <div className="btn_area">
           <div className="btn_first_row">
             <div className="tip_text">畫布參數</div>
             <div className="color_area">
-              <div className="color_tip">Canva Color</div>
+              <div className="color_tip">Canva</div>
               <input
                 type="color"
                 value={canvaColor}
@@ -515,27 +523,32 @@ export default () => {
               <div className="stroke_tip">Stroke</div>
               {/* //setPenWidth */}
               <div className="dropdown_container">
-                <div
-                  className="default_area"
-                  onClick={() => setShowMenu(!showMenu)}
-                >
-                  {/* <div className="icon_area">
+                <div className={`dropdown_bg ${showMenu ? 'show_bg':'hide_bg'}`} onClick={() => setShowMenu(!showMenu)}></div>
+                <div className="dropdown_body">
+                  <div
+                    className="default_area"
+                    onClick={() => setShowMenu(!showMenu)}
+                  >
+                    {/* <div className="icon_area">
                     <div className={`arrow_down ${showMenu ? 'unfold':''}`}></div>
                   </div> */}
-                  {penWidth}
-                </div>
-                <div className={`unfold_area ${showMenu ? "unfold" : ""}`}>
-                  {srokeWidthList.map((item, index) => {
-                    return (
-                      <div
-                        className="each_row"
-                        key={index}
-                        onClick={() => setPenWidth(item)}
-                      >
-                        {item}
-                      </div>
-                    );
-                  })}
+                    {penWidth}
+                  </div>
+                  <div
+                    className={`unfold_area ${showMenu ? "unfold" : ""}`}
+                  >
+                    {srokeWidthList.map((item, index) => {
+                      return (
+                        <div
+                          className="each_row"
+                          key={index}
+                          onClick={() => changePenWidth(item)}
+                        >
+                          {item}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
