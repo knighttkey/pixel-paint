@@ -7,7 +7,7 @@
   // width: 100vw;
   height: 100vh;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: column;
   padding: 50px 0;
@@ -72,8 +72,8 @@
         .hour {
           margin: 0;
           .cube {
-            min-width: 9px;
-            height: 9px;
+            min-width: 10px;
+            height: 10px;
             &.selected {
               background-color: rgb(0, 255, 136);
             }
