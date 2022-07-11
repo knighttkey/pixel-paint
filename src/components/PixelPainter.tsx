@@ -11,6 +11,7 @@ import * as R from "ramda";
 import deleteIcon from "/images/icon_delete.svg";
 import html2canvas from "html2canvas";
 import wantItAll from "./../../jsonFile_wantItAll.json";
+import Dropdown from "./Dropdown";
 
 type DragPoint = {
   x: number;
@@ -53,7 +54,8 @@ export default () => {
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
   const [penWidth, setPenWidth] = useState<number>(2);
-  const [showMenu, setShowMenu] = useState<Boolean>(false);
+  const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
+  const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
 
   // console.log('navigator.userAgent', navigator.userAgent)
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
@@ -405,56 +407,6 @@ export default () => {
 
   const demoPlay = () => {
     let prevSpeed = speed;
-    // console.log("wantItAll", wantItAll);
-    // console.log("wantItAll.listData", wantItAll.listData);
-    let coordinateList = wantItAll.listData;
-    let scale = penWidth;
-    // let modified = coordinateList.map((item, index) => {
-    // let innerList = resizeStroke(item.coor, scale, 'pureCoordinate', item.color);
-    // console.log('innerList', innerList)
-    // return innerList.map((innerItem, innerIndex)=>{
-    //   return (
-    //     innerItem.id
-    //   )
-    // })
-    //   let itemX = Number(item.coor.split('-')[0]);
-    //   let itemY = Number(item.coor.split('-')[1]);
-    //
-    //   let newCoor = `${itemX*scale}-${itemY*scale}`;
-    //   let origin = `${itemX*scale-1}-${itemY*scale-1}`;
-    //   let bottom = `${itemX*scale-1}-${itemY*scale}`;
-    //   let right = `${itemX*scale}-${itemY*scale-1}`;
-    //   return [{coor:newCoor, color:item.color},{coor:origin, color:item.color}, {coor:bottom, color:item.color}, {coor:right, color:item.color}]
-
-    //   let itemX = Number(item.coor.split("-")[0]);
-    //   let itemY = Number(item.coor.split("-")[1]);
-
-    //   let scale = 2;
-
-    //   const newList = new Array(scale).fill(0).map((item, key) => {
-    //     return new Array(scale).fill(0).map((innerItem, innerKey) => {
-    //       return { accordingX: innerKey, accordingY: key };
-    //     });
-    //   });
-    //   console.log("newList", newList);
-
-    //   let scaledCubeList = R.flatten(newList).map((accordingItem, index) => {
-    //     let prepareCubeId = `${itemX + accordingItem.accordingX}-${
-    //       itemY + accordingItem.accordingY
-    //     }`;
-    //     console.log("prepareCubeId", prepareCubeId);
-
-    //     return { coor: prepareCubeId, color: item.color };
-    //   });
-    //   // console.log('scaledCubeList', scaledCubeList)
-
-    //   return scaledCubeList;
-    // });
-    // console.log("modified________", modified);
-    // let flattenLsit = R.flatten(modified);
-    // console.log("flattenLsit", flattenLsit);
-
-    // wantItAll.listData = R.flatten(flattenLsit);
 
     let tempObj = { ...wantItAll, id: "", thumbnail: "" };
     setList([]);
@@ -469,10 +421,16 @@ export default () => {
 
   const changePenWidth = (item: number) => {
     setPenWidth(item);
-    setShowMenu(false);
+    setShowPenWidthMenu(false);
+  };
+
+  const changeSpeedLevel = (item: number) => {
+    setSpeed(item);
+    setShowSpeedMenu(false);
   };
 
   const srokeWidthList = [1, 2, 3, 4, 5, 6];
+  const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
@@ -487,7 +445,6 @@ export default () => {
           >
             {renderCube()}
           </div>
-
         </div>
         <div className="btn_area">
           <div className="btn_first_row">
@@ -512,45 +469,24 @@ export default () => {
             </div>
             <div className="speed_area">
               <div className="speed_tip">Speed</div>
-              <input
-                type="number"
-                className="speed_input"
-                onChange={(e) => setSpeed(Number(e.target.value))}
-                placeholder={speed.toString()}
-              ></input>
+              <Dropdown
+                showMenu={showSpeedMenu}
+                setShowMenu={setShowSpeedMenu}
+                defaultValue={speed}
+                menuList={speedList}
+                action={changeSpeedLevel}
+              ></Dropdown>
             </div>
             <div className="stroke_area">
               <div className="stroke_tip">Stroke</div>
-              {/* //setPenWidth */}
-              <div className="dropdown_container">
-                <div className={`dropdown_bg ${showMenu ? 'show_bg':'hide_bg'}`} onClick={() => setShowMenu(!showMenu)}></div>
-                <div className="dropdown_body">
-                  <div
-                    className="default_area"
-                    onClick={() => setShowMenu(!showMenu)}
-                  >
-                    {/* <div className="icon_area">
-                    <div className={`arrow_down ${showMenu ? 'unfold':''}`}></div>
-                  </div> */}
-                    {penWidth}
-                  </div>
-                  <div
-                    className={`unfold_area ${showMenu ? "unfold" : ""}`}
-                  >
-                    {srokeWidthList.map((item, index) => {
-                      return (
-                        <div
-                          className="each_row"
-                          key={index}
-                          onClick={() => changePenWidth(item)}
-                        >
-                          {item}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+
+              <Dropdown
+                showMenu={showPenWidthMenu}
+                setShowMenu={setShowPenWidthMenu}
+                defaultValue={penWidth}
+                menuList={srokeWidthList}
+                action={changePenWidth}
+              ></Dropdown>
             </div>
           </div>
           <div className="btn_second_row">
