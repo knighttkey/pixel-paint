@@ -117,8 +117,8 @@ export default () => {
     window.localStorage.setItem("pixelData", JSON.stringify(modified));
   };
 
-  const allList = new Array(70).fill(0).map((item, key) => {
-    return new Array(35).fill(0).map((key) => {
+  const allList = new Array(50).fill(0).map((item, key) => {
+    return new Array(50).fill(0).map((key) => {
       return key + 1;
     });
   });
@@ -252,9 +252,11 @@ export default () => {
         // console.log('fla', fla)
 
         lastChanged.forEach((item: any, key) => {
+          if(!item) return;
           tempList.push({ coor: item.id, color: item.color });
         });
         setList(R.uniq(tempList));
+        // setList(tempList);
         setDetectList([]);
       }
     }
@@ -270,7 +272,7 @@ export default () => {
     let clientYY = e.touches[0].clientY - parentRect.top;
     // let coor = { x: 8*Math.floor(clientXX/8), y: 8*Math.floor(clientYY/8) };
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
-    // console.log("coor", coor);
+    console.log("coor", coor);
 
       if (R.includes(coor, temp)) {
       } else {
