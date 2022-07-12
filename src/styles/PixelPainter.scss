@@ -62,6 +62,7 @@
     .wrap_outer {
       border: 1px solid var(--main);
       .wrap {
+        user-select: none;
         display: flex;
         justify-content: center;
         // border: 1px solid var(--main);
