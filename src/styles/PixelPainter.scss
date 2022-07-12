@@ -62,7 +62,6 @@
     .wrap_outer {
       border: 1px solid var(--main);
       .wrap {
-        user-select: none;
         display: flex;
         justify-content: center;
         // border: 1px solid var(--main);
@@ -70,12 +69,16 @@
         // padding: 3px;
         box-sizing: border-box;
         width: 100%;
+        user-select:none;
+        -webkit-user-select: none;
         .hour {
           margin: 0;
           .cube {
             min-width: 14px;
             height: 14px;
-            user-select: none;
+            user-select:none;
+            -webkit-user-select: none;
+            pointer-events: none;
             &.selected {
               background-color: rgb(0, 255, 136);
             }
