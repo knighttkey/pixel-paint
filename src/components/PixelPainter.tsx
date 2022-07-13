@@ -575,7 +575,6 @@ export default () => {
             play={play}
             exportData={exportData}
             deleteThisPaint={deleteThisPaint}
-            historyModalShow={historyModalShow}
             setHistoryModalShow={setHistoryModalShow}
           ></HistoryPanel>
         </ModalTool>
