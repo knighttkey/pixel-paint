@@ -51,6 +51,9 @@ export default () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [list, setList] = useState<coordinateData[]>([]);
   // console.log('list', list)
+  const [listPainted, setListPainted] = useState<coordinateData[]>([]);
+  // console.log('listPainted', listPainted)
+  // console.log('list', list)
 
   const [showText, setShowText] = useState<boolean>(false);
   const [prevDataFromLocal, setPrevDataFromLocal] = useState<
@@ -132,7 +135,10 @@ export default () => {
     });
   });
 
-  let tempList = [...list];
+  let tempListOrigin = [...list];
+  console.log('tempListOrigin', tempListOrigin)
+  let tempList = [...listPainted];
+  console.log('tempList', tempList)
 
   const resetList = () => {
     setList([]);
@@ -208,20 +214,22 @@ export default () => {
     // console.log('coor', coor)
 
     let currentChanged = handleReturnCubeId(coor);
+    console.log('currentChanged', currentChanged)
     if (!currentChanged) return;
     let lightCurrentChanged = currentChanged.map((item: any, index) => {
       return { coor: item.id };
     });
-    // console.log('lightCurrentChanged', lightCurrentChanged)
+    console.log('lightCurrentChanged', lightCurrentChanged)
     if (!lightCurrentChanged) return;
-    let withoutColor = list.map((i) => {
+    console.log('listPainted', listPainted)
+    let withoutColor = listPainted.map((i) => {
       return { coor: i.coor };
     });
-    // console.log('withoutColor', withoutColor)
+    console.log('withoutColor', withoutColor)
     let compareResult = lightCurrentChanged.filter((x) =>
       R.includes(x, withoutColor)
     );
-    // console.log('compareResult', compareResult)
+    console.log('compareResult', compareResult)
     compareResult.forEach((item) => {
       let ele = document.getElementById(item.coor);
       if (!ele) return;
@@ -230,12 +238,35 @@ export default () => {
           return i.coor;
         })
         .indexOf(item.coor);
+        console.log('targetIndex', targetIndex)
       if (targetIndex >= 0) {
         tempList.splice(targetIndex, 1);
+        setListPainted(tempList);
       }
 
-      setList(tempList);
     });
+    // console.log('_________________tempList', tempList)
+
+    // let cubeList = [...document.querySelectorAll(".cube")];
+    // let withoutColor2 = listPainted.map((i) => {
+    //   return i.coor;
+    // });
+    // console.log('______withoutColor2', withoutColor2)
+    // let modifiedCubeList = cubeList.filter((i) => {
+    //   return !R.includes(i.id, withoutColor2);
+    // });
+    // modifiedCubeList.forEach((item) => {
+    //   let cubeEle = document.getElementById(item.id);
+    //   if (!cubeEle) return;
+    //   cubeEle.style.backgroundColor = "transparent";
+    // });
+  
+    // tempList.forEach((item) => {
+    //   let cubeEle = document.getElementById(item.coor);
+    //   if (!cubeEle) return;
+    //   cubeEle.style.backgroundColor = item.color;
+    // });
+    // paintCube
   };
 
   useEffect(() => {
@@ -247,9 +278,9 @@ export default () => {
 
         lastChanged.forEach((item: any, key) => {
           if (!item) return;
-          tempList.push({ coor: item.id, color: item.color });
+          tempListOrigin.push({ coor: item.id, color: item.color });
         });
-        setList(R.uniq(tempList));
+        setList(R.uniq(tempListOrigin));
         // setList(tempList);
         setDetectList([]);
       }
@@ -265,7 +296,7 @@ export default () => {
     let clientYY = e.touches[0].clientY - parentRect.top;
     // let coor = { x: 8*Math.floor(clientXX/8), y: 8*Math.floor(clientYY/8) };
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
-    console.log("coor", coor);
+    // console.log("coor", coor);
 
     if (R.includes(coor, temp)) {
     } else {
@@ -274,9 +305,13 @@ export default () => {
     setDetectList(temp);
   };
 
-  useEffect(() => {
+  const touchEnd = (e:any) => {
     paintCube();
-  }, [list]);
+  }
+
+  // useEffect(() => {
+  //   paintCube();
+  // }, [list]);
 
   const renderCube = () => {
     return allList.map((dayItem, key) => {
@@ -297,12 +332,13 @@ export default () => {
   };
 
   const paintCube = () => {
-    if (list.length) {
+    // if (list.length) {
       if (eraseMode) {
         let cubeList = [...document.querySelectorAll(".cube")];
         let withoutColor = list.map((i) => {
           return i.coor;
         });
+        console.log('______withoutColor', withoutColor)
         let modifiedCubeList = cubeList.filter((i) => {
           return !R.includes(i.id, withoutColor);
         });
@@ -317,14 +353,17 @@ export default () => {
         if (!cubeEle) return;
         cubeEle.style.backgroundColor = item.color;
       });
-    } else {
-      let cubeList = [...document.querySelectorAll(".cube")];
-      cubeList.forEach((item) => {
-        let cubeEle = document.getElementById(item.id);
-        if (!cubeEle) return;
-        cubeEle.style.backgroundColor = "transparent";
-      });
-    }
+      setListPainted(JSON.parse(JSON.stringify(list)))
+      console.log('畫完')
+      setList([]);
+    // } else {
+      // let cubeList = [...document.querySelectorAll(".cube")];
+      // cubeList.forEach((item) => {
+      //   let cubeEle = document.getElementById(item.id);
+      //   if (!cubeEle) return;
+      //   cubeEle.style.backgroundColor = "transparent";
+      // });
+    // }
   };
 
   const save = async () => {
@@ -332,7 +371,7 @@ export default () => {
     let prepare = [
       ...prevDataFromLocal,
       {
-        listData: list,
+        listData: listPainted,
         id: new Date().getTime().toString(),
         thumbnail: thumbnail,
         canvaColor: canvaColor
@@ -551,6 +590,7 @@ export default () => {
             ref={wrapRef}
             onTouchMove={(e) => (eraseMode ? eraseCube(e) : handleTouchMove(e))}
             style={{ backgroundColor: canvaColor }}
+            onTouchEnd={(e)=>touchEnd(e)}
           >
             {renderCube()}
           </div>
