@@ -10,7 +10,10 @@ import * as R from "ramda";
 // import * as htmlToImage from "html-to-image";
 
 import html2canvas from "html2canvas";
-import wantItAll from "./../../jsonFile_wantItAll.json";
+import wantItAllorigin from "./../../jsonFile_wantItAll.json";
+import starryNight from "./../../jsonFile_16576367.json";
+import starryNight2 from "./../../jsonFile_16576228.json";
+import wantItAll from "./../../jsonFile_16576374.json";
 
 import DragPanel from "./DragPanel";
 import HistoryPanel from "./HistoryPanel";
@@ -66,6 +69,7 @@ export default () => {
   const [eraseMode, setEraseMode] = useState(false);
   const [historyModalShow, setHistoryModalShow] = useState(false);
   const [settingPanelShow, setSettingPanelShow] = useState(false);
+  const [demoIndex, setDemoIndex] = useState<number>(0);
   // console.log('eraseMode', eraseMode)
 
   // console.log('navigator.userAgent', navigator.userAgent)
@@ -132,6 +136,7 @@ export default () => {
 
   const resetList = () => {
     setList([]);
+    setCanvaColor('transparent');
   };
 
   const resizeStroke = (cubeId: string, scale: number) => {
@@ -394,7 +399,6 @@ export default () => {
       });
       let count = currentPicked.listData.length;
       // console.log('count', count)
-      // console.log("count*speed", count * speed);
       setTimeout(() => {
         setEnable(true);
       }, count * speed);
@@ -404,14 +408,18 @@ export default () => {
 
   const play = (item: paintDataFromLocal) => {
     setList([]);
-    setCurrentPicked(item);
-    setShowText(true);
+    setHistoryModalShow(false);
+    setTimeout(() => {
+      setCurrentPicked(item);
+      setShowText(true);
+    }, 500);
+
   };
 
   const exportData = (item: paintDataFromLocal) => {
     const content = JSON.stringify({
       listData: item.listData,
-      canvaColor: item.canvaColor
+      canvaColor: item.canvaColor ?item.canvaColor: canvaColor
     });
     let a = document.createElement("a");
     let file = new Blob([content], { type: "text/json" });
@@ -448,15 +456,27 @@ export default () => {
   const demoPlay = () => {
     let prevSpeed = speed;
 
-    let tempObj = { ...wantItAll, id: "", thumbnail: "" };
+    let demoList = [wantItAll, starryNight]
+    let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "" };
     setList([]);
     setCurrentPicked(tempObj);
     setShowText(true);
-    setSpeed(1);
+    setSpeed(5);
+
+    let count = starryNight.listData.length;
+    // console.log('count', count)
+    let tempIndex = 0;
+    if(demoIndex === 1) {
+      tempIndex = 0;
+    } else {
+      tempIndex=1;
+    }
+    setDemoIndex(tempIndex);
     setTimeout(() => {
       // console.log('prevSpeed', prevSpeed)
       setSpeed(prevSpeed);
-    }, 7303);
+
+    }, count*speed);
   };
 
   const changePenWidth = (item: number) => {

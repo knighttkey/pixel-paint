@@ -1,3 +1,4 @@
+import React from "react";
 import "./../styles/HistoryPanel.scss";
 import { paintDataFromLocal } from "./PixelPainter";
 import deleteIcon from "/images/icon_delete.svg";
@@ -10,7 +11,6 @@ type Props = {
   play: Function;
   exportData: Function;
   deleteThisPaint: Function;
-  historyModalShow: Boolean;
   setHistoryModalShow: Function;
 };
 
@@ -22,10 +22,11 @@ export default (props: Props) => {
     play,
     exportData,
     deleteThisPaint,
-    historyModalShow,
     setHistoryModalShow
   } = props;
-
+  const scrollList = (e: any) => {
+    e.stopPropagation();
+  };
   return (
     <div className="list_panel_container">
       <div className="list_panel_header">
@@ -38,7 +39,11 @@ export default (props: Props) => {
           ></div>
         </div>
       </div>
-      <div className="list_panel_wrap" ref={listPanelRef}>
+      <div
+        className="list_panel_wrap"
+        ref={listPanelRef}
+        onScroll={(e) => scrollList(e)}
+      >
         <div className="list_panel_inner">
           {prevDataFromLocal.map((item, index) => {
             return (
