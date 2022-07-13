@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: flex-start;
     .toggle_wrap {
-        width: 36px;
+        width: 30px;
         height: 20px;
         display: flex;
         align-items: center;
@@ -14,9 +14,10 @@
         cursor: pointer;
         transition: .3s;
         user-select: none;
+        line-height: 20px;
         &.on {
             background-color: #2a8ab6;
-            border:#d2d2d2;
+            // border:#d2d2d2;
         }
         .toggle_button {
             width: 14px;
@@ -24,10 +25,10 @@
             border-radius: 50%;
             background-color: #fff;
             transition: 0.3s;
-            transform: translateX(-4px);
+            transform: translateX(-3px);
             pointer-events: none;
             &.on {
-                transform:translateX(-18px);
+                transform:translateX(-12px);
             }
         }
     }

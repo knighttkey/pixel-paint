@@ -8,11 +8,14 @@ import React, {
 import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
 // import * as htmlToImage from "html-to-image";
-import deleteIcon from "/images/icon_delete.svg";
+
 import html2canvas from "html2canvas";
 import wantItAll from "./../../jsonFile_wantItAll.json";
-import Dropdown from "./Dropdown";
-import SwitchToggle from "./SwitchToggle";
+
+import DragPanel from "./DragPanel";
+import HistoryPanel from "./HistoryPanel";
+import ModalTool from "./ModalTool";
+import SettingPanel from "./SettingPanel";
 
 type DragPoint = {
   x: number;
@@ -21,7 +24,7 @@ type DragPoint = {
 interface ColorPickTarget extends EventTarget {
   value: string;
 }
-interface paintDataFromLocal {
+export interface paintDataFromLocal {
   id: string;
   listData: coordinateData[];
   thumbnail: string;
@@ -61,6 +64,8 @@ export default () => {
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [eraseMode, setEraseMode] = useState(false);
+  const [historyModalShow, setHistoryModalShow] = useState(false);
+  const [settingPanelShow, setSettingPanelShow] = useState(false);
   // console.log('eraseMode', eraseMode)
 
   // console.log('navigator.userAgent', navigator.userAgent)
@@ -146,7 +151,7 @@ export default () => {
         itemY + item.accordingY
       }`;
       let prepareEle = document.getElementById(prepareCubeId);
-      if(!prepareEle) return;
+      if (!prepareEle) return;
       return { ele: prepareEle, id: prepareCubeId, color: currentColor };
     });
     return scaledCubeList;
@@ -190,7 +195,6 @@ export default () => {
   };
 
   const eraseCube = (e: React.TouchEvent) => {
-
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
@@ -199,30 +203,35 @@ export default () => {
     // console.log('coor', coor)
 
     let currentChanged = handleReturnCubeId(coor);
-    if(!currentChanged) return;
-    let lightCurrentChanged = currentChanged.map((item:any, index)=>{
-      return {coor:item.id};
-    })
+    if (!currentChanged) return;
+    let lightCurrentChanged = currentChanged.map((item: any, index) => {
+      return { coor: item.id };
+    });
     // console.log('lightCurrentChanged', lightCurrentChanged)
-    if(!lightCurrentChanged) return;
-    let withoutColor = list.map((i)=>{
-      return {coor:i.coor};
-    })
+    if (!lightCurrentChanged) return;
+    let withoutColor = list.map((i) => {
+      return { coor: i.coor };
+    });
     // console.log('withoutColor', withoutColor)
-    let compareResult = lightCurrentChanged.filter(x => R.includes(x, withoutColor));
+    let compareResult = lightCurrentChanged.filter((x) =>
+      R.includes(x, withoutColor)
+    );
     // console.log('compareResult', compareResult)
-    compareResult.forEach((item)=>{
+    compareResult.forEach((item) => {
       let ele = document.getElementById(item.coor);
-      if(!ele) return;
-        let targetIndex = tempList.map((i)=>{return i.coor}).indexOf(item.coor);
-        if (targetIndex >= 0) {
-          tempList.splice(targetIndex, 1);
-        }
+      if (!ele) return;
+      let targetIndex = tempList
+        .map((i) => {
+          return i.coor;
+        })
+        .indexOf(item.coor);
+      if (targetIndex >= 0) {
+        tempList.splice(targetIndex, 1);
+      }
 
       setList(tempList);
-        
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     if (detectList.length) {
@@ -230,29 +239,9 @@ export default () => {
       let lastChanged = handleReturnCubeId(detectList[detectList.length - 1]);
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
-        // if (
-        //   R.includes(
-        //     lastChanged.id,
-        //     tempList.map((item) => {
-        //       return item.coor;
-        //     })
-        //   )
-        // ) {
-        //   let index = tempList
-        //     .map((item) => {
-        //       return item.coor;
-        //     })
-        //     .indexOf(lastChanged.id);
-        //   // console.log("index", index);
-        //   if (index >= 0) {
-        //     tempList[index].color = lastChanged.color;
-        //   }
-        // } else {
-        // let fla = R.flatten(lastChanged);
-        // console.log('fla', fla)
 
         lastChanged.forEach((item: any, key) => {
-          if(!item) return;
+          if (!item) return;
           tempList.push({ coor: item.id, color: item.color });
         });
         setList(R.uniq(tempList));
@@ -262,10 +251,9 @@ export default () => {
     }
   }, [detectList]);
 
-
-
   let temp = [...detectList];
   const handleTouchMove = (e: React.TouchEvent) => {
+    e.stopPropagation();
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
@@ -274,10 +262,10 @@ export default () => {
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
     console.log("coor", coor);
 
-      if (R.includes(coor, temp)) {
-      } else {
-        temp.push(coor);
-      }
+    if (R.includes(coor, temp)) {
+    } else {
+      temp.push(coor);
+    }
     setDetectList(temp);
   };
 
@@ -305,31 +293,31 @@ export default () => {
 
   const paintCube = () => {
     if (list.length) {
-      if(eraseMode) {
+      if (eraseMode) {
         let cubeList = [...document.querySelectorAll(".cube")];
-        let withoutColor = list.map((i)=>{
+        let withoutColor = list.map((i) => {
           return i.coor;
-        })
-        let modifiedCubeList = cubeList.filter((i)=>{
+        });
+        let modifiedCubeList = cubeList.filter((i) => {
           return !R.includes(i.id, withoutColor);
-        })
+        });
         modifiedCubeList.forEach((item) => {
           let cubeEle = document.getElementById(item.id);
           if (!cubeEle) return;
-            cubeEle.style.backgroundColor = "transparent";
+          cubeEle.style.backgroundColor = "transparent";
         });
       }
       list.forEach((item) => {
         let cubeEle = document.getElementById(item.coor);
         if (!cubeEle) return;
-          cubeEle.style.backgroundColor = item.color;
+        cubeEle.style.backgroundColor = item.color;
       });
     } else {
       let cubeList = [...document.querySelectorAll(".cube")];
       cubeList.forEach((item) => {
         let cubeEle = document.getElementById(item.id);
         if (!cubeEle) return;
-          cubeEle.style.backgroundColor = "transparent";
+        cubeEle.style.backgroundColor = "transparent";
       });
     }
   };
@@ -459,45 +447,6 @@ export default () => {
 
   const demoPlay = () => {
     let prevSpeed = speed;
-    // console.log("wantItAll", wantItAll);
-    // console.log("wantItAll.listData", wantItAll.listData);
-    // let coordinateList = wantItAll.listData;
-
-    // let scale = penWidth;
-    // console.log('coordinateList', coordinateList)
-    // let modified = coordinateList.map((item, index) => {
-  
-    //   let itemX = Number(item.coor.split("-")[0]);
-    //   let itemY = Number(item.coor.split("-")[1]);
-
-    //   let scale = 2;
-
-    //   const newList = new Array(scale).fill(0).map((item, key) => {
-    //     return new Array(scale).fill(0).map((innerItem, innerKey) => {
-    //       return { accordingX: innerKey, accordingY: key };
-    //     });
-    //   });
-    //   // console.log("newList", newList);
-
-    //   let scaledCubeList = R.flatten(newList).map((accordingItem, index) => {
-    //     let prepareCubeId = `${itemX + accordingItem.accordingX}-${
-    //       itemY + accordingItem.accordingY
-    //     }`;
-    //     // console.log("prepareCubeId", prepareCubeId);
-
-    //     return { coor: prepareCubeId, color: item.color };
-    //   });
-    //   // console.log('scaledCubeList', scaledCubeList)
-
-    //   return scaledCubeList;
-    // });
-    // console.log("modified________", modified);
-    // let flattenLsit = R.flatten(modified[0]);
-    // console.log("flattenLsit", flattenLsit);
-
-    // wantItAll.listData = flattenLsit;
-
-
 
     let tempObj = { ...wantItAll, id: "", thumbnail: "" };
     setList([]);
@@ -508,7 +457,7 @@ export default () => {
       // console.log('prevSpeed', prevSpeed)
       setSpeed(prevSpeed);
     }, 7303);
-    }
+  };
 
   const changePenWidth = (item: number) => {
     setPenWidth(item);
@@ -520,72 +469,14 @@ export default () => {
     setShowSpeedMenu(false);
   };
 
-  const srokeWidthList = [1, 2, 3, 4, 5, 6];
-  const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
         <div className="header">Pixel Painter</div>
-        <div className="wrap_outer">
-          <div
-            className="wrap"
-            // draggable={true}
-            ref={wrapRef}
-            onTouchMove={(e) => eraseMode ? eraseCube(e) : handleTouchMove(e)}
-            style={{ backgroundColor: canvaColor }}
-          >
-            {renderCube()}
-          </div>
-        </div>
         <div className="btn_area">
-          <div className="btn_first_row">
-            <div className="tip_text">畫布參數</div>
-            <div className="color_area">
-              <div className="color_tip">Canva</div>
-              <input
-                type="color"
-                value={canvaColor}
-                className="color_picker"
-                onChange={(e) => changeCanvaColor(e.target)}
-              />
-            </div>
-            <div className="color_area">
-              <div className="color_tip">Color</div>
-              <input
-                type="color"
-                value={currentColor}
-                className="color_picker"
-                onChange={(e) => changeColor(e.target)}
-              />
-            </div>
-            <div className="speed_area">
-              <div className="speed_tip">Speed</div>
-              <Dropdown
-                showMenu={showSpeedMenu}
-                setShowMenu={setShowSpeedMenu}
-                defaultValue={speed}
-                menuList={speedList}
-                action={changeSpeedLevel}
-              ></Dropdown>
-            </div>
-            <div className="stroke_area">
-              <div className="stroke_tip">Stroke</div>
-
-              <Dropdown
-                showMenu={showPenWidthMenu}
-                setShowMenu={setShowPenWidthMenu}
-                defaultValue={penWidth}
-                menuList={srokeWidthList}
-                action={changePenWidth}
-              ></Dropdown>
-            </div>
-            <div className="erase_area">
-            <div className="erase_tip">Erase</div>
-              <SwitchToggle toggleOn={eraseMode} switchAction={()=>{}} setToggleOn={setEraseMode}></SwitchToggle>
-              {/* <button onClick={()=>setEraseMode(!eraseMode)}>Erase {eraseMode ? '開啟':'關閉'}</button> */}
-            </div>
-          </div>
-          <div className="btn_second_row">
+          
+          <div className="btn_row">
             <div className="tip_text">功能操作</div>
             <div
               className={`btn demo_btn ${enable ? "" : "disable"}`}
@@ -619,45 +510,82 @@ export default () => {
             >
               Save
             </div>
-          </div>
-        </div>
-      </div>
-      {prevDataFromLocal.length ? (
-        <div className="list_panel">
-          <div className="list_panel_header">筆跡紀錄</div>
-          <div className="list_panel_wrap" ref={listPanelRef}>
-            <div className="list_panel_inner">
-              {prevDataFromLocal.map((item, index) => {
-                return (
-                  <div className="each_row" key={index}>
-                    {/* <div className="data_id">{item.id}</div> */}
-                    <div className="data_id">{index + 1}</div>
-                    <img className="thumbnail" src={item.thumbnail}></img>
-                    <div
-                      className={`play_btn ${enable ? "" : "disable"}`}
-                      onClick={() => play(item)}
-                    >
-                      Play
-                    </div>
-
-                    <div
-                      className={`export_btn  ${enable ? "" : "disable"}`}
-                      onClick={() => exportData(item)}
-                    >
-                      Export
-                    </div>
-                    <div
-                      className={`delete_icon  ${enable ? "" : "disable"}`}
-                      style={{ backgroundImage: `url(${deleteIcon})` }}
-                      onClick={() => deleteThisPaint(item.id)}
-                    ></div>
-                  </div>
-                );
-              })}
+            <div
+              className={`btn history_btn ${enable ? "" : "disable"}`}
+              onClick={()=>setHistoryModalShow(true)}
+            >
+              History
+            </div>
+            <div
+              className={`btn setting_btn ${enable ? "" : "disable"} ${settingPanelShow ? 'active':''}`}
+              onClick={()=>setSettingPanelShow(!settingPanelShow)}
+            >
+              Setting
             </div>
           </div>
         </div>
+        <div className="wrap_outer">
+          <div
+            className="wrap"
+            // draggable={true}
+            ref={wrapRef}
+            onTouchMove={(e) => (eraseMode ? eraseCube(e) : handleTouchMove(e))}
+            style={{ backgroundColor: canvaColor }}
+          >
+            {renderCube()}
+          </div>
+        </div>
+
+      </div>
+      {prevDataFromLocal.length && historyModalShow ? (
+        <ModalTool
+            modalShow={historyModalShow}
+            modalCloseFunction={()=>setHistoryModalShow(false)}
+            modalWidth={"unset"}
+            modalHeight={"400px"}
+            modalInnerBackground={"#ffffff20"}
+            backgroundOpacity={0.5}
+            background={"#000000"}
+            zIndex={12}
+        >
+          <HistoryPanel
+            prevDataFromLocal={prevDataFromLocal}
+            listPanelRef={listPanelRef}
+            enable={enable}
+            play={play}
+            exportData={exportData}
+            deleteThisPaint={deleteThisPaint}
+            historyModalShow={historyModalShow}
+            setHistoryModalShow={setHistoryModalShow}
+          ></HistoryPanel>
+        </ModalTool>
       ) : null}
+
+      <DragPanel
+          id={"functionPanel"}
+          background={"transparent"}
+          childStartX={0.08}
+          childStartY={0.2}
+          show={settingPanelShow}
+          setShow={setSettingPanelShow}
+        >
+          <SettingPanel
+            canvaColor={canvaColor}
+            changeCanvaColor={changeCanvaColor}
+            currentColor={currentColor}
+            changeColor={changeColor}
+            showSpeedMenu={showSpeedMenu}
+            setShowSpeedMenu={setShowSpeedMenu}
+            speed={speed}
+            changeSpeedLevel={changeSpeedLevel}
+            showPenWidthMenu={showPenWidthMenu}
+            setShowPenWidthMenu={setShowPenWidthMenu}
+            penWidth={penWidth}
+            changePenWidth={changePenWidth}
+            eraseMode={eraseMode}
+            setEraseMode={setEraseMode}
+          />
+        </DragPanel>  
     </div>
   );
 };

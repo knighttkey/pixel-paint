@@ -6,13 +6,12 @@ import React, {
   useEffect
 } from "react";
 import "./../styles/Template.scss";
-import * as R from "ramda";
 
 type Props = {
 };
 
-export default () => {
-
+export default (props:Props) => {
+  const {} = props;
   return (
     <div className="_container">
   

@@ -4,25 +4,28 @@
 }
 
 .pixel_canva_container {
-  // width: 100vw;
-  // height: 100vh;
+  // width: 100%;
+  height: 100vh;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
   padding: 50px 0;
+  // overflow-x: hidden;
+  // overflow-y: scroll;
+  // touch-action:none;
   // transform: scale(calc(var(--main-width) / 1920));
-  transform:scale(1);
-  transition: .1s;
+  transform: scale(1);
+  transition: 0.1s;
   transform-origin: top;
-  @media screen and(min-width:600px) and (max-width:800px) {
-    transform:scale(0.8);
+  @media screen and(min-width:600px) and (max-width: 800px) {
+    transform: scale(0.8);
   }
-  @media screen and (min-width:300px) and (max-width:600px) {
-    transform:scale(0.5);
+  @media screen and (min-width: 300px) and (max-width: 600px) {
+    transform: scale(0.5);
   }
-  @media screen and (max-width:300px) {
-    transform:scale(0.35);
+  @media screen and (max-width: 300px) {
+    transform: scale(0.35);
   }
   ::-webkit-scrollbar {
     width: 5px;
@@ -48,16 +51,82 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-    
+
     .header {
-      color:var(--main);
+      color: var(--main);
       font-size: 26px;
       font-weight: 600;
       border: 1px solid var(--main);
-      // width: 100%;
       height: 40px;
-      border-bottom: none;
       line-height: 40px;
+      border-radius: 5px;
+    }
+    .btn_area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 15px;
+      flex-direction: column;
+      margin: 20px 0 0 0;
+      .btn_row {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+        // margin: 0 0 20px 0;
+        box-sizing: border-box;
+        padding: 0 0 20px 0;
+        .tip_text {
+          color: var(--main);
+          font-size: 16px;
+          font-weight: 600;
+          margin:0 20px 0 0;
+        }
+        .btn {
+          width: 80px;
+          height: 30px;
+          color: var(--main);
+          font-size: 16px;
+          font-weight: 500;
+          border: 1px solid var(--main);
+          border-radius: 5px;
+          display: flex;
+          justify-content: center;
+          line-height: 28px;
+          transition: 0.3s;
+          margin: 0 10px;
+          position: relative;
+          cursor: pointer;
+          &:hover {
+            background-color: var(--main);
+            color: #0c1a2a;
+          }
+          &.import_btn {
+            // margin: 0 10px 0 0;
+          }
+          &.demo_btn {
+            margin: 0 10px 0 0;
+          }
+          &.setting_btn {
+            filter: brightness(1.5);
+            &.active {
+              background-color: var(--main);
+              color: #0c1a2a;
+            }
+          }
+          &.disable {
+            pointer-events: none;
+            cursor: initial;
+            opacity: 0.5;
+          }
+          .file_input {
+            width: 80px;
+            height: 30px;
+            opacity: 0;
+            position: absolute;
+          }
+        }
+      }
     }
     .wrap_outer {
       border: 1px solid var(--main);
@@ -69,250 +138,18 @@
         // padding: 3px;
         box-sizing: border-box;
         width: 100%;
-        user-select:none;
+        user-select: none;
         -webkit-user-select: none;
         .hour {
           margin: 0;
           .cube {
             min-width: 14px;
             height: 14px;
-            user-select:none;
+            user-select: none;
             -webkit-user-select: none;
             pointer-events: none;
             &.selected {
               background-color: rgb(0, 255, 136);
-            }
-          }
-        }
-      }
-
-    }
-  }
-  .btn_area {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 15px;
-    flex-direction: column;
-    margin: 20px 0 0 0;
-    .btn_first_row,.btn_second_row {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      width: 100%;
-      margin: 0 0 20px 0;
-      border-bottom: 1px dashed var(--main);
-      box-sizing: border-box;
-      padding: 0 0 20px 0;
-      .tip_text {
-        color: var(--main);
-        font-size: 16px;
-        font-weight: 600;
-        margin:0 20px 0 0;
-      }
-      .color_area {
-        display: flex;
-        margin: 0 10px 0 0;
-        border-right: 1px dashed var(--main);
-        justify-content: center;
-        .color_tip {
-          color:var(--main);
-          font-weight: 600;
-          margin: 0 10px 0 0;
-          height: 30px;
-          line-height: 30px;
-        }
-        .color_picker {
-          opacity: 1;
-          width: 30px;
-          height: 30px;
-          // position: absolute;
-          cursor: pointer;
-          margin-right: 15px;
-          // border: none;
-          border-radius: 5px;
-          background-color: transparent;
-          border-color: var(--border);
-        }
-      }
-  
-      .speed_area {
-        display: flex;
-        height: 30px;
-        border-right: 1px dashed var(--main);
-        padding:0 15px 0 0;
-        .speed_tip {
-          color:var(--main);
-          font-weight: 600;
-          margin: 0 10px 0 0;
-          height: 30px;
-          line-height: 30px;
-        }
-        .speed_input {
-          border: none;
-          outline: none;
-          width: 60px;
-          height: 30px;
-          // margin: 0 20px 0 0;
-          padding: 5px;
-          box-sizing: border-box;
-          font-size: 18px;
-          background-color: transparent;
-          border: 1px solid var(--main);
-          border-radius: 5px;
-          color: var(--main);
-          line-height: 30px;
-          text-align: center;
-        }
-      }
-      .stroke_area {
-        display: flex;
-        height: 30px;
-        border-right: 1px dashed var(--main);
-        padding:0 15px 0 10px;
-        .stroke_tip {
-          color:var(--main);
-          font-weight: 600;
-          margin: 0 10px 0 0;
-          height: 30px;
-          line-height: 30px;
-        }
-
-      }
-      .erase_area {
-        display: flex;
-        height: 30px;
-        // border-right: 1px dashed var(--main);
-        padding:0 15px 0 10px;
-        .erase_tip {
-          color:var(--main);
-          font-weight: 600;
-          margin: 0 10px 0 0;
-          height: 30px;
-          line-height: 30px;
-        }
-
-      }
-      .btn {
-        width: 80px;
-        height: 30px;
-        color: var(--main);
-        font-size: 16px;
-        font-weight: 500;
-        border: 1px solid var(--main);
-        border-radius: 5px;
-        display: flex;
-        justify-content: center;
-        line-height: 28px;
-        transition: 0.3s;
-        margin:0 10px;
-        position: relative;
-        cursor: pointer;
-        &:hover {
-          background-color: var(--main);
-          color: #0c1a2a;
-        }
-        &.import_btn {
-          // margin: 0 10px 0 0;
-        }
-        &.demo_btn {
-          margin:0 10px 0 0;
-        }
-        &.disable {
-          pointer-events: none;
-          cursor: initial;
-          opacity: 0.5;
-        }
-        .file_input {
-          width: 80px;
-          height: 30px;
-          opacity: 0;
-          position: absolute;
-        }
-      }
-    }
-  }
-  .list_panel {
-    margin: 35px 0 0 0;
-    border: 1px solid var(--main);
-    .list_panel_header {
-      color: var(--main);
-      font-size: 16px;
-      font-weight: 600;
-      height: 35px;
-      border-bottom: 1px solid var(--border);
-      margin: 0 0 0 0;
-      line-height: 33px;
-    }
-    .list_panel_wrap {
-      max-height: 300px;
-      box-sizing: border-box;
-      padding: 5px 0 0 0;
-      overflow-x: hidden;
-      overflow-y: scroll;
-
-
-      .list_panel_inner {
-        width: 100%;
-
-        .each_row {
-          // height: 60px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin: 5px 0 0 0;
-          padding: 0 10px;
-          box-sizing: border-box;
-          border-bottom: 1px dashed var(--main);
-          padding-bottom: 8px;
-          box-sizing: border-box;
-          &:last-child {
-            border-bottom: none;
-          }
-          .data_id {
-            color: var(--main);
-            width: 30px;
-          }
-          .thumbnail {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            // border: 1px solid #42c6fc;
-            margin: 0 10px 0 10px;
-          }
-          .delete_btn,
-          .play_btn,.export_btn {
-            width: 60px;
-            height: 20px;
-            color: var(--main);
-            font-size: 16px;
-            font-weight: 500;
-            border: 1px solid var(--main);
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            line-height: 20px;
-            transition: 0.3s;
-            cursor: pointer;
-            margin: 0 10px;
-            &.disable {
-              pointer-events: none;
-              cursor: initial;
-              opacity: 0.5;
-            }
-          }
-          .delete_icon {
-            width: 20px;
-            height: 20px;
-            // background-image: url("images/icon_delete.svg");
-            background-repeat: no-repeat;
-            background-size: 80%;
-            background-position: center;
-            margin: 0 10px;
-            &.disable {
-              pointer-events: none;
-              cursor: initial;
-              opacity: 0.5;
             }
           }
         }
