@@ -156,8 +156,35 @@ export default () => {
         return { accordingX: innerKey, accordingY: key };
       });
     });
+    console.log("newList", newList);
+    const makeupStroke = (
+      newList: {
+        accordingX: number;
+        accordingY: number;
+      }[][]
+    ) => {
+      switch (penWidth) {
+        case 3:
+          return [[newList[0][1]], newList[1], [newList[2][1]]];
+          break;
+        case 4:
+          return [[newList[0][1],newList[0][2]], newList[1], newList[2], [newList[3][1],newList[3][2]]];
+          break;
+        case 5:
+          return [[newList[0][2]], [newList[1][1],newList[1][2],newList[1][3]], newList[2], [newList[3][1],newList[3][2],newList[3][3]],[newList[4][2]]];
+          break;
+        case 6:
+          return [[newList[0][2],newList[0][3]], [newList[1][1],newList[1][2],newList[1][3],newList[1][4]], newList[2], newList[3], [newList[4][1],newList[4][2],newList[4][3],newList[4][4]],[newList[5][2],newList[5][3]]];
+          break;
 
-    let scaledCubeList = R.flatten(newList).map((item, index) => {
+        default:
+          return newList;
+          break;
+      }
+    };
+    let makeupResult = makeupStroke(newList);
+    // console.log('makeupResult', makeupResult)
+    let scaledCubeList = R.flatten(makeupResult).map((item, index) => {
       let prepareCubeId = `${itemX + item.accordingX}-${
         itemY + item.accordingY
       }`;
@@ -232,14 +259,14 @@ export default () => {
       return { coor: i.coor };
     });
     // console.log("withoutColor", withoutColor);
-    let compareResult = currentChangedWithoutColor.filter(
-      (x) => R.includes(x, withoutColor)
+    let compareResult = currentChangedWithoutColor.filter((x) =>
+      R.includes(x, withoutColor)
     );
 
     // console.log("erase_compareResult", compareResult);
 
     compareResult.forEach((item) => {
-      if(!item) return;
+      if (!item) return;
       let ele = document.getElementById(item.coor);
       if (!ele) return;
       let targetIndex = tempList
