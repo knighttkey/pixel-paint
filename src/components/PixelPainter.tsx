@@ -10,9 +10,7 @@ import * as R from "ramda";
 // import * as htmlToImage from "html-to-image";
 
 import html2canvas from "html2canvas";
-import wantItAllorigin from "./../../jsonFile_wantItAll.json";
-import starryNight from "./../../jsonFile_16576367.json";
-import starryNight2 from "./../../jsonFile_16576228.json";
+import starryNight from "./../../jsonFile_16577771.json";
 import wantItAll from "./../../jsonFile_16576374.json";
 
 import DragPanel from "./DragPanel";
@@ -68,7 +66,7 @@ export default () => {
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [eraseMode, setEraseMode] = useState(false);
   const [historyModalShow, setHistoryModalShow] = useState(false);
-  const [settingPanelShow, setSettingPanelShow] = useState(false);
+  const [settingPanelShow, setSettingPanelShow] = useState(true);
   const [demoIndex, setDemoIndex] = useState<number>(0);
   // console.log('eraseMode', eraseMode)
 
@@ -568,7 +566,7 @@ export default () => {
           modalShow={historyModalShow}
           modalCloseFunction={() => setHistoryModalShow(false)}
           modalWidth={"unset"}
-          modalHeight={"400px"}
+          modalHeight={"500px"}
           modalInnerBackground={"#ffffff20"}
           backgroundOpacity={0.5}
           background={"#000000"}
@@ -590,7 +588,7 @@ export default () => {
         id={"functionPanel"}
         background={"transparent"}
         childStartX={0.08}
-        childStartY={0.2}
+        childStartY={0.1}
         show={settingPanelShow}
         setShow={setSettingPanelShow}
       >

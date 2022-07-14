@@ -3,7 +3,7 @@
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 10;
   position: fixed;
   top: 0;
@@ -26,6 +26,14 @@
     border-radius: 5px;
     overflow: hidden;
     border: 1px solid var(--main);
+    margin-top:20%;
+    transform: scale(1);
+    transition: 0.1s;
+    transform-origin: top;
+  
+    @media screen and (max-width: 500px) {
+      transform: scale(0.8);
+    }
   }
 
   .background {
@@ -38,6 +46,7 @@
     background-color: rgba(0, 0, 0, 0.95);
     z-index: 10;
     cursor: initial;
+    // background-attachment: fixed;
   }
 
   /* width */
@@ -59,7 +68,7 @@
   }
   ::-webkit-scrollbar-button {
     width: 20px;
-    display: none;
+    // display: none;
   }
   ::-webkit-scrollbar-corner {
     background-color: transparent;

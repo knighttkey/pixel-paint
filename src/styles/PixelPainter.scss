@@ -12,22 +12,6 @@
   align-items: center;
   flex-direction: column;
   padding: 50px 0;
-  // overflow-x: hidden;
-  // overflow-y: scroll;
-  // touch-action:none;
-  // transform: scale(calc(var(--main-width) / 1920));
-  transform: scale(1);
-  transition: 0.1s;
-  transform-origin: top;
-  @media screen and(min-width:600px) and (max-width: 800px) {
-    transform: scale(0.8);
-  }
-  @media screen and (min-width: 300px) and (max-width: 600px) {
-    transform: scale(0.5);
-  }
-  @media screen and (max-width: 300px) {
-    transform: scale(0.35);
-  }
   ::-webkit-scrollbar {
     width: 5px;
     // background-color: #152637;
@@ -52,7 +36,18 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-
+    transform: scale(1);
+    transition: 0.1s;
+    transform-origin: top;
+    @media screen and(min-width:600px) and (max-width: 800px) {
+      transform: scale(0.8);
+    }
+    @media screen and (min-width: 300px) and (max-width: 600px) {
+      transform: scale(0.5);
+    }
+    @media screen and (max-width: 300px) {
+      transform: scale(0.35);
+    }
     .header {
       color: var(--main);
       font-size: 26px;
