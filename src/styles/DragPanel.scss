@@ -17,16 +17,35 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    .pin_btn {
+      .pin_icon {
+        width: 12px;
+        height: 30px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        position: absolute;
+        left: 10px;
+        top: 7px;
+        filter: invert(46%) sepia(57%) saturate(618%) hue-rotate(154deg)
+          brightness(91%) contrast(86%);
+        cursor: pointer;
+        &.active {
+          filter: invert(36%) sepia(61%) saturate(291%) hue-rotate(314deg)
+            brightness(118%) contrast(109%);
+        }
+      }
+    }
     .close_btn {
       .close_icon {
         width: 12px;
-        height: 40px;
+        height: 30px;
         background-position: center;
         background-repeat: no-repeat;
         background-size: contain;
         position: absolute;
         right: 10px;
-        top: 2px;
+        top: 7px;
         filter: invert(46%) sepia(57%) saturate(618%) hue-rotate(154deg)
           brightness(91%) contrast(86%);
         cursor: pointer;

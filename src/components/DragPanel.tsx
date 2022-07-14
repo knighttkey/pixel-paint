@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./../styles/DragPanel.scss";
 import closeIcon from "/images/xmark.svg";
+import pinIcon from "/images/thumbtack.svg";
 
 interface Props {
   id: string;
@@ -17,6 +18,7 @@ const DragPanel = (props: Props) => {
     props;
 
   const [parentSize, setParentSize] = useState({ x: 0, y: 0 });
+  const [pinned, setPinned] = useState<Boolean>(false);
 
   useEffect(() => {
     let parentEle = document.querySelector(".pixel_canva_container");
@@ -37,6 +39,7 @@ const DragPanel = (props: Props) => {
     const targetEle = document.getElementById(id);
     e.stopPropagation();
     if(dragDisable) return;
+    if(pinned) return;
     if (!targetEle) return;
     const selfRect = targetEle.getBoundingClientRect();
     let rectPatchX = accordingX - selfRect.left;
@@ -47,6 +50,7 @@ const DragPanel = (props: Props) => {
 
   const move = (accordingX: number, accordingY: number) => {
     if(dragDisable) return;
+    if(pinned) return;
     const targetEle = document.getElementById(id);
     if (!targetEle) return;
     const patchX = Number(targetEle.dataset.patchX);
@@ -135,6 +139,13 @@ const DragPanel = (props: Props) => {
       }}
     >
       <div className="drag_panel">
+        <div className="pin_btn">
+          <div
+            className={`pin_icon ${pinned ? 'active':''}`}
+            style={{ backgroundImage: `url(${pinIcon})` }}
+            onClick={()=>setPinned(!pinned)}
+          ></div>
+        </div>
         <div className="close_btn">
           <div
             className="close_icon"
