@@ -7,8 +7,6 @@ import React, {
 } from "react";
 import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
-// import * as htmlToImage from "html-to-image";
-
 import html2canvas from "html2canvas";
 import starryNight from "./../../jsonFile_16577771.json";
 import wantItAll from "./../../jsonFile_16576374.json";
@@ -511,7 +509,7 @@ export default () => {
   const demoPlay = () => {
     let prevSpeed = speed;
 
-    let demoList = [wantItAll, starryNight];
+    let demoList = [starryNight, wantItAll];
     let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "" };
     // setList([]);
     resetList();
