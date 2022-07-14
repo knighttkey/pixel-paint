@@ -14,11 +14,20 @@ interface Props {
   dragDisable?: Boolean;
 }
 const DragPanel = (props: Props) => {
-  const { id, children, background, childStartX, childStartY, show, setShow, dragDisable } =
-    props;
+  const {
+    id,
+    children,
+    background,
+    childStartX,
+    childStartY,
+    show,
+    setShow,
+    dragDisable
+  } = props;
 
   const [parentSize, setParentSize] = useState({ x: 0, y: 0 });
   const [pinned, setPinned] = useState<Boolean>(false);
+  const [touchType, setTouchType] = useState<string>("finger");
 
   useEffect(() => {
     let parentEle = document.querySelector(".pixel_canva_container");
@@ -36,10 +45,11 @@ const DragPanel = (props: Props) => {
     accordingY: number,
     eventType: string
   ) => {
+    console.log("e", e);
     const targetEle = document.getElementById(id);
     e.stopPropagation();
-    if(dragDisable) return;
-    if(pinned) return;
+    if (dragDisable) return;
+    if (pinned) return;
     if (!targetEle) return;
     const selfRect = targetEle.getBoundingClientRect();
     let rectPatchX = accordingX - selfRect.left;
@@ -49,8 +59,9 @@ const DragPanel = (props: Props) => {
   };
 
   const move = (accordingX: number, accordingY: number) => {
-    if(dragDisable) return;
-    if(pinned) return;
+    if (touchType === "pencil") return;
+    if (dragDisable) return;
+    if (pinned) return;
     const targetEle = document.getElementById(id);
     if (!targetEle) return;
     const patchX = Number(targetEle.dataset.patchX);
@@ -112,7 +123,7 @@ const DragPanel = (props: Props) => {
   };
 
   const moveEnd = (e: React.TouchEvent) => {
-    if(dragDisable) return;
+    if (dragDisable) return;
     // cancelDefault(e);
   };
 
@@ -120,6 +131,24 @@ const DragPanel = (props: Props) => {
     e.preventDefault();
     e.stopPropagation();
     return false;
+  };
+
+  const detectTouchArea = (e: any) => {
+    const roundTo = (num: number, decimal: number) => {
+      return (
+        Math.round((num + Number.EPSILON) * Math.pow(10, decimal)) /
+        Math.pow(10, decimal)
+      );
+    };
+    const w = roundTo(Number(e.width), 1);
+    console.log("w", w);
+    const h = roundTo(Number(e.height), 1);
+    console.log("h", h);
+    if (w < 1) {
+      setTouchType("pencil");
+    } else {
+      setTouchType("finger");
+    }
   };
 
   return (
@@ -131,6 +160,7 @@ const DragPanel = (props: Props) => {
       }
       onTouchMove={(e) => move(e.touches[0].clientX, e.touches[0].clientY)}
       onTouchEnd={(e) => moveEnd(e)}
+      onPointerDown={(e) => detectTouchArea(e)}
       // draggable={true}
       style={{
         background: background,
@@ -141,16 +171,16 @@ const DragPanel = (props: Props) => {
       <div className="drag_panel">
         <div className="pin_btn">
           <div
-            className={`pin_icon ${pinned ? 'active':''}`}
+            className={`pin_icon ${pinned ? "active" : ""}`}
             style={{ backgroundImage: `url(${pinIcon})` }}
-            onClick={()=>setPinned(!pinned)}
+            onClick={() => setPinned(!pinned)}
           ></div>
         </div>
         <div className="close_btn">
           <div
             className="close_icon"
             style={{ backgroundImage: `url(${closeIcon})` }}
-            onClick={()=>setShow(false)}
+            onClick={() => setShow(false)}
           ></div>
         </div>
         {children}
