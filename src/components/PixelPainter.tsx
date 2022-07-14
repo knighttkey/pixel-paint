@@ -136,7 +136,8 @@ export default () => {
 
   const resetList = () => {
     setList([]);
-    setCanvaColor('transparent');
+    setCanvaColor("transparent");
+    eraseAllCube();
   };
 
   const resizeStroke = (cubeId: string, scale: number) => {
@@ -208,20 +209,21 @@ export default () => {
     // console.log('coor', coor)
 
     let currentChanged = handleReturnCubeId(coor);
+    // console.log("currentChanged", currentChanged);
     if (!currentChanged) return;
-    let lightCurrentChanged = currentChanged.map((item: any, index) => {
+    let currentChangedWithoutColor = currentChanged.map((item: any, index) => {
       return { coor: item.id };
     });
-    // console.log('lightCurrentChanged', lightCurrentChanged)
-    if (!lightCurrentChanged) return;
+    // console.log("currentChangedWithoutColor", currentChangedWithoutColor);
+    if (!currentChangedWithoutColor) return;
     let withoutColor = list.map((i) => {
       return { coor: i.coor };
     });
-    // console.log('withoutColor', withoutColor)
-    let compareResult = lightCurrentChanged.filter((x) =>
+    // console.log("withoutColor", withoutColor);
+    let compareResult = currentChangedWithoutColor.filter((x) =>
       R.includes(x, withoutColor)
     );
-    // console.log('compareResult', compareResult)
+    // console.log("compareResult", compareResult);
     compareResult.forEach((item) => {
       let ele = document.getElementById(item.coor);
       if (!ele) return;
@@ -233,50 +235,14 @@ export default () => {
       if (targetIndex >= 0) {
         tempList.splice(targetIndex, 1);
       }
-
+      eraseCubeSingle(item);
       setList(tempList);
     });
   };
 
-  useEffect(() => {
-    if (detectList.length) {
-      // console.log("detectList", detectList);
-      let lastChanged = handleReturnCubeId(detectList[detectList.length - 1]);
-      // console.log("lastChanged", lastChanged);
-      if (lastChanged) {
-
-        lastChanged.forEach((item: any, key) => {
-          if (!item) return;
-          tempList.push({ coor: item.id, color: item.color });
-        });
-        setList(R.uniq(tempList));
-        // setList(tempList);
-        setDetectList([]);
-      }
-    }
-  }, [detectList]);
-
-  let temp = [...detectList];
-  const handleTouchMove = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    if (!wrapRef.current) return;
-    let parentRect = wrapRef.current.getBoundingClientRect();
-    let clientXX = e.touches[0].clientX - parentRect.left;
-    let clientYY = e.touches[0].clientY - parentRect.top;
-    // let coor = { x: 8*Math.floor(clientXX/8), y: 8*Math.floor(clientYY/8) };
-    let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
-    console.log("coor", coor);
-
-    if (R.includes(coor, temp)) {
-    } else {
-      temp.push(coor);
-    }
-    setDetectList(temp);
-  };
-
-  useEffect(() => {
-    paintCube();
-  }, [list]);
+  // useEffect(() => {
+  //   paintCube();
+  // }, [list]);
 
   const renderCube = () => {
     return allList.map((dayItem, key) => {
@@ -296,35 +262,70 @@ export default () => {
     });
   };
 
-  const paintCube = () => {
-    if (list.length) {
-      if (eraseMode) {
-        let cubeList = [...document.querySelectorAll(".cube")];
-        let withoutColor = list.map((i) => {
-          return i.coor;
+  useEffect(() => {
+    if (detectList.length) {
+      // console.log("detectList", detectList);
+      let lastChanged = handleReturnCubeId(detectList[detectList.length - 1]);
+      // console.log("lastChanged", lastChanged);
+      if (lastChanged) {
+        // console.log("lastChanged", lastChanged);
+        lastChanged.forEach((item: any, key) => {
+          if (!item) return;
+          tempList.push({ coor: item.id, color: item.color });
+          paintCubeSingle({ coor: item.id, color: item.color });
         });
-        let modifiedCubeList = cubeList.filter((i) => {
-          return !R.includes(i.id, withoutColor);
-        });
-        modifiedCubeList.forEach((item) => {
-          let cubeEle = document.getElementById(item.id);
-          if (!cubeEle) return;
-          cubeEle.style.backgroundColor = "transparent";
-        });
+        setList(R.uniq(tempList));
+        // setList(tempList);
+        setDetectList([]);
+
+        // paintCube(R.uniq(tempList));
+        // R.uniq(tempList).forEach((positionItem, index)=>{
+        //   paintCubeSingle(positionItem);
+        // })
       }
-      list.forEach((item) => {
-        let cubeEle = document.getElementById(item.coor);
-        if (!cubeEle) return;
-        cubeEle.style.backgroundColor = item.color;
-      });
-    } else {
-      let cubeList = [...document.querySelectorAll(".cube")];
-      cubeList.forEach((item) => {
-        let cubeEle = document.getElementById(item.id);
-        if (!cubeEle) return;
-        cubeEle.style.backgroundColor = "transparent";
-      });
     }
+  }, [detectList]);
+
+  let temp = [...detectList];
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    if (!wrapRef.current) return;
+    let parentRect = wrapRef.current.getBoundingClientRect();
+    let clientXX = e.touches[0].clientX - parentRect.left;
+    let clientYY = e.touches[0].clientY - parentRect.top;
+    // let coor = { x: 8*Math.floor(clientXX/8), y: 8*Math.floor(clientYY/8) };
+    let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
+    // console.log("coor", coor);
+
+    if (R.includes(coor, temp)) {
+    } else {
+      temp.push(coor);
+    }
+    setDetectList(temp);
+  };
+
+  const paintCubeSingle = (position: coordinateData) => {
+    let cubeEle = document.getElementById(position.coor);
+    if (!cubeEle) return;
+    cubeEle.style.backgroundColor = position.color;
+  };
+  const eraseCubeSingle = (position: { coor: string }) => {
+    let cubeEle = document.getElementById(position.coor);
+    if (!cubeEle) return;
+    cubeEle.style.backgroundColor = "transparent";
+  };
+
+  const eraseAllCube = () => {
+    let cubeList = [...document.querySelectorAll(".cube")];
+    cubeList.forEach((item) => {
+      let cubeEle = document.getElementById(item.id);
+      if (!cubeEle) return;
+      cubeEle.style.backgroundColor = "transparent";
+    });
+  };
+
+  const handleTouchEnd = (e: any) => {
+    setList(R.uniq(tempList));
   };
 
   const save = async () => {
@@ -346,7 +347,9 @@ export default () => {
       temp = [];
       tempList = [];
       setDetectList([]);
-      setList([]);
+      // setList([]);
+      resetList();
+      setHistoryModalShow(true);
     }, 200);
     setTimeout(() => {
       if (listPanelRef.current) {
@@ -392,6 +395,7 @@ export default () => {
       currentPicked.listData.forEach((item, key) => {
         setTimeout(() => {
           tempList.push({ coor: item.coor, color: item.color });
+          paintCubeSingle({ coor: item.coor, color: item.color });
           setList([...tempList]);
         }, speed * key);
         setCurrentPicked(undefined);
@@ -407,19 +411,21 @@ export default () => {
   }, [showText]);
 
   const play = (item: paintDataFromLocal) => {
-    setList([]);
+    console.log("item", item);
+    // setList([]);
+    // eraseAllCube();
+    resetList();
     setHistoryModalShow(false);
     setTimeout(() => {
       setCurrentPicked(item);
       setShowText(true);
     }, 500);
-
   };
 
   const exportData = (item: paintDataFromLocal) => {
     const content = JSON.stringify({
       listData: item.listData,
-      canvaColor: item.canvaColor ?item.canvaColor: canvaColor
+      canvaColor: item.canvaColor ? item.canvaColor : canvaColor
     });
     let a = document.createElement("a");
     let file = new Blob([content], { type: "text/json" });
@@ -456,9 +462,10 @@ export default () => {
   const demoPlay = () => {
     let prevSpeed = speed;
 
-    let demoList = [wantItAll, starryNight]
+    let demoList = [wantItAll, starryNight];
     let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "" };
-    setList([]);
+    // setList([]);
+    resetList();
     setCurrentPicked(tempObj);
     setShowText(true);
     setSpeed(5);
@@ -466,17 +473,16 @@ export default () => {
     let count = starryNight.listData.length;
     // console.log('count', count)
     let tempIndex = 0;
-    if(demoIndex === 1) {
+    if (demoIndex === 1) {
       tempIndex = 0;
     } else {
-      tempIndex=1;
+      tempIndex = 1;
     }
     setDemoIndex(tempIndex);
     setTimeout(() => {
       // console.log('prevSpeed', prevSpeed)
       setSpeed(prevSpeed);
-
-    }, count*speed);
+    }, count * speed);
   };
 
   const changePenWidth = (item: number) => {
@@ -489,13 +495,11 @@ export default () => {
     setShowSpeedMenu(false);
   };
 
-
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
         <div className="header">Pixel Painter</div>
         <div className="btn_area">
-          
           <div className="btn_row">
             <div className="tip_text">功能操作</div>
             <div
@@ -532,13 +536,15 @@ export default () => {
             </div>
             <div
               className={`btn history_btn ${enable ? "" : "disable"}`}
-              onClick={()=>setHistoryModalShow(true)}
+              onClick={() => setHistoryModalShow(true)}
             >
               History
             </div>
             <div
-              className={`btn setting_btn ${enable ? "" : "disable"} ${settingPanelShow ? 'active':''}`}
-              onClick={()=>setSettingPanelShow(!settingPanelShow)}
+              className={`btn setting_btn ${enable ? "" : "disable"} ${
+                settingPanelShow ? "active" : ""
+              }`}
+              onClick={() => setSettingPanelShow(!settingPanelShow)}
             >
               Setting
             </div>
@@ -551,22 +557,22 @@ export default () => {
             ref={wrapRef}
             onTouchMove={(e) => (eraseMode ? eraseCube(e) : handleTouchMove(e))}
             style={{ backgroundColor: canvaColor }}
+            onTouchEnd={(e) => handleTouchEnd(e)}
           >
             {renderCube()}
           </div>
         </div>
-
       </div>
       {prevDataFromLocal.length && historyModalShow ? (
         <ModalTool
-            modalShow={historyModalShow}
-            modalCloseFunction={()=>setHistoryModalShow(false)}
-            modalWidth={"unset"}
-            modalHeight={"400px"}
-            modalInnerBackground={"#ffffff20"}
-            backgroundOpacity={0.5}
-            background={"#000000"}
-            zIndex={12}
+          modalShow={historyModalShow}
+          modalCloseFunction={() => setHistoryModalShow(false)}
+          modalWidth={"unset"}
+          modalHeight={"400px"}
+          modalInnerBackground={"#ffffff20"}
+          backgroundOpacity={0.5}
+          background={"#000000"}
+          zIndex={12}
         >
           <HistoryPanel
             prevDataFromLocal={prevDataFromLocal}
@@ -581,30 +587,30 @@ export default () => {
       ) : null}
 
       <DragPanel
-          id={"functionPanel"}
-          background={"transparent"}
-          childStartX={0.08}
-          childStartY={0.2}
-          show={settingPanelShow}
-          setShow={setSettingPanelShow}
-        >
-          <SettingPanel
-            canvaColor={canvaColor}
-            changeCanvaColor={changeCanvaColor}
-            currentColor={currentColor}
-            changeColor={changeColor}
-            showSpeedMenu={showSpeedMenu}
-            setShowSpeedMenu={setShowSpeedMenu}
-            speed={speed}
-            changeSpeedLevel={changeSpeedLevel}
-            showPenWidthMenu={showPenWidthMenu}
-            setShowPenWidthMenu={setShowPenWidthMenu}
-            penWidth={penWidth}
-            changePenWidth={changePenWidth}
-            eraseMode={eraseMode}
-            setEraseMode={setEraseMode}
-          />
-        </DragPanel>  
+        id={"functionPanel"}
+        background={"transparent"}
+        childStartX={0.08}
+        childStartY={0.2}
+        show={settingPanelShow}
+        setShow={setSettingPanelShow}
+      >
+        <SettingPanel
+          canvaColor={canvaColor}
+          changeCanvaColor={changeCanvaColor}
+          currentColor={currentColor}
+          changeColor={changeColor}
+          showSpeedMenu={showSpeedMenu}
+          setShowSpeedMenu={setShowSpeedMenu}
+          speed={speed}
+          changeSpeedLevel={changeSpeedLevel}
+          showPenWidthMenu={showPenWidthMenu}
+          setShowPenWidthMenu={setShowPenWidthMenu}
+          penWidth={penWidth}
+          changePenWidth={changePenWidth}
+          eraseMode={eraseMode}
+          setEraseMode={setEraseMode}
+        />
+      </DragPanel>
     </div>
   );
 };
