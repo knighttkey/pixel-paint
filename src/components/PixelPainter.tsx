@@ -43,6 +43,11 @@ interface WholeData {
   color: string;
 }
 
+interface PalmRejectSize {
+  w: number;
+  h: number;
+}
+
 export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const listPanelRef = useRef<HTMLDivElement>(null);
@@ -68,7 +73,16 @@ export default () => {
   const [historyModalShow, setHistoryModalShow] = useState(false);
   const [settingPanelShow, setSettingPanelShow] = useState(true);
   const [demoIndex, setDemoIndex] = useState<number>(0);
+  const [palmRejectShow, setPalmRejectShow] = useState<Boolean>(false);
+  const [palmRejectSizeIndex, setPalmRejectSizeIndex] = useState<number>(0);
+  const [isPainting, setIsPainting] = useState<Boolean>(false);
   // console.log('eraseMode', eraseMode)
+  const palmRejectSizeList: PalmRejectSize[] = [
+    { w: 200, h: 300 },
+    { w: 250, h: 400 },
+    { w: 350, h: 500 },
+    { w: 450, h: 600 }
+  ];
 
   // console.log('navigator.userAgent', navigator.userAgent)
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
@@ -238,9 +252,6 @@ export default () => {
     });
   };
 
-  // useEffect(() => {
-  //   paintCube();
-  // }, [list]);
 
   const renderCube = () => {
     return allList.map((dayItem, key) => {
@@ -287,6 +298,7 @@ export default () => {
   let temp = [...detectList];
   const handleTouchMove = (e: React.TouchEvent) => {
     e.stopPropagation();
+    setIsPainting(true);
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
@@ -324,6 +336,7 @@ export default () => {
 
   const handleTouchEnd = (e: any) => {
     setList(R.uniq(tempList));
+    setIsPainting(false);
   };
 
   const save = async () => {
@@ -409,9 +422,7 @@ export default () => {
   }, [showText]);
 
   const play = (item: paintDataFromLocal) => {
-    console.log("item", item);
-    // setList([]);
-    // eraseAllCube();
+    // console.log("item", item);
     resetList();
     setHistoryModalShow(false);
     setTimeout(() => {
@@ -493,6 +504,31 @@ export default () => {
     setShowSpeedMenu(false);
   };
 
+  const resizePalmRejectionPanel = (behavior: string) => {
+    let tempIndex = palmRejectSizeIndex;
+    switch (behavior) {
+      case "minus":
+        console.log("縮小");
+        if (tempIndex !== 0) {
+          tempIndex--;
+          console.log("tempIndex", tempIndex);
+          setPalmRejectSizeIndex(tempIndex);
+        }
+        break;
+      case "add":
+        console.log("放大");
+        if (tempIndex !== 3) {
+          tempIndex++;
+          console.log("tempIndex", tempIndex);
+          setPalmRejectSizeIndex(tempIndex);
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
@@ -536,7 +572,7 @@ export default () => {
               className={`btn history_btn ${enable ? "" : "disable"}`}
               onClick={() => setHistoryModalShow(true)}
             >
-              History
+              Gallery
             </div>
             <div
               className={`btn setting_btn ${enable ? "" : "disable"} ${
@@ -544,7 +580,7 @@ export default () => {
               }`}
               onClick={() => setSettingPanelShow(!settingPanelShow)}
             >
-              Setting
+              Setup
             </div>
           </div>
         </div>
@@ -607,8 +643,49 @@ export default () => {
           changePenWidth={changePenWidth}
           eraseMode={eraseMode}
           setEraseMode={setEraseMode}
+          palmRejectShow={palmRejectShow}
+          setPalmRejectShow={setPalmRejectShow}
         />
       </DragPanel>
+      {palmRejectShow ? (
+        <DragPanel
+          id={"palmRejectionPanel"}
+          background={"transparent"}
+          childStartX={0.65}
+          childStartY={0.1}
+          show={palmRejectShow}
+          setShow={setPalmRejectShow}
+          dragDisable={isPainting}
+        >
+          <div
+            className="palm_rejection"
+            style={{
+              width: `${palmRejectSizeList[palmRejectSizeIndex].w}px`,
+              height: `${palmRejectSizeList[palmRejectSizeIndex].h}px`
+            }}
+          >
+            <div className="resize_btn_area">
+              <div
+                className={`resize_btn ${
+                  palmRejectSizeIndex === 0 ? "disable" : ""
+                }`}
+                onClick={() => resizePalmRejectionPanel("minus")}
+              >
+                -
+              </div>
+              <div
+                className={`resize_btn ${
+                  palmRejectSizeIndex === 2 ? "disable" : ""
+                }`}
+                onClick={() => resizePalmRejectionPanel("add")}
+              >
+                +
+              </div>
+            </div>
+          </div>
+        </DragPanel>
+      ) : null}
     </div>
   );
 };
+// palmRejectSizeList  ,palmRejectSizeIndex  ,setPalmRejectSizeIndex

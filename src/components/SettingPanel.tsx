@@ -17,6 +17,8 @@ type Props = {
   changePenWidth: Function;
   eraseMode: Boolean;
   setEraseMode: Function;
+  palmRejectShow:Boolean;
+  setPalmRejectShow:Function;
 };
 
 export default (props: Props) => {
@@ -34,9 +36,11 @@ export default (props: Props) => {
     penWidth,
     changePenWidth,
     eraseMode,
-    setEraseMode
+    setEraseMode,
+    palmRejectShow,
+    setPalmRejectShow
   } = props;
-
+  
   const srokeWidthList = [1, 2, 3, 4, 5, 6];
   const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -89,6 +93,14 @@ export default (props: Props) => {
             toggleOn={eraseMode}
             switchAction={() => {}}
             setToggleOn={setEraseMode}
+          ></SwitchToggle>
+        </div>
+        <div className="area palm_reject_area">
+          <div className="palm_reject_tip">Palm</div>
+          <SwitchToggle
+            toggleOn={palmRejectShow}
+            switchAction={() => {}}
+            setToggleOn={setPalmRejectShow}
           ></SwitchToggle>
         </div>
       </div>

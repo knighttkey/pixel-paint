@@ -10,9 +10,10 @@ interface Props {
   childStartY: number;
   show: Boolean;
   setShow: Function;
+  dragDisable?: Boolean;
 }
 const DragPanel = (props: Props) => {
-  const { id, children, background, childStartX, childStartY, show, setShow } =
+  const { id, children, background, childStartX, childStartY, show, setShow, dragDisable } =
     props;
 
   const [parentSize, setParentSize] = useState({ x: 0, y: 0 });
@@ -35,6 +36,7 @@ const DragPanel = (props: Props) => {
   ) => {
     const targetEle = document.getElementById(id);
     e.stopPropagation();
+    if(dragDisable) return;
     if (!targetEle) return;
     const selfRect = targetEle.getBoundingClientRect();
     let rectPatchX = accordingX - selfRect.left;
@@ -44,6 +46,7 @@ const DragPanel = (props: Props) => {
   };
 
   const move = (accordingX: number, accordingY: number) => {
+    if(dragDisable) return;
     const targetEle = document.getElementById(id);
     if (!targetEle) return;
     const patchX = Number(targetEle.dataset.patchX);
@@ -105,6 +108,7 @@ const DragPanel = (props: Props) => {
   };
 
   const moveEnd = (e: React.TouchEvent) => {
+    if(dragDisable) return;
     // cancelDefault(e);
   };
 
