@@ -53,7 +53,7 @@ export default () => {
   const listPanelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [list, setList] = useState<coordinateData[]>([]);
-  // console.log('list', list)
+  // console.log("list", list);
 
   const [showText, setShowText] = useState<boolean>(false);
   const [prevDataFromLocal, setPrevDataFromLocal] = useState<
@@ -103,13 +103,6 @@ export default () => {
         window.innerWidth.toString()
       );
     }
-    // let appEle:any = document.querySelector('.App');
-    // if(!appEle) return;
-    // if(isMobile) {
-    //   appEle.style.height = 'unset';
-    // } else {
-    //   appEle.style.height = 'unset';
-    // }
   };
 
   useEffect(() => {
@@ -175,7 +168,7 @@ export default () => {
     return scaledCubeList;
   };
 
-  const handleReturnCubeId = (coorItem: DragPoint) => {
+  const getCubeId = (coorItem: DragPoint) => {
     // console.log("coorItem", coorItem);
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
@@ -212,18 +205,25 @@ export default () => {
     }
   };
 
-  const eraseCube = (e: React.TouchEvent) => {
+  const touchStart = () => {
+    setIsPainting(true);
+  };
+  const eraseMove = (e: React.TouchEvent) => {
+    e.stopPropagation();
+
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
     let clientYY = e.touches[0].clientY - parentRect.top;
+    // let coor = { x: 8*Math.floor(clientXX/8), y: 8*Math.floor(clientYY/8) };
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
-    // console.log('coor', coor)
+    // console.log("erase_coor", coor);
 
-    let currentChanged = handleReturnCubeId(coor);
+    let currentChanged = getCubeId(coor);
     // console.log("currentChanged", currentChanged);
     if (!currentChanged) return;
     let currentChangedWithoutColor = currentChanged.map((item: any, index) => {
+      if (!item) return;
       return { coor: item.id };
     });
     // console.log("currentChangedWithoutColor", currentChangedWithoutColor);
@@ -232,11 +232,14 @@ export default () => {
       return { coor: i.coor };
     });
     // console.log("withoutColor", withoutColor);
-    let compareResult = currentChangedWithoutColor.filter((x) =>
-      R.includes(x, withoutColor)
+    let compareResult = currentChangedWithoutColor.filter(
+      (x) => R.includes(x, withoutColor)
     );
-    // console.log("compareResult", compareResult);
+
+    // console.log("erase_compareResult", compareResult);
+
     compareResult.forEach((item) => {
+      if(!item) return;
       let ele = document.getElementById(item.coor);
       if (!ele) return;
       let targetIndex = tempList
@@ -251,7 +254,6 @@ export default () => {
       setList(tempList);
     });
   };
-
 
   const renderCube = () => {
     return allList.map((dayItem, key) => {
@@ -274,31 +276,25 @@ export default () => {
   useEffect(() => {
     if (detectList.length) {
       // console.log("detectList", detectList);
-      let lastChanged = handleReturnCubeId(detectList[detectList.length - 1]);
+      let lastChanged = getCubeId(detectList[detectList.length - 1]);
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
         // console.log("lastChanged", lastChanged);
         lastChanged.forEach((item: any, key) => {
           if (!item) return;
-          tempList.push({ coor: item.id, color: item.color });
-          paintCubeSingle({ coor: item.id, color: item.color });
+          if (eraseMode) {
+            // eraseCubeSingle({ coor: item.id });
+          } else {
+            paintCubeSingle({ coor: item.id, color: item.color });
+          }
         });
-        setList(R.uniq(tempList));
-        // setList(tempList);
-        setDetectList([]);
-
-        // paintCube(R.uniq(tempList));
-        // R.uniq(tempList).forEach((positionItem, index)=>{
-        //   paintCubeSingle(positionItem);
-        // })
       }
     }
   }, [detectList]);
 
   let temp = [...detectList];
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const paintMove = (e: React.TouchEvent) => {
     e.stopPropagation();
-    setIsPainting(true);
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
@@ -311,6 +307,7 @@ export default () => {
     } else {
       temp.push(coor);
     }
+    // console.log("temp", temp);
     setDetectList(temp);
   };
 
@@ -334,9 +331,25 @@ export default () => {
     });
   };
 
-  const handleTouchEnd = (e: any) => {
-    setList(R.uniq(tempList));
+  const eraseEnd = (e: any) => {
     setIsPainting(false);
+  };
+  const paintEnd = (e: any) => {
+    setIsPainting(false);
+
+    let allCubeData = detectList.map((item) => {
+      return getCubeId(item);
+    });
+    let bbfgb = R.flatten(allCubeData);
+    // console.log("allCubeData", allCubeData);
+    // console.log("bbfgb", bbfgb);
+    bbfgb.forEach((item: any, index) => {
+      if (!item) return;
+      tempList.push({ coor: item.id, color: item.color });
+    });
+    // console.log('tempList', tempList)
+    setList(R.uniq(tempList));
+    setDetectList([]);
   };
 
   const save = async () => {
@@ -589,9 +602,10 @@ export default () => {
             className="wrap"
             // draggable={true}
             ref={wrapRef}
-            onTouchMove={(e) => (eraseMode ? eraseCube(e) : handleTouchMove(e))}
+            onTouchStart={touchStart}
+            onTouchMove={(e) => (eraseMode ? eraseMove(e) : paintMove(e))}
+            onTouchEnd={(e) => (eraseMode ? eraseEnd(e) : paintEnd(e))}
             style={{ backgroundColor: canvaColor }}
-            onTouchEnd={(e) => handleTouchEnd(e)}
           >
             {renderCube()}
           </div>
@@ -647,42 +661,42 @@ export default () => {
           setPalmRejectShow={setPalmRejectShow}
         />
       </DragPanel>
-        <DragPanel
-          id={"palmRejectionPanel"}
-          background={"transparent"}
-          childStartX={0.65}
-          childStartY={0.1}
-          show={palmRejectShow}
-          setShow={setPalmRejectShow}
-          dragDisable={isPainting}
+      <DragPanel
+        id={"palmRejectionPanel"}
+        background={"transparent"}
+        childStartX={0.65}
+        childStartY={0.1}
+        show={palmRejectShow}
+        setShow={setPalmRejectShow}
+        dragDisable={isPainting}
+      >
+        <div
+          className="palm_rejection"
+          style={{
+            width: `${palmRejectSizeList[palmRejectSizeIndex].w}px`,
+            height: `${palmRejectSizeList[palmRejectSizeIndex].h}px`
+          }}
         >
-          <div
-            className="palm_rejection"
-            style={{
-              width: `${palmRejectSizeList[palmRejectSizeIndex].w}px`,
-              height: `${palmRejectSizeList[palmRejectSizeIndex].h}px`
-            }}
-          >
-            <div className="resize_btn_area">
-              <div
-                className={`resize_btn ${
-                  palmRejectSizeIndex === 0 ? "disable" : ""
-                }`}
-                onClick={() => resizePalmRejectionPanel("minus")}
-              >
-                -
-              </div>
-              <div
-                className={`resize_btn ${
-                  palmRejectSizeIndex === 2 ? "disable" : ""
-                }`}
-                onClick={() => resizePalmRejectionPanel("add")}
-              >
-                +
-              </div>
+          <div className="resize_btn_area">
+            <div
+              className={`resize_btn ${
+                palmRejectSizeIndex === 0 ? "disable" : ""
+              }`}
+              onClick={() => resizePalmRejectionPanel("minus")}
+            >
+              -
+            </div>
+            <div
+              className={`resize_btn ${
+                palmRejectSizeIndex === 2 ? "disable" : ""
+              }`}
+              onClick={() => resizePalmRejectionPanel("add")}
+            >
+              +
             </div>
           </div>
-        </DragPanel>
+        </div>
+      </DragPanel>
     </div>
   );
 };
