@@ -647,7 +647,6 @@ export default () => {
           setPalmRejectShow={setPalmRejectShow}
         />
       </DragPanel>
-      {palmRejectShow ? (
         <DragPanel
           id={"palmRejectionPanel"}
           background={"transparent"}
@@ -684,7 +683,6 @@ export default () => {
             </div>
           </div>
         </DragPanel>
-      ) : null}
     </div>
   );
 };
