@@ -277,6 +277,7 @@ export default () => {
   const eraseMove = (e: React.TouchEvent) => {
     e.stopPropagation();
     if (!canvaTouchEnable(e)) return;
+    // console.log('!canvaTouchEnable(e)', !canvaTouchEnable(e))
 
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
@@ -394,14 +395,14 @@ export default () => {
   };
   const paintEnd = (e: any) => {
     setIsPainting(false);
-    if (!canvaTouchEnable(e)) return;
+    // if (!canvaTouchEnable(e)) return;
     let allCubeData = detectList.map((item) => {
       return getCubeId(item);
     });
-    let bbfgb = R.flatten(allCubeData);
+    let flattenList = R.flatten(allCubeData);
     // console.log("allCubeData", allCubeData);
-    // console.log("bbfgb", bbfgb);
-    bbfgb.forEach((item: any, index) => {
+    // console.log("flattenList", flattenList);
+    flattenList.forEach((item: any, index) => {
       if (!item) return;
       tempList.push({ coor: item.id, color: item.color });
     });
@@ -629,7 +630,7 @@ export default () => {
     if (!setupPanelEle) return;
     let parentElement = setupPanelEle.parentElement;
     if (!parentElement) return;
-    console.log('parentElement', parentElement)
+    // console.log('parentElement', parentElement)
     parentElement.classList.add("hide");
   };
 
@@ -639,7 +640,7 @@ export default () => {
       if (!setupPanelEle) return;
       let parentElement = setupPanelEle.parentElement;
       if (!parentElement) return;
-      console.log('parentElement', parentElement)
+      // console.log('parentElement', parentElement)
       parentElement.classList.remove("hide");
     }
     setGalleryModalShow(false);
