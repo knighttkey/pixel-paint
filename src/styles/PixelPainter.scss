@@ -12,7 +12,7 @@
   // justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding: 50px 0;
+  // padding: 50px 0;
   ::-webkit-scrollbar {
     width: 5px;
     // background-color: #152637;
@@ -40,6 +40,7 @@
     transform: scale(1);
     transition: 0.1s;
     transform-origin: top;
+    margin: 50px 0 0 0;
     @media screen and(min-width:600px) and (max-width: 800px) {
       transform: scale(0.8);
     }

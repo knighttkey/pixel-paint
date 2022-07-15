@@ -44,7 +44,7 @@ const DragPanel = (props: Props) => {
     accordingX: number,
     accordingY: number,
     eventType: string
-  ) => {
+    ) => {
     // console.log("e", e);
     const targetEle = document.getElementById(id);
     e.stopPropagation();
@@ -97,6 +97,7 @@ const DragPanel = (props: Props) => {
     }
 
     if (accordingY) {
+      // let YwhenMove = accordingY - selfRect.top;
       let dragPositionY = accordingY - parentRect.top;
       if (dragPositionY < 0) {
         dragPositionY = 0;
