@@ -180,16 +180,16 @@
     @keyframes ItemPulseGreen {
       0% {
         transform: scale(1.00);
-        filter: drop-shadow(0px 0px 2px var(--border));
+        filter: drop-shadow(0px 0px 2px var(--custom-green));
         
       }
       50% {
         transform: scale(1.03);
-        filter: drop-shadow(0px 0px 5px var(--border));
+        filter: drop-shadow(0px 0px 5px var(--custom-green));
       }
       100% {
         transform: scale(1.00);
-        filter: drop-shadow(0px 0px 2px var(--border));
+        filter: drop-shadow(0px 0px 2px var(--custom-green));
       }
     }
   }
