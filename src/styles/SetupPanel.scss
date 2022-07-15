@@ -1,4 +1,4 @@
-.setting_panel_container {
+.setup_panel_container {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -8,6 +8,12 @@
     background-color: #0c1a2a;
     border:1px solid #2a8ab6;
     border-radius: 5px;
+    opacity: 1;
+    pointer-events: auto;
+    &.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
     .title {
       color: var(--main);
       font-size: 20px;
@@ -38,13 +44,13 @@
             line-height: 30px;
           }
           .color_picker {
-            opacity: 1;
             width: 30px;
             height: 30px;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 50%;
             background-color: transparent;
-            border-color: var(--border);
+            border: 1px solid var(--border);
+            padding: 0;
           }
         }
     
@@ -98,6 +104,25 @@
           }
     
         }
+        .touch_type_area {
+          &.must_bounce {
+            animation: ItemPulse 1.7s ease-in-out infinite;
+          }
+          &.must_bounce.custom_green {
+            animation: ItemPulseGreen 1.7s ease-in-out infinite;
+          }
+          .touch_type_tip {
+            color:var(--main);
+            font-weight: 600;
+            height: 30px;
+            line-height: 30px;
+            transition: .3s;
+            &.custom_green {
+              color: var(--custom-green);
+            }
+          }
+    
+        }
         .btn {
           width: 80px;
           height: 30px;
@@ -136,5 +161,35 @@
           }
         }
 
+    }
+    @keyframes ItemPulse {
+      0% {
+        transform: scale(1.00);
+        filter: drop-shadow(0px 0px 2px var(--border));
+        
+      }
+      50% {
+        transform: scale(1.03);
+        filter: drop-shadow(0px 0px 5px var(--border));
+      }
+      100% {
+        transform: scale(1.00);
+        filter: drop-shadow(0px 0px 2px var(--border));
+      }
+    }
+    @keyframes ItemPulseGreen {
+      0% {
+        transform: scale(1.00);
+        filter: drop-shadow(0px 0px 2px var(--border));
+        
+      }
+      50% {
+        transform: scale(1.03);
+        filter: drop-shadow(0px 0px 5px var(--border));
+      }
+      100% {
+        transform: scale(1.00);
+        filter: drop-shadow(0px 0px 2px var(--border));
+      }
     }
   }

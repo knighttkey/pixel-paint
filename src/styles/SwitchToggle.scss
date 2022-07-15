@@ -10,13 +10,16 @@
         justify-content:flex-end;
         border-radius: 20px;
         background-color: #bbbbbb;
-        border: #0088ff;
+        // border: #0088ff;
         cursor: pointer;
         transition: .3s;
         user-select: none;
         line-height: 20px;
+        &.custom_green {
+            background-color: var(--custom-green);
+        }
         &.on {
-            background-color: #2a8ab6;
+            background-color: var(--main);
             // border:#d2d2d2;
         }
         .toggle_button {

@@ -45,7 +45,7 @@ const DragPanel = (props: Props) => {
     accordingY: number,
     eventType: string
   ) => {
-    console.log("e", e);
+    // console.log("e", e);
     const targetEle = document.getElementById(id);
     e.stopPropagation();
     if (dragDisable) return;
@@ -59,7 +59,7 @@ const DragPanel = (props: Props) => {
   };
 
   const move = (accordingX: number, accordingY: number) => {
-    if (touchType === "pencil") return;
+    if (touchType === "stylus") return;
     if (dragDisable) return;
     if (pinned) return;
     const targetEle = document.getElementById(id);
@@ -141,11 +141,11 @@ const DragPanel = (props: Props) => {
       );
     };
     const w = roundTo(Number(e.width), 1);
-    console.log("w", w);
+    // console.log("w", w);
     const h = roundTo(Number(e.height), 1);
-    console.log("h", h);
+    // console.log("h", h);
     if (w < 1) {
-      setTouchType("pencil");
+      setTouchType("stylus");
     } else {
       setTouchType("finger");
     }

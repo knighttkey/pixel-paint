@@ -4,10 +4,11 @@ type Props = {
   toggleOn: Boolean;
   switchAction:Function;
   setToggleOn:Function;
+  customGreen?:Boolean;
 };
 
 export default (props: Props) => {
-  const { toggleOn,switchAction,setToggleOn } = props;
+  const { toggleOn,switchAction,setToggleOn, customGreen } = props;
 
   const handleSwitch = () => {
     switchAction();
@@ -16,7 +17,7 @@ export default (props: Props) => {
 
   return (
     <div className="switch_toggle_container">
-      <div className={`toggle_wrap ${toggleOn ? "on" : ""}`}
+      <div className={`toggle_wrap ${toggleOn ? "on" : ""} ${customGreen ? 'custom_green':''}`}
         onClick={() => handleSwitch()}
       >
         <div className={`toggle_button  ${toggleOn ? "on" : ""}`}></div>

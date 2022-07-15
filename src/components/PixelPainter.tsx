@@ -3,18 +3,18 @@ import React, {
   useRef,
   useState,
   MouseEvent,
-  useEffect
+  useEffect,
+  Fragment
 } from "react";
 import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
 import html2canvas from "html2canvas";
-import starryNight from "./../../jsonFile_16577771.json";
+import starryNight from "./../../jsonFile_16578030.json";
 import wantItAll from "./../../jsonFile_16576374.json";
-
 import DragPanel from "./DragPanel";
-import HistoryPanel from "./HistoryPanel";
+import GalleryPanel from "./GalleryPanel";
 import ModalTool from "./ModalTool";
-import SettingPanel from "./SettingPanel";
+import SetupPanel from "./SetupPanel";
 
 type DragPoint = {
   x: number;
@@ -32,12 +32,6 @@ export interface paintDataFromLocal {
 
 interface coordinateData {
   coor: string;
-  color: string;
-}
-
-interface WholeData {
-  ele: HTMLDivElement;
-  id: string;
   color: string;
 }
 
@@ -68,12 +62,14 @@ export default () => {
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [eraseMode, setEraseMode] = useState(false);
-  const [historyModalShow, setHistoryModalShow] = useState(false);
-  const [settingPanelShow, setSettingPanelShow] = useState(true);
+  const [galleryModalShow, setGalleryModalShow] = useState(false);
+  const [setupPanelShow, setSetupPanelShow] = useState(true);
   const [demoIndex, setDemoIndex] = useState<number>(0);
   const [palmRejectShow, setPalmRejectShow] = useState<Boolean>(false);
   const [palmRejectSizeIndex, setPalmRejectSizeIndex] = useState<number>(0);
   const [isPainting, setIsPainting] = useState<Boolean>(false);
+  const [touchBehavior, setTouchBehavior] = useState<string>("finger");
+  const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
   // console.log('eraseMode', eraseMode)
   const palmRejectSizeList: PalmRejectSize[] = [
     { w: 200, h: 300 },
@@ -154,7 +150,7 @@ export default () => {
         return { accordingX: innerKey, accordingY: key };
       });
     });
-    console.log("newList", newList);
+    // console.log("newList", newList);
     const makeupStroke = (
       newList: {
         accordingX: number;
@@ -166,13 +162,31 @@ export default () => {
           return [[newList[0][1]], newList[1], [newList[2][1]]];
           break;
         case 4:
-          return [[newList[0][1],newList[0][2]], newList[1], newList[2], [newList[3][1],newList[3][2]]];
+          return [
+            [newList[0][1], newList[0][2]],
+            newList[1],
+            newList[2],
+            [newList[3][1], newList[3][2]]
+          ];
           break;
         case 5:
-          return [[newList[0][2]], [newList[1][1],newList[1][2],newList[1][3]], newList[2], [newList[3][1],newList[3][2],newList[3][3]],[newList[4][2]]];
+          return [
+            [newList[0][2]],
+            [newList[1][1], newList[1][2], newList[1][3]],
+            newList[2],
+            [newList[3][1], newList[3][2], newList[3][3]],
+            [newList[4][2]]
+          ];
           break;
         case 6:
-          return [[newList[0][2],newList[0][3]], [newList[1][1],newList[1][2],newList[1][3],newList[1][4]], newList[2], newList[3], [newList[4][1],newList[4][2],newList[4][3],newList[4][4]],[newList[5][2],newList[5][3]]];
+          return [
+            [newList[0][2], newList[0][3]],
+            [newList[1][1], newList[1][2], newList[1][3], newList[1][4]],
+            newList[2],
+            newList[3],
+            [newList[4][1], newList[4][2], newList[4][3], newList[4][4]],
+            [newList[5][2], newList[5][3]]
+          ];
           break;
 
         default:
@@ -229,12 +243,40 @@ export default () => {
       console.log("err", err);
     }
   };
+  const renderCube = () => {
+    return allList.map((dayItem, key) => {
+      return (
+        <div key={key} className="hour">
+          {dayItem.map((cubeItem, cubeKey) => {
+            return (
+              <div
+                className={`cube`}
+                id={`${key + 1}-${cubeKey + 1}`}
+                key={cubeKey}
+              ></div>
+            );
+          })}
+        </div>
+      );
+    });
+  };
 
-  const touchStart = () => {
+  const canvaTouchEnable = (e: React.TouchEvent) => {
+    let behavior: string = getTouchBehavior(e);
+    // console.log("behavior", behavior);
+    if (behavior !== touchBehavior) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+  const touchStart = (e: React.TouchEvent) => {
     setIsPainting(true);
+    if (!canvaTouchEnable(e)) return;
   };
   const eraseMove = (e: React.TouchEvent) => {
     e.stopPropagation();
+    if (!canvaTouchEnable(e)) return;
 
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
@@ -280,24 +322,6 @@ export default () => {
     });
   };
 
-  const renderCube = () => {
-    return allList.map((dayItem, key) => {
-      return (
-        <div key={key} className="hour">
-          {dayItem.map((cubeItem, cubeKey) => {
-            return (
-              <div
-                className={`cube`}
-                id={`${key + 1}-${cubeKey + 1}`}
-                key={cubeKey}
-              ></div>
-            );
-          })}
-        </div>
-      );
-    });
-  };
-
   useEffect(() => {
     if (detectList.length) {
       // console.log("detectList", detectList);
@@ -320,6 +344,14 @@ export default () => {
   let temp = [...detectList];
   const paintMove = (e: React.TouchEvent) => {
     e.stopPropagation();
+
+    if (!canvaTouchEnable(e)) {
+      // alert(`若欲使用${touchBehavior === 'finger' ? '觸控筆':'指尖'}繪圖，請修改設定`);
+      setTouchTipShow(true);
+      
+      return;
+    }
+
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
@@ -358,10 +390,11 @@ export default () => {
 
   const eraseEnd = (e: any) => {
     setIsPainting(false);
+    if (!canvaTouchEnable(e)) return;
   };
   const paintEnd = (e: any) => {
     setIsPainting(false);
-
+    if (!canvaTouchEnable(e)) return;
     let allCubeData = detectList.map((item) => {
       return getCubeId(item);
     });
@@ -398,7 +431,7 @@ export default () => {
       setDetectList([]);
       // setList([]);
       resetList();
-      setHistoryModalShow(true);
+      setGalleryModalShow(true);
     }, 200);
     setTimeout(() => {
       if (listPanelRef.current) {
@@ -462,7 +495,7 @@ export default () => {
   const play = (item: paintDataFromLocal) => {
     // console.log("item", item);
     resetList();
-    setHistoryModalShow(false);
+    setGalleryModalShow(false);
     setTimeout(() => {
       setCurrentPicked(item);
       setShowText(true);
@@ -567,6 +600,67 @@ export default () => {
     }
   };
 
+  const getTouchBehavior = (e: any) => {
+    // console.log("e", e);
+    // console.log("e.touches", e.touches);
+    // console.log("e.touches[0]", e.touches[0]);
+    if (!e.touches.length) return "";
+    // console.log('getTouchBehavior_e.touches[0].radiusX', e.touches[0].radiusX)
+    const roundTo = (num: number, decimal: number) => {
+      return (
+        Math.round((num + Number.EPSILON) * Math.pow(10, decimal)) /
+        Math.pow(10, decimal)
+      );
+    };
+    const radius = roundTo(Number(e.touches[0].radiusX), 1);
+
+    // return radius;
+    if (radius > 1) {
+      return "finger";
+    } else {
+      return "stylus";
+    }
+  };
+
+  const visitGallery = () => {
+    setGalleryModalShow(true);
+    // setSetupPanelShow(false);
+    let setupPanelEle = document.querySelector(".setup_panel_container");
+    if (!setupPanelEle) return;
+    let parentElement = setupPanelEle.parentElement;
+    if (!parentElement) return;
+    console.log('parentElement', parentElement)
+    parentElement.classList.add("hide");
+  };
+
+  const closeGalleryModal = () => {
+    if (galleryModalShow) {
+      let setupPanelEle = document.querySelector(".setup_panel_container");
+      if (!setupPanelEle) return;
+      let parentElement = setupPanelEle.parentElement;
+      if (!parentElement) return;
+      console.log('parentElement', parentElement)
+      parentElement.classList.remove("hide");
+    }
+    setGalleryModalShow(false);
+  };
+
+  const startBounce = () => {
+    let toggleEle = document.getElementById("touchBehavior");
+    if (!toggleEle) return;
+    toggleEle.classList.add("must_bounce");
+
+    setTimeout(() => {
+      if (!toggleEle) return;
+      toggleEle.classList.remove("must_bounce");
+    }, 3500);
+  }
+
+  const closeTouchTipModal = () => {
+    setTouchTipShow(false);
+    startBounce();
+  }
+
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
@@ -608,15 +702,15 @@ export default () => {
             </div>
             <div
               className={`btn history_btn ${enable ? "" : "disable"}`}
-              onClick={() => setHistoryModalShow(true)}
+              onClick={() => visitGallery()}
             >
               Gallery
             </div>
             <div
-              className={`btn setting_btn ${enable ? "" : "disable"} ${
-                settingPanelShow ? "active" : ""
+              className={`btn setup_btn ${enable ? "" : "disable"} ${
+                setupPanelShow ? "active" : ""
               }`}
-              onClick={() => setSettingPanelShow(!settingPanelShow)}
+              onClick={() => setSetupPanelShow(!setupPanelShow)}
             >
               Setup
             </div>
@@ -627,7 +721,7 @@ export default () => {
             className="wrap"
             // draggable={true}
             ref={wrapRef}
-            onTouchStart={touchStart}
+            onTouchStart={(e) => touchStart(e)}
             onTouchMove={(e) => (eraseMode ? eraseMove(e) : paintMove(e))}
             onTouchEnd={(e) => (eraseMode ? eraseEnd(e) : paintEnd(e))}
             style={{ backgroundColor: canvaColor }}
@@ -636,10 +730,10 @@ export default () => {
           </div>
         </div>
       </div>
-      {prevDataFromLocal.length && historyModalShow ? (
+      {prevDataFromLocal.length && galleryModalShow ? (
         <ModalTool
-          modalShow={historyModalShow}
-          modalCloseFunction={() => setHistoryModalShow(false)}
+          modalShow={galleryModalShow}
+          modalCloseFunction={() => closeGalleryModal()}
           modalWidth={"unset"}
           modalHeight={"500px"}
           modalInnerBackground={"#ffffff20"}
@@ -647,15 +741,44 @@ export default () => {
           background={"#000000"}
           zIndex={12}
         >
-          <HistoryPanel
+          <GalleryPanel
             prevDataFromLocal={prevDataFromLocal}
             listPanelRef={listPanelRef}
             enable={enable}
             play={play}
             exportData={exportData}
             deleteThisPaint={deleteThisPaint}
-            setHistoryModalShow={setHistoryModalShow}
-          ></HistoryPanel>
+            setGalleryModalShow={setGalleryModalShow}
+            closeGalleryModal={closeGalleryModal}
+          ></GalleryPanel>
+        </ModalTool>
+      ) : null}
+      {touchTipShow ? (
+        <ModalTool
+          modalShow={touchTipShow}
+          modalCloseFunction={() => setTouchTipShow(false)}
+          modalWidth={"200px"}
+          modalHeight={"120px"}
+          modalInnerBackground={"#0c1a2a"}
+          backgroundOpacity={0.5}
+          background={"#000000"}
+          zIndex={12}
+        >
+          <div className="touch_tip_wrap">
+          <div className="touch_tip_text">
+            若欲使用{touchBehavior === "finger" ? "觸控筆" : "指尖"}
+            繪圖<br/>請修改設定
+          </div>
+          <div
+              className={`btn touch_tip_btn ${enable ? "" : "disable"}`}
+              onClick={()=>closeTouchTipModal()}
+            >
+              Yes
+            </div>
+          </div>
+          
+
+
         </ModalTool>
       ) : null}
 
@@ -664,10 +787,10 @@ export default () => {
         background={"transparent"}
         childStartX={0.08}
         childStartY={0.1}
-        show={settingPanelShow}
-        setShow={setSettingPanelShow}
+        show={setupPanelShow}
+        setShow={setSetupPanelShow}
       >
-        <SettingPanel
+        <SetupPanel
           canvaColor={canvaColor}
           changeCanvaColor={changeCanvaColor}
           currentColor={currentColor}
@@ -684,9 +807,11 @@ export default () => {
           setEraseMode={setEraseMode}
           palmRejectShow={palmRejectShow}
           setPalmRejectShow={setPalmRejectShow}
+          touchBehavior={touchBehavior}
+          setTouchBehavior={setTouchBehavior}
         />
       </DragPanel>
-      <DragPanel
+      {/* <DragPanel
         id={"palmRejectionPanel"}
         background={"transparent"}
         childStartX={0.65}
@@ -721,7 +846,7 @@ export default () => {
             </div>
           </div>
         </div>
-      </DragPanel>
+      </DragPanel> */}
     </div>
   );
 };

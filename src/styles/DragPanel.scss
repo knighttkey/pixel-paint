@@ -17,6 +17,12 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    opacity: 1;
+    pointer-events: auto;
+    &.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
     .pin_btn {
       .pin_icon {
         width: 12px;

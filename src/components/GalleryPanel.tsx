@@ -1,5 +1,5 @@
 import React from "react";
-import "./../styles/HistoryPanel.scss";
+import "./../styles/GalleryPanel.scss";
 import { paintDataFromLocal } from "./PixelPainter";
 import deleteIcon from "/images/icon_delete.svg";
 import closeIcon from "/images/xmark.svg";
@@ -11,7 +11,8 @@ type Props = {
   play: Function;
   exportData: Function;
   deleteThisPaint: Function;
-  setHistoryModalShow: Function;
+  setGalleryModalShow: Function;
+  closeGalleryModal: Function;
 };
 
 export default (props: Props) => {
@@ -22,7 +23,8 @@ export default (props: Props) => {
     play,
     exportData,
     deleteThisPaint,
-    setHistoryModalShow
+    setGalleryModalShow,
+    closeGalleryModal
   } = props;
   const scrollList = (e: any) => {
     e.stopPropagation();
@@ -35,7 +37,7 @@ export default (props: Props) => {
           <div
             className="close_icon"
             style={{ backgroundImage: `url(${closeIcon})` }}
-            onClick={() => setHistoryModalShow(false)}
+            onClick={() => closeGalleryModal()}
           ></div>
         </div>
       </div>

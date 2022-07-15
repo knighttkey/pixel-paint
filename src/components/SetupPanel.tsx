@@ -1,4 +1,4 @@
-import "./../styles/SettingPanel.scss";
+import "./../styles/SetupPanel.scss";
 import DropExpand from "./DropExpand";
 import SwitchToggle from "./SwitchToggle";
 
@@ -19,6 +19,8 @@ type Props = {
   setEraseMode: Function;
   palmRejectShow:Boolean;
   setPalmRejectShow:Function;
+  touchBehavior:string, 
+  setTouchBehavior: Function;
 };
 
 export default (props: Props) => {
@@ -38,14 +40,32 @@ export default (props: Props) => {
     eraseMode,
     setEraseMode,
     palmRejectShow,
-    setPalmRejectShow
+    setPalmRejectShow,
+    touchBehavior,
+    setTouchBehavior
   } = props;
   
   const srokeWidthList = [1, 2, 3, 4, 5, 6];
   const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+  const switchTouchBehavior = () => {
+    if(touchBehavior === 'finger') {
+      setTouchBehavior('stylus');
+    } else {
+      setTouchBehavior('finger');
+    }
+  }
+
+  const removeBounce = () => {
+    let toggleEle = document.getElementById('touchBehavior');
+    if(!toggleEle) return;
+    toggleEle.classList.remove('must_bounce');
+  }
+
+
+
   return (
-    <div className="setting_panel_container">
+    <div className="setup_panel_container">
       <div className="title">畫布參數</div>
       <div className="function">
         <div className="area color_area">
@@ -95,12 +115,21 @@ export default (props: Props) => {
             setToggleOn={setEraseMode}
           ></SwitchToggle>
         </div>
-        <div className="area palm_reject_area">
+        {/* <div className="area palm_reject_area">
           <div className="palm_reject_tip">Palm</div>
           <SwitchToggle
             toggleOn={palmRejectShow}
             switchAction={() => {}}
             setToggleOn={setPalmRejectShow}
+          ></SwitchToggle>
+        </div> */}
+        <div className={`area touch_type_area ${touchBehavior === 'stylus'?'custom_green':''}`} id='touchBehavior'>
+          <div className={`touch_type_tip ${touchBehavior==='finger' ? '' :'custom_green'}`}>{touchBehavior=== 'finger' ? 'Finger':'Stylus'}</div>
+          <SwitchToggle
+            toggleOn={touchBehavior === 'finger'? true:false}
+            switchAction={() => removeBounce()}
+            setToggleOn={switchTouchBehavior}
+            customGreen={true}
           ></SwitchToggle>
         </div>
       </div>

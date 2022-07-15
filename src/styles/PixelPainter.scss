@@ -1,6 +1,7 @@
 :root {
   --main: #2a8ab6;
   --border: #42c6fc;
+  --custom-green: #9ed433;
 }
 
 .pixel_canva_container {
@@ -103,7 +104,7 @@
           &.demo_btn {
             margin: 0 10px 0 0;
           }
-          &.setting_btn {
+          &.setup_btn {
             filter: brightness(1.5);
             &.active {
               background-color: var(--main);
@@ -199,6 +200,50 @@
         }
       }
 
+    }
+  }
+  .touch_tip_wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .touch_tip_text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      color:var(--main);
+      line-height: 20px;
+    }
+    .btn {
+      width: 60px;
+      height: 25px;
+      color: var(--main);
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid var(--main);
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      line-height: 23px;
+      transition: 0.3s;
+      margin: 15px 10px 0 10px;
+      position: relative;
+      cursor: pointer;
+      &:hover {
+        background-color: var(--main);
+        color: #0c1a2a;
+      }
+      &:active {
+        background-color: var(--main);
+        color: #0c1a2a;
+      }
+      &.disable {
+        pointer-events: none;
+        cursor: initial;
+        opacity: 0.5;
+      }
     }
   }
 }
