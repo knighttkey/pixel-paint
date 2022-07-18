@@ -15,6 +15,7 @@ import DragPanel from "./DragPanel";
 import GalleryPanel from "./GalleryPanel";
 import ModalTool from "./ModalTool";
 import SetupPanel from "./SetupPanel";
+import moment from "moment";
 
 type DragPoint = {
   x: number;
@@ -70,6 +71,7 @@ export default () => {
   const [isPainting, setIsPainting] = useState<Boolean>(false);
   const [touchBehavior, setTouchBehavior] = useState<string>("finger");
   const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
+  const [cubeDivide, setCubeDivide] = useState<number>(50);
   // console.log('eraseMode', eraseMode)
   const palmRejectSizeList: PalmRejectSize[] = [
     { w: 200, h: 300 },
@@ -125,8 +127,9 @@ export default () => {
     window.localStorage.setItem("pixelData", JSON.stringify(modified));
   };
 
-  const allList = new Array(50).fill(0).map((item, key) => {
-    return new Array(50).fill(0).map((key) => {
+
+  const allList = new Array(cubeDivide).fill(0).map((item, key) => {
+    return new Array(cubeDivide).fill(0).map((key) => {
       return key + 1;
     });
   });
@@ -253,6 +256,7 @@ export default () => {
                 className={`cube`}
                 id={`${key + 1}-${cubeKey + 1}`}
                 key={cubeKey}
+                style={{width:`${700/cubeDivide}px`, height:`${700/cubeDivide}px`}}
               ></div>
             );
           })}
@@ -509,6 +513,12 @@ export default () => {
       setCurrentPicked(item);
       setShowText(true);
     }, 500);
+    let count = item.listData.length;
+    setTimeout(() => {
+      console.log('open')
+      setSetupPanelShow(true);
+    }, count * speed);
+    
   };
 
   const exportData = (item: paintDataFromLocal) => {
@@ -519,7 +529,10 @@ export default () => {
     let a = document.createElement("a");
     let file = new Blob([content], { type: "text/json" });
     a.href = URL.createObjectURL(file);
-    a.download = `jsonFile_${Math.floor(Number(item.id) / 100000)}.json`;
+    // a.download = `jsonFile_${Math.floor(Number(item.id) / 100000)}.json`;
+    a.download = `jsonFile_${moment(new Date())
+      .locale('zh-tw')
+      .format('YYYY_MM_DD_hh_mm_ss')}.json`;
     a.click();
   };
 
@@ -635,23 +648,9 @@ export default () => {
   const visitGallery = () => {
     setGalleryModalShow(true);
     setSetupPanelShow(false);
-    // let setupPanelEle = document.querySelector(".setup_panel_container");
-    // if (!setupPanelEle) return;
-    // let parentElement = setupPanelEle.parentElement;
-    // if (!parentElement) return;
-    // // console.log('parentElement', parentElement)
-    // parentElement.classList.add("hide");
   };
 
   const closeGalleryModal = () => {
-    // if (galleryModalShow) {
-    //   let setupPanelEle = document.querySelector(".setup_panel_container");
-    //   if (!setupPanelEle) return;
-    //   let parentElement = setupPanelEle.parentElement;
-    //   if (!parentElement) return;
-    //   // console.log('parentElement', parentElement)
-    //   parentElement.classList.remove("hide");
-    // }
     setGalleryModalShow(false);
     setSetupPanelShow(true);
   };
@@ -672,15 +671,63 @@ export default () => {
     startBounce();
   };
 
-  useEffect(() => {
-    let debugListEle = document.querySelector(".debug_list");
-    if (debugListEle) {
-      debugListEle.scrollTo({
-        top: Number.MAX_SAFE_INTEGER,
-        behavior: "smooth",
-      });
-    }
-  }, [list]);
+  // useEffect(() => {
+  //   let debugListEle = document.querySelector(".debug_list");
+  //   if (debugListEle) {
+  //     debugListEle.scrollTo({
+  //       top: Number.MAX_SAFE_INTEGER,
+  //       behavior: "auto",
+  //     });
+  //   }
+  // }, [list]);
+
+  const handleEnlargeThisCube = (item:coordinateData) => {
+    let thisId = item.coor;
+    let thisCubeEle = document.getElementById(thisId);
+    // console.log('thisCubeEle', thisCubeEle)
+    thisCubeEle?.classList.add('enlarge');
+    let cubeList = [...document.querySelectorAll(".cube")];
+    cubeList.filter((i)=>{return (i !== thisCubeEle)}).forEach((c)=>{c.classList.remove('enlarge')})
+  }
+
+  const playFromThisFrame = (index:number, canvaColor:string) => {
+    console.log('index', index)
+    let tempOrigin = [...list];
+    let fromThisFrame = tempOrigin.filter((item,key)=>{
+      return (key >= index)
+    })
+    console.log('fromThisFrame', fromThisFrame)
+    tempList = [];
+    setList([]);
+    eraseAllCube();
+    setEnable(false);
+    fromThisFrame.forEach((item, key) => {
+      setTimeout(() => {
+        tempList.push({ coor: item.coor, color: item.color });
+        paintCubeSingle({ coor: item.coor, color: item.color });
+        setList([...tempList]);
+      }, speed * key);
+      setCurrentPicked(undefined);
+      // setShowText(false);
+    });
+    let count = fromThisFrame.length;
+    // console.log('count', count)
+    setTimeout(() => {
+      setEnable(true);
+    }, count * speed);
+  }
+
+  const removeThisFrame = (index:number) => {
+    console.log('index', index)
+    let tempOrigin = [...list];
+    let othersFrame = tempOrigin.filter((item,key)=>{
+      return (key !== index)
+    })
+    othersFrame.forEach((item, index)=>{
+      paintCubeSingle({ coor: item.coor, color: item.color });
+    })
+    setList(othersFrame);
+  }
 
   return (
     <div className="pixel_canva_container">
@@ -754,7 +801,7 @@ export default () => {
           <Fragment>
             <div
               className="debug_list"
-              style={{ overflowY: "scroll", height: "300px" }}
+              style={{ overflow: "scroll", height: "300px", marginTop:'50px', position:'relative' }}
             >
               {list.map((item, index) => {
                 return (
@@ -790,8 +837,12 @@ export default () => {
                         width: "20px",
                         height: "20px",
                         backgroundColor: item.color,
+                        marginRight:'15px'
                       }}
                     ></div>
+                    <button onClick={()=>handleEnlargeThisCube(item)}>顯示</button>
+                    <button onClick={()=>playFromThisFrame(index, canvaColor)}>從此播放</button>
+                    <button onClick={(e)=>removeThisFrame(index)}>刪除此格</button>
                   </div>
                 );
               })}
