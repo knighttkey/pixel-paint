@@ -467,7 +467,6 @@ export default () => {
   const readFile = (e: any) => {
     let files = e.target.files;
     console.log(files);
-    
 
     let reader = new FileReader();
     reader.onload = (r: any) => {
@@ -490,198 +489,12 @@ export default () => {
       }
     };
     reader.readAsText(files[0]);
-    e.target.value="";
+    e.target.value = "";
   };
 
   // console.log('enable', enable)
 
   // useEffect(()=>{
-
-  //   let ddate = [
-  //     { "coor": "31-26", "color": "#ffc5ab" },
-  //     { "coor": "31-25", "color": "#ffc5ab" },
-  //     { "coor": "31-24", "color": "#ffc5ab" },
-  //     { "coor": "31-23", "color": "#ffc5ab" },
-  //     { "coor": "31-22", "color": "#ffc5ab" },
-  //     { "coor": "31-21", "color": "#ffc5ab" },
-  //     { "coor": "31-20", "color": "#ffc5ab" },
-  //     { "coor": "31-19", "color": "#ffc5ab" },
-  //     { "coor": "31-18", "color": "#ffc5ab" },
-  //     { "coor": "31-17", "color": "#ffc5ab" },
-  //     { "coor": "31-16", "color": "#ffc5ab" },
-  //     { "coor": "30-15", "color": "#ffc5ab" },
-  //     { "coor": "30-14", "color": "#ffc5ab" },
-  //     { "coor": "29-14", "color": "#ffc5ab" },
-  //     { "coor": "29-13", "color": "#ffc5ab" },
-  //     { "coor": "28-13", "color": "#ffc5ab" },
-  //     { "coor": "31-15", "color": "#ffc5ab" },
-  //     { "coor": "32-17", "color": "#ffc5ab" },
-  //     { "coor": "32-18", "color": "#ffc5ab" },
-  //     { "coor": "32-19", "color": "#ffc5ab" },
-  //     { "coor": "32-20", "color": "#ffc5ab" },
-  //     { "coor": "32-21", "color": "#ffc5ab" },
-  //     { "coor": "32-22", "color": "#ffc5ab" },
-  //     { "coor": "32-23", "color": "#ffc5ab" },
-  //     { "coor": "32-24", "color": "#ffc5ab" },
-  //     { "coor": "18-14", "color": "#ffc5ab" },
-  //     { "coor": "19-14", "color": "#ffc5ab" },
-  //     { "coor": "19-13", "color": "#ffc5ab" },
-  //     { "coor": "20-13", "color": "#ffc5ab" },
-  //     { "coor": "20-12", "color": "#ffc5ab" },
-  //     { "coor": "21-12", "color": "#ffc5ab" },
-  //     { "coor": "21-11", "color": "#ffc5ab" },
-  //     { "coor": "22-11", "color": "#ffc5ab" },
-  //     { "coor": "23-11", "color": "#ffc5ab" },
-  //     { "coor": "24-11", "color": "#ffc5ab" },
-  //     { "coor": "25-11", "color": "#ffc5ab" },
-  //     { "coor": "26-11", "color": "#ffc5ab" },
-  //     { "coor": "27-11", "color": "#ffc5ab" },
-  //     { "coor": "28-11", "color": "#ffc5ab" },
-  //     { "coor": "28-12", "color": "#ffc5ab" },
-  //     { "coor": "29-12", "color": "#ffc5ab" },
-  //     { "coor": "30-12", "color": "#ffc5ab" },
-  //     { "coor": "30-13", "color": "#ffc5ab" },
-  //     { "coor": "31-13", "color": "#ffc5ab" },
-  //     { "coor": "31-14", "color": "#ffc5ab" },
-  //     { "coor": "32-16", "color": "#ffc5ab" },
-  //     { "coor": "32-15", "color": "#ffc5ab" },
-  //     { "coor": "27-12", "color": "#ffc5ab" },
-  //     { "coor": "26-12", "color": "#ffc5ab" },
-  //     { "coor": "25-12", "color": "#ffc5ab" },
-  //     { "coor": "24-12", "color": "#ffc5ab" },
-  //     { "coor": "23-12", "color": "#ffc5ab" },
-  //     { "coor": "22-12", "color": "#ffc5ab" },
-  //     { "coor": "21-13", "color": "#ffc5ab" },
-  //     { "coor": "18-15", "color": "#ffc5ab" },
-  //     { "coor": "18-18", "color": "#ffc5ab" },
-  //     { "coor": "30-17", "color": "#ffc5ab" },
-  //     { "coor": "29-17", "color": "#ffc5ab" },
-  //     { "coor": "29-16", "color": "#ffc5ab" },
-  //     { "coor": "30-16", "color": "#ffc5ab" },
-  //     { "coor": "30-18", "color": "#ffc5ab" },
-  //     { "coor": "29-18", "color": "#ffc5ab" },
-  //     { "coor": "28-18", "color": "#ffc5ab" },
-  //     { "coor": "27-18", "color": "#ffc5ab" },
-  //     { "coor": "26-18", "color": "#ffc5ab" },
-  //     { "coor": "25-18", "color": "#ffc5ab" },
-  //     { "coor": "24-18", "color": "#ffc5ab" },
-  //     { "coor": "23-18", "color": "#ffc5ab" },
-  //     { "coor": "22-18", "color": "#ffc5ab" },
-  //     { "coor": "22-17", "color": "#ffc5ab" },
-  //     { "coor": "22-16", "color": "#ffc5ab" },
-  //     { "coor": "22-15", "color": "#ffc5ab" },
-  //     { "coor": "22-14", "color": "#ffc5ab" },
-  //     { "coor": "23-14", "color": "#ffc5ab" },
-  //     { "coor": "23-15", "color": "#ffc5ab" },
-  //     { "coor": "23-16", "color": "#ffc5ab" },
-  //     { "coor": "23-17", "color": "#ffc5ab" },
-  //     { "coor": "24-14", "color": "#ffc5ab" },
-  //     { "coor": "24-13", "color": "#ffc5ab" },
-  //     { "coor": "25-13", "color": "#ffc5ab" },
-  //     { "coor": "26-13", "color": "#ffc5ab" },
-  //     { "coor": "27-13", "color": "#ffc5ab" },
-  //     { "coor": "27-14", "color": "#ffc5ab" },
-  //     { "coor": "27-15", "color": "#ffc5ab" },
-  //     { "coor": "28-15", "color": "#ffc5ab" },
-  //     { "coor": "29-15", "color": "#ffc5ab" },
-  //     { "coor": "28-14", "color": "#ffc5ab" },
-  //     { "coor": "28-16", "color": "#ffc5ab" },
-  //     { "coor": "28-17", "color": "#ffc5ab" },
-  //     { "coor": "27-16", "color": "#ffc5ab" },
-  //     { "coor": "26-16", "color": "#ffc5ab" },
-  //     { "coor": "25-16", "color": "#ffc5ab" },
-  //     { "coor": "24-16", "color": "#ffc5ab" },
-  //     { "coor": "24-15", "color": "#ffc5ab" },
-  //     { "coor": "25-15", "color": "#ffc5ab" },
-  //     { "coor": "26-15", "color": "#ffc5ab" },
-  //     { "coor": "26-14", "color": "#ffc5ab" },
-  //     { "coor": "25-14", "color": "#ffc5ab" },
-  //     { "coor": "24-17", "color": "#ffc5ab" },
-  //     { "coor": "25-17", "color": "#ffc5ab" },
-  //     { "coor": "23-20", "color": "#ffc5ab" },
-  //     { "coor": "24-20", "color": "#ffc5ab" },
-  //     { "coor": "25-20", "color": "#ffc5ab" },
-  //     { "coor": "26-20", "color": "#ffc5ab" },
-  //     { "coor": "27-20", "color": "#ffc5ab" },
-  //     { "coor": "28-20", "color": "#ffc5ab" },
-  //     { "coor": "28-19", "color": "#ffc5ab" },
-  //     { "coor": "29-20", "color": "#ffc5ab" },
-  //     { "coor": "30-20", "color": "#ffc5ab" },
-  //     { "coor": "30-21", "color": "#ffc5ab" },
-  //     { "coor": "29-21", "color": "#ffc5ab" },
-  //     { "coor": "29-22", "color": "#ffc5ab" },
-  //     { "coor": "29-23", "color": "#ffc5ab" },
-  //     { "coor": "30-23", "color": "#ffc5ab" },
-  //     { "coor": "28-23", "color": "#ffc5ab" },
-  //     { "coor": "27-23", "color": "#ffc5ab" },
-  //     { "coor": "26-23", "color": "#ffc5ab" },
-  //     { "coor": "26-22", "color": "#ffc5ab" },
-  //     { "coor": "27-22", "color": "#ffc5ab" },
-  //     { "coor": "28-21", "color": "#ffc5ab" },
-  //     { "coor": "27-21", "color": "#ffc5ab" },
-  //     { "coor": "26-21", "color": "#ffc5ab" },
-  //     { "coor": "25-21", "color": "#ffc5ab" },
-  //     { "coor": "24-21", "color": "#ffc5ab" },
-  //     { "coor": "23-21", "color": "#ffc5ab" },
-  //     { "coor": "22-21", "color": "#ffc5ab" },
-  //     { "coor": "22-20", "color": "#ffc5ab" },
-  //     { "coor": "22-19", "color": "#ffc5ab" },
-  //     { "coor": "23-19", "color": "#ffc5ab" },
-  //     { "coor": "21-19", "color": "#ffc5ab" },
-  //     { "coor": "21-20", "color": "#ffc5ab" },
-  //     { "coor": "21-21", "color": "#ffc5ab" },
-  //     { "coor": "21-22", "color": "#ffc5ab" },
-  //     { "coor": "21-23", "color": "#ffc5ab" },
-  //     { "coor": "21-24", "color": "#ffc5ab" },
-  //     { "coor": "21-25", "color": "#ffc5ab" },
-  //     { "coor": "21-26", "color": "#ffc5ab" },
-  //     { "coor": "20-26", "color": "#ffc5ab" },
-  //     { "coor": "20-25", "color": "#ffc5ab" },
-  //     { "coor": "20-24", "color": "#ffc5ab" },
-  //     { "coor": "20-23", "color": "#ffc5ab" },
-  //     { "coor": "20-22", "color": "#ffc5ab" },
-  //     { "coor": "20-21", "color": "#ffc5ab" },
-  //     { "coor": "20-20", "color": "#ffc5ab" },
-  //     { "coor": "20-19", "color": "#ffc5ab" },
-  //     { "coor": "19-19", "color": "#ffc5ab" },
-  //     { "coor": "18-19", "color": "#ffc5ab" },
-  //     { "coor": "22-27", "color": "#ffc5ab" },
-  //     { "coor": "22-26", "color": "#ffc5ab" },
-  //     { "coor": "22-25", "color": "#ffc5ab" },
-  //     { "coor": "22-24", "color": "#ffc5ab" },
-  //     { "coor": "22-23", "color": "#ffc5ab" },
-  //     { "coor": "23-26", "color": "#ffc5ab" },
-  //     { "coor": "23-25", "color": "#ffc5ab" },
-  //     { "coor": "23-24", "color": "#ffc5ab" },
-  //     { "coor": "24-24", "color": "#ffc5ab" },
-  //     { "coor": "25-24", "color": "#ffc5ab" },
-  //     { "coor": "25-25", "color": "#ffc5ab" },
-  //     { "coor": "24-25", "color": "#ffc5ab" },
-  //     { "coor": "24-26", "color": "#ffc5ab" },
-  //     { "coor": "24-27", "color": "#ffc5ab" },
-  //     { "coor": "24-28", "color": "#ffc5ab" },
-  //     { "coor": "23-28", "color": "#ffc5ab" },
-  //     { "coor": "23-27", "color": "#ffc5ab" },
-  //     { "coor": "25-28", "color": "#ffc5ab" },
-  //     { "coor": "26-28", "color": "#ffc5ab" },
-  //     { "coor": "27-28", "color": "#ffc5ab" },
-  //     { "coor": "28-28", "color": "#ffc5ab" },
-  //     { "coor": "22-11", "color": "#ffc5ab" },
-  //     { "coor": "23-11", "color": "#ffc5ab" },
-  //     { "coor": "24-11", "color": "#ffc5ab" },
-  //     { "coor": "25-11", "color": "#ffc5ab" },
-  //     { "coor": "26-11", "color": "#ffc5ab" },
-  //     { "coor": "27-11", "color": "#ffc5ab" },
-  //     { "coor": "22-13", "color": "#ffc5ab" },
-  //     { "coor": "23-13", "color": "#ffc5ab" },
-  //     { "coor": "22-14", "color": "#ffc5ab" },
-  //     { "coor": "19-22", "color": "#ffc5ab" },
-  //     { "coor": "19-23", "color": "#ffc5ab" },
-  //     { "coor": "23-23", "color": "#ffc5ab" },
-  //     { "coor": "24-23", "color": "#ffc5ab" },
-  //     { "coor": "25-23", "color": "#ffc5ab" },
-  //     { "coor": "25-22", "color": "#ffc5ab" },
-  //   ]
   //   function sort(ddate:any) {
   //     return ddate.sort(() => Math.random() - 0.5);
   //   }
@@ -724,7 +537,7 @@ export default () => {
       // setCurrentPicked(item);
       setShowText(true);
     }, 500);
-    if(!currentPicked) return;
+    if (!currentPicked) return;
     let count = currentPicked.listData.length;
     setTimeout(() => {
       console.log("open");
@@ -790,7 +603,7 @@ export default () => {
     if (demoIndex === 2) {
       tempIndex = 0;
     } else {
-      tempIndex = demoIndex+1;
+      tempIndex = demoIndex + 1;
     }
     setDemoIndex(tempIndex);
     setTimeout(() => {
@@ -948,6 +761,76 @@ export default () => {
   };
   const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+  const prepareToExportVideo = () => {
+    return new Promise<string>((resolve, reject) => {
+      const canvas = document.createElement("canvas");
+      // canvas.style.backgroundColor = canvaColor;
+      canvas.height = 700;
+      canvas.width = 700;
+      let ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      if (!wrapRef.current) return;
+      let parentRect = wrapRef.current.getBoundingClientRect();
+      ctx.clearRect(0, 0, 700, 700);
+      ctx.fillStyle = canvaColor;
+      ctx.fillRect(0, 0, 700, 700);
+      // ctx.fill = canvaColor;
+      list.forEach((item, key) => {
+        if (!ctx) return;
+
+        setTimeout(() => {
+          let ele = document.getElementById(item.coor);
+          console.log("ele", ele);
+          if (!ele) return;
+          if (!ctx) return;
+          let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
+          // .getPropertyValue("backgroundColor");
+          console.log("eleBgColor", eleBgColor);
+          let eleRect = ele.getBoundingClientRect();
+          console.log("eleRect", eleRect);
+
+          console.log("parentRect", parentRect);
+
+
+          let top = eleRect.top - parentRect.top;
+          let left = eleRect.left - parentRect.left;
+          let width = eleRect.width;
+          let height = eleRect.height;
+          let topRatio = top / parentRect.height;
+          let leftRatio = top / parentRect.width;
+          let heightRatio = eleRect.height / parentRect.height;
+          let widthRatio = eleRect.width / parentRect.width;
+          console.log("rect", top, left, width, height);
+          console.log("ratio", topRatio, leftRatio, heightRatio, widthRatio);
+          ctx.fillStyle = eleBgColor;
+          ctx.fillRect(left, top, width, height);
+        }, key * speed);
+      });
+
+
+      function recordCanvas(canvas:any, videoLength:any) {
+        const recordedChunks:any = [];
+        const mediaRecorder = new MediaRecorder(
+          canvas.captureStream(25), {mimeType: 'video/webm; codecs=vp9'});
+        mediaRecorder.ondataavailable = 
+          event => recordedChunks.push(event.data);
+        mediaRecorder.onstop = () => {
+          const url = URL.createObjectURL(
+            new Blob(recordedChunks, {type: "video/webm"}));
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = "video.webm";
+          anchor.click();
+          window.URL.revokeObjectURL(url);
+        }
+        mediaRecorder.start();
+        window.setTimeout(() => {mediaRecorder.stop();}, 12000);
+      }
+
+      recordCanvas(canvas, 2000);
+    });
+  };
+
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
@@ -1016,6 +899,12 @@ export default () => {
             {renderCube()}
           </div>
         </div>
+        <button onClick={() => prepareToExportVideo()}>準備輸出</button>
+        <video id="video" width="160" height="90" muted autoPlay controls>
+          <a>
+            <button></button>
+          </a>
+        </video>
         {/* {list.length ? (
           <Fragment>
             <div
@@ -1103,7 +992,7 @@ export default () => {
             setGalleryModalShow={setGalleryModalShow}
             closeGalleryModal={closeGalleryModal}
             setSpeedChangeModalShow={setSpeedChangeModalShow}
-            setCurrentPicked ={setCurrentPicked}
+            setCurrentPicked={setCurrentPicked}
           ></GalleryPanel>
         </ModalTool>
       ) : null}
@@ -1146,10 +1035,13 @@ export default () => {
           background={"#000000"}
           zIndex={12}
         >
-          <div className={`speed_change_wrap ${showSpeedMenuBeforePlay ? '':'changed'}`}>
+          <div
+            className={`speed_change_wrap ${
+              showSpeedMenuBeforePlay ? "" : "changed"
+            }`}
+          >
             <div className="speed_change_tip_text">
-             Change Play Speed Level? 
-              (Max:1)
+              Change Play Speed Level? (Max:1)
             </div>
             <DropExpand
               showMenu={showSpeedMenuBeforePlay}
@@ -1157,17 +1049,15 @@ export default () => {
               defaultValue={speed}
               menuList={speedList}
               action={changeSpeedLevel}
-
             ></DropExpand>
             <div className="btn_wrap">
-            <div
-              className={`btn speed_change_btn ${enable ? "" : "disable"}`}
-              onClick={() => play()}
-            >
-              Start
+              <div
+                className={`btn speed_change_btn ${enable ? "" : "disable"}`}
+                onClick={() => play()}
+              >
+                Start
+              </div>
             </div>
-            </div>
-
           </div>
         </ModalTool>
       ) : null}
@@ -1201,42 +1091,6 @@ export default () => {
           setTouchBehavior={setTouchBehavior}
         />
       </DragPanel>
-      {/* <DragPanel
-        id={"palmRejectionPanel"}
-        background={"transparent"}
-        childStartX={0.65}
-        childStartY={0.1}
-        show={palmRejectShow}
-        setShow={setPalmRejectShow}
-        dragDisable={isPainting}
-      >
-        <div
-          className="palm_rejection"
-          style={{
-            width: `${palmRejectSizeList[palmRejectSizeIndex].w}px`,
-            height: `${palmRejectSizeList[palmRejectSizeIndex].h}px`
-          }}
-        >
-          <div className="resize_btn_area">
-            <div
-              className={`resize_btn ${
-                palmRejectSizeIndex === 0 ? "disable" : ""
-              }`}
-              onClick={() => resizePalmRejectionPanel("minus")}
-            >
-              -
-            </div>
-            <div
-              className={`resize_btn ${
-                palmRejectSizeIndex === 2 ? "disable" : ""
-              }`}
-              onClick={() => resizePalmRejectionPanel("add")}
-            >
-              +
-            </div>
-          </div>
-        </div>
-      </DragPanel> */}
     </div>
   );
 };
