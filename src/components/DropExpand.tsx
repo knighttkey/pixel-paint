@@ -24,7 +24,7 @@ export default (props: Props) => {
           {menuList.map((item, index) => {
             return (
               <div
-                className="each_item"
+                className={`each_item ${item === defaultValue ? 'current_item':''}`}
                 key={index}
                 onClick={() => action(item)}
               >

@@ -13,6 +13,8 @@ type Props = {
   deleteThisPaint: Function;
   setGalleryModalShow: Function;
   closeGalleryModal: Function;
+  setSpeedChangeModalShow: Function;
+  setCurrentPicked:Function;
 };
 
 export default (props: Props) => {
@@ -24,11 +26,18 @@ export default (props: Props) => {
     exportData,
     deleteThisPaint,
     setGalleryModalShow,
-    closeGalleryModal
+    closeGalleryModal,
+    setSpeedChangeModalShow,
+    setCurrentPicked
   } = props;
   const scrollList = (e: any) => {
     e.stopPropagation();
   };
+
+  const prepareToPlay = (item:paintDataFromLocal) => {
+    setCurrentPicked(item);
+    setSpeedChangeModalShow(true)
+  }
   return (
     <div className="list_panel_container">
       <div className="list_panel_header">
@@ -55,7 +64,7 @@ export default (props: Props) => {
                 <img className="thumbnail" src={item.thumbnail}></img>
                 <div
                   className={`play_btn ${enable ? "" : "disable"}`}
-                  onClick={() => play(item)}
+                  onClick={() => prepareToPlay(item)}
                 >
                   Play
                 </div>

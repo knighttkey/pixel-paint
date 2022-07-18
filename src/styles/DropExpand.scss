@@ -85,17 +85,25 @@
         }
         .each_item {
           width: 100%;
+          height: 100%;
           cursor: pointer;
           transition: .3s;
           box-sizing: border-box;
           padding: 0 8px;
           border-right: dashed 1px var(--main);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           &:hover {
             background-color: var(--main);
             color: #0c1a2a;
           }
           &:last-child {
             border-right: none;
+          }
+          &.current_item {
+            background-color: var(--main);
+            color: #0c1a2a;
           }
         }
         &::-webkit-scrollbar {

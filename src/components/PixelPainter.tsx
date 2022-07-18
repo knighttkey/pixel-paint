@@ -4,18 +4,21 @@ import React, {
   useState,
   MouseEvent,
   useEffect,
-  Fragment,
+  Fragment
 } from "react";
 import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
 import html2canvas from "html2canvas";
 import starryNight from "./../../jsonFile_16578030.json";
 import wantItAll from "./../../jsonFile_16576374.json";
+import wretched from "./../../jsonFile_wretched.json";
 import DragPanel from "./DragPanel";
 import GalleryPanel from "./GalleryPanel";
 import ModalTool from "./ModalTool";
 import SetupPanel from "./SetupPanel";
 import moment from "moment";
+// import Dropdown from "./Dropdown";
+import DropExpand from "./DropExpand";
 
 type DragPoint = {
   x: number;
@@ -62,6 +65,8 @@ export default () => {
   const [penWidth, setPenWidth] = useState<number>(1);
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
+  const [showSpeedMenuBeforePlay, setShowSpeedMenuBeforePlay] =
+    useState<Boolean>(true);
   const [eraseMode, setEraseMode] = useState(false);
   const [galleryModalShow, setGalleryModalShow] = useState(false);
   const [setupPanelShow, setSetupPanelShow] = useState(true);
@@ -72,12 +77,14 @@ export default () => {
   const [touchBehavior, setTouchBehavior] = useState<string>("finger");
   const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
   const [cubeDivide, setCubeDivide] = useState<number>(50);
+  const [speedChangeModalShow, setSpeedChangeModalShow] =
+    useState<Boolean>(false);
   // console.log('eraseMode', eraseMode)
   const palmRejectSizeList: PalmRejectSize[] = [
     { w: 200, h: 300 },
     { w: 250, h: 400 },
     { w: 350, h: 500 },
-    { w: 450, h: 600 },
+    { w: 450, h: 600 }
   ];
 
   // console.log('navigator.userAgent', navigator.userAgent)
@@ -127,7 +134,6 @@ export default () => {
     window.localStorage.setItem("pixelData", JSON.stringify(modified));
   };
 
-
   const allList = new Array(cubeDivide).fill(0).map((item, key) => {
     return new Array(cubeDivide).fill(0).map((key) => {
       return key + 1;
@@ -169,7 +175,7 @@ export default () => {
             [newList[0][1], newList[0][2]],
             newList[1],
             newList[2],
-            [newList[3][1], newList[3][2]],
+            [newList[3][1], newList[3][2]]
           ];
           break;
         case 5:
@@ -178,7 +184,7 @@ export default () => {
             [newList[1][1], newList[1][2], newList[1][3]],
             newList[2],
             [newList[3][1], newList[3][2], newList[3][3]],
-            [newList[4][2]],
+            [newList[4][2]]
           ];
           break;
         case 6:
@@ -188,7 +194,7 @@ export default () => {
             newList[2],
             newList[3],
             [newList[4][1], newList[4][2], newList[4][3], newList[4][4]],
-            [newList[5][2], newList[5][3]],
+            [newList[5][2], newList[5][3]]
           ];
           break;
 
@@ -256,7 +262,10 @@ export default () => {
                 className={`cube`}
                 id={`${key + 1}-${cubeKey + 1}`}
                 key={cubeKey}
-                style={{width:`${700/cubeDivide}px`, height:`${700/cubeDivide}px`}}
+                style={{
+                  width: `${700 / cubeDivide}px`,
+                  height: `${700 / cubeDivide}px`
+                }}
               ></div>
             );
           })}
@@ -423,8 +432,8 @@ export default () => {
         listData: list,
         id: new Date().getTime().toString(),
         thumbnail: thumbnail,
-        canvaColor: canvaColor,
-      },
+        canvaColor: canvaColor
+      }
     ];
     console.log("prepare", prepare);
     window.localStorage.setItem("pixelData", JSON.stringify(prepare));
@@ -443,19 +452,23 @@ export default () => {
       if (listPanelRef.current) {
         listPanelRef.current.scrollTo({
           top: Number.MAX_SAFE_INTEGER,
-          behavior: "smooth",
+          behavior: "smooth"
         });
       }
     }, 250);
   };
 
   const importList = () => {
-    setList([]);
+    tempList = [];
+    // setList([]);
+    resetList();
   };
 
   const readFile = (e: any) => {
     let files = e.target.files;
-    // console.log(files);
+    console.log(files);
+    
+
     let reader = new FileReader();
     reader.onload = (r: any) => {
       //  console.log(r.target.result);
@@ -477,9 +490,205 @@ export default () => {
       }
     };
     reader.readAsText(files[0]);
+    e.target.value="";
   };
 
   // console.log('enable', enable)
+
+  // useEffect(()=>{
+
+  //   let ddate = [
+  //     { "coor": "31-26", "color": "#ffc5ab" },
+  //     { "coor": "31-25", "color": "#ffc5ab" },
+  //     { "coor": "31-24", "color": "#ffc5ab" },
+  //     { "coor": "31-23", "color": "#ffc5ab" },
+  //     { "coor": "31-22", "color": "#ffc5ab" },
+  //     { "coor": "31-21", "color": "#ffc5ab" },
+  //     { "coor": "31-20", "color": "#ffc5ab" },
+  //     { "coor": "31-19", "color": "#ffc5ab" },
+  //     { "coor": "31-18", "color": "#ffc5ab" },
+  //     { "coor": "31-17", "color": "#ffc5ab" },
+  //     { "coor": "31-16", "color": "#ffc5ab" },
+  //     { "coor": "30-15", "color": "#ffc5ab" },
+  //     { "coor": "30-14", "color": "#ffc5ab" },
+  //     { "coor": "29-14", "color": "#ffc5ab" },
+  //     { "coor": "29-13", "color": "#ffc5ab" },
+  //     { "coor": "28-13", "color": "#ffc5ab" },
+  //     { "coor": "31-15", "color": "#ffc5ab" },
+  //     { "coor": "32-17", "color": "#ffc5ab" },
+  //     { "coor": "32-18", "color": "#ffc5ab" },
+  //     { "coor": "32-19", "color": "#ffc5ab" },
+  //     { "coor": "32-20", "color": "#ffc5ab" },
+  //     { "coor": "32-21", "color": "#ffc5ab" },
+  //     { "coor": "32-22", "color": "#ffc5ab" },
+  //     { "coor": "32-23", "color": "#ffc5ab" },
+  //     { "coor": "32-24", "color": "#ffc5ab" },
+  //     { "coor": "18-14", "color": "#ffc5ab" },
+  //     { "coor": "19-14", "color": "#ffc5ab" },
+  //     { "coor": "19-13", "color": "#ffc5ab" },
+  //     { "coor": "20-13", "color": "#ffc5ab" },
+  //     { "coor": "20-12", "color": "#ffc5ab" },
+  //     { "coor": "21-12", "color": "#ffc5ab" },
+  //     { "coor": "21-11", "color": "#ffc5ab" },
+  //     { "coor": "22-11", "color": "#ffc5ab" },
+  //     { "coor": "23-11", "color": "#ffc5ab" },
+  //     { "coor": "24-11", "color": "#ffc5ab" },
+  //     { "coor": "25-11", "color": "#ffc5ab" },
+  //     { "coor": "26-11", "color": "#ffc5ab" },
+  //     { "coor": "27-11", "color": "#ffc5ab" },
+  //     { "coor": "28-11", "color": "#ffc5ab" },
+  //     { "coor": "28-12", "color": "#ffc5ab" },
+  //     { "coor": "29-12", "color": "#ffc5ab" },
+  //     { "coor": "30-12", "color": "#ffc5ab" },
+  //     { "coor": "30-13", "color": "#ffc5ab" },
+  //     { "coor": "31-13", "color": "#ffc5ab" },
+  //     { "coor": "31-14", "color": "#ffc5ab" },
+  //     { "coor": "32-16", "color": "#ffc5ab" },
+  //     { "coor": "32-15", "color": "#ffc5ab" },
+  //     { "coor": "27-12", "color": "#ffc5ab" },
+  //     { "coor": "26-12", "color": "#ffc5ab" },
+  //     { "coor": "25-12", "color": "#ffc5ab" },
+  //     { "coor": "24-12", "color": "#ffc5ab" },
+  //     { "coor": "23-12", "color": "#ffc5ab" },
+  //     { "coor": "22-12", "color": "#ffc5ab" },
+  //     { "coor": "21-13", "color": "#ffc5ab" },
+  //     { "coor": "18-15", "color": "#ffc5ab" },
+  //     { "coor": "18-18", "color": "#ffc5ab" },
+  //     { "coor": "30-17", "color": "#ffc5ab" },
+  //     { "coor": "29-17", "color": "#ffc5ab" },
+  //     { "coor": "29-16", "color": "#ffc5ab" },
+  //     { "coor": "30-16", "color": "#ffc5ab" },
+  //     { "coor": "30-18", "color": "#ffc5ab" },
+  //     { "coor": "29-18", "color": "#ffc5ab" },
+  //     { "coor": "28-18", "color": "#ffc5ab" },
+  //     { "coor": "27-18", "color": "#ffc5ab" },
+  //     { "coor": "26-18", "color": "#ffc5ab" },
+  //     { "coor": "25-18", "color": "#ffc5ab" },
+  //     { "coor": "24-18", "color": "#ffc5ab" },
+  //     { "coor": "23-18", "color": "#ffc5ab" },
+  //     { "coor": "22-18", "color": "#ffc5ab" },
+  //     { "coor": "22-17", "color": "#ffc5ab" },
+  //     { "coor": "22-16", "color": "#ffc5ab" },
+  //     { "coor": "22-15", "color": "#ffc5ab" },
+  //     { "coor": "22-14", "color": "#ffc5ab" },
+  //     { "coor": "23-14", "color": "#ffc5ab" },
+  //     { "coor": "23-15", "color": "#ffc5ab" },
+  //     { "coor": "23-16", "color": "#ffc5ab" },
+  //     { "coor": "23-17", "color": "#ffc5ab" },
+  //     { "coor": "24-14", "color": "#ffc5ab" },
+  //     { "coor": "24-13", "color": "#ffc5ab" },
+  //     { "coor": "25-13", "color": "#ffc5ab" },
+  //     { "coor": "26-13", "color": "#ffc5ab" },
+  //     { "coor": "27-13", "color": "#ffc5ab" },
+  //     { "coor": "27-14", "color": "#ffc5ab" },
+  //     { "coor": "27-15", "color": "#ffc5ab" },
+  //     { "coor": "28-15", "color": "#ffc5ab" },
+  //     { "coor": "29-15", "color": "#ffc5ab" },
+  //     { "coor": "28-14", "color": "#ffc5ab" },
+  //     { "coor": "28-16", "color": "#ffc5ab" },
+  //     { "coor": "28-17", "color": "#ffc5ab" },
+  //     { "coor": "27-16", "color": "#ffc5ab" },
+  //     { "coor": "26-16", "color": "#ffc5ab" },
+  //     { "coor": "25-16", "color": "#ffc5ab" },
+  //     { "coor": "24-16", "color": "#ffc5ab" },
+  //     { "coor": "24-15", "color": "#ffc5ab" },
+  //     { "coor": "25-15", "color": "#ffc5ab" },
+  //     { "coor": "26-15", "color": "#ffc5ab" },
+  //     { "coor": "26-14", "color": "#ffc5ab" },
+  //     { "coor": "25-14", "color": "#ffc5ab" },
+  //     { "coor": "24-17", "color": "#ffc5ab" },
+  //     { "coor": "25-17", "color": "#ffc5ab" },
+  //     { "coor": "23-20", "color": "#ffc5ab" },
+  //     { "coor": "24-20", "color": "#ffc5ab" },
+  //     { "coor": "25-20", "color": "#ffc5ab" },
+  //     { "coor": "26-20", "color": "#ffc5ab" },
+  //     { "coor": "27-20", "color": "#ffc5ab" },
+  //     { "coor": "28-20", "color": "#ffc5ab" },
+  //     { "coor": "28-19", "color": "#ffc5ab" },
+  //     { "coor": "29-20", "color": "#ffc5ab" },
+  //     { "coor": "30-20", "color": "#ffc5ab" },
+  //     { "coor": "30-21", "color": "#ffc5ab" },
+  //     { "coor": "29-21", "color": "#ffc5ab" },
+  //     { "coor": "29-22", "color": "#ffc5ab" },
+  //     { "coor": "29-23", "color": "#ffc5ab" },
+  //     { "coor": "30-23", "color": "#ffc5ab" },
+  //     { "coor": "28-23", "color": "#ffc5ab" },
+  //     { "coor": "27-23", "color": "#ffc5ab" },
+  //     { "coor": "26-23", "color": "#ffc5ab" },
+  //     { "coor": "26-22", "color": "#ffc5ab" },
+  //     { "coor": "27-22", "color": "#ffc5ab" },
+  //     { "coor": "28-21", "color": "#ffc5ab" },
+  //     { "coor": "27-21", "color": "#ffc5ab" },
+  //     { "coor": "26-21", "color": "#ffc5ab" },
+  //     { "coor": "25-21", "color": "#ffc5ab" },
+  //     { "coor": "24-21", "color": "#ffc5ab" },
+  //     { "coor": "23-21", "color": "#ffc5ab" },
+  //     { "coor": "22-21", "color": "#ffc5ab" },
+  //     { "coor": "22-20", "color": "#ffc5ab" },
+  //     { "coor": "22-19", "color": "#ffc5ab" },
+  //     { "coor": "23-19", "color": "#ffc5ab" },
+  //     { "coor": "21-19", "color": "#ffc5ab" },
+  //     { "coor": "21-20", "color": "#ffc5ab" },
+  //     { "coor": "21-21", "color": "#ffc5ab" },
+  //     { "coor": "21-22", "color": "#ffc5ab" },
+  //     { "coor": "21-23", "color": "#ffc5ab" },
+  //     { "coor": "21-24", "color": "#ffc5ab" },
+  //     { "coor": "21-25", "color": "#ffc5ab" },
+  //     { "coor": "21-26", "color": "#ffc5ab" },
+  //     { "coor": "20-26", "color": "#ffc5ab" },
+  //     { "coor": "20-25", "color": "#ffc5ab" },
+  //     { "coor": "20-24", "color": "#ffc5ab" },
+  //     { "coor": "20-23", "color": "#ffc5ab" },
+  //     { "coor": "20-22", "color": "#ffc5ab" },
+  //     { "coor": "20-21", "color": "#ffc5ab" },
+  //     { "coor": "20-20", "color": "#ffc5ab" },
+  //     { "coor": "20-19", "color": "#ffc5ab" },
+  //     { "coor": "19-19", "color": "#ffc5ab" },
+  //     { "coor": "18-19", "color": "#ffc5ab" },
+  //     { "coor": "22-27", "color": "#ffc5ab" },
+  //     { "coor": "22-26", "color": "#ffc5ab" },
+  //     { "coor": "22-25", "color": "#ffc5ab" },
+  //     { "coor": "22-24", "color": "#ffc5ab" },
+  //     { "coor": "22-23", "color": "#ffc5ab" },
+  //     { "coor": "23-26", "color": "#ffc5ab" },
+  //     { "coor": "23-25", "color": "#ffc5ab" },
+  //     { "coor": "23-24", "color": "#ffc5ab" },
+  //     { "coor": "24-24", "color": "#ffc5ab" },
+  //     { "coor": "25-24", "color": "#ffc5ab" },
+  //     { "coor": "25-25", "color": "#ffc5ab" },
+  //     { "coor": "24-25", "color": "#ffc5ab" },
+  //     { "coor": "24-26", "color": "#ffc5ab" },
+  //     { "coor": "24-27", "color": "#ffc5ab" },
+  //     { "coor": "24-28", "color": "#ffc5ab" },
+  //     { "coor": "23-28", "color": "#ffc5ab" },
+  //     { "coor": "23-27", "color": "#ffc5ab" },
+  //     { "coor": "25-28", "color": "#ffc5ab" },
+  //     { "coor": "26-28", "color": "#ffc5ab" },
+  //     { "coor": "27-28", "color": "#ffc5ab" },
+  //     { "coor": "28-28", "color": "#ffc5ab" },
+  //     { "coor": "22-11", "color": "#ffc5ab" },
+  //     { "coor": "23-11", "color": "#ffc5ab" },
+  //     { "coor": "24-11", "color": "#ffc5ab" },
+  //     { "coor": "25-11", "color": "#ffc5ab" },
+  //     { "coor": "26-11", "color": "#ffc5ab" },
+  //     { "coor": "27-11", "color": "#ffc5ab" },
+  //     { "coor": "22-13", "color": "#ffc5ab" },
+  //     { "coor": "23-13", "color": "#ffc5ab" },
+  //     { "coor": "22-14", "color": "#ffc5ab" },
+  //     { "coor": "19-22", "color": "#ffc5ab" },
+  //     { "coor": "19-23", "color": "#ffc5ab" },
+  //     { "coor": "23-23", "color": "#ffc5ab" },
+  //     { "coor": "24-23", "color": "#ffc5ab" },
+  //     { "coor": "25-23", "color": "#ffc5ab" },
+  //     { "coor": "25-22", "color": "#ffc5ab" },
+  //   ]
+  //   function sort(ddate:any) {
+  //     return ddate.sort(() => Math.random() - 0.5);
+  //   }
+  //   let final = sort(ddate);
+  //   console.log('final', final)
+  //   console.log('finalToJson', JSON.stringify(final))
+  // },[])
 
   useEffect(() => {
     if (showText) {
@@ -505,34 +714,36 @@ export default () => {
     }
   }, [showText]);
 
-  const play = (item: paintDataFromLocal) => {
+  // const play = (item: paintDataFromLocal) => {
+  const play = () => {
     // console.log("item", item);
+    setSpeedChangeModalShow(false);
     resetList();
     setGalleryModalShow(false);
     setTimeout(() => {
-      setCurrentPicked(item);
+      // setCurrentPicked(item);
       setShowText(true);
     }, 500);
-    let count = item.listData.length;
+    if(!currentPicked) return;
+    let count = currentPicked.listData.length;
     setTimeout(() => {
-      console.log('open')
+      console.log("open");
       setSetupPanelShow(true);
     }, count * speed);
-    
   };
 
   const exportData = (item: paintDataFromLocal) => {
     const content = JSON.stringify({
       listData: item.listData,
-      canvaColor: item.canvaColor ? item.canvaColor : canvaColor,
+      canvaColor: item.canvaColor ? item.canvaColor : canvaColor
     });
     let a = document.createElement("a");
     let file = new Blob([content], { type: "text/json" });
     a.href = URL.createObjectURL(file);
     // a.download = `jsonFile_${Math.floor(Number(item.id) / 100000)}.json`;
     a.download = `jsonFile_${moment(new Date())
-      .locale('zh-tw')
-      .format('YYYY_MM_DD_hh_mm_ss')}.json`;
+      .locale("zh-tw")
+      .format("YYYY_MM_DD_hh_mm_ss")}.json`;
     a.click();
   };
 
@@ -565,7 +776,7 @@ export default () => {
   const demoPlay = () => {
     let prevSpeed = speed;
 
-    let demoList = [starryNight, wantItAll];
+    let demoList = [starryNight, wantItAll, wretched];
     let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "" };
     // setList([]);
     resetList();
@@ -576,10 +787,10 @@ export default () => {
     let count = starryNight.listData.length;
     // console.log('count', count)
     let tempIndex = 0;
-    if (demoIndex === 1) {
+    if (demoIndex === 2) {
       tempIndex = 0;
     } else {
-      tempIndex = 1;
+      tempIndex = demoIndex+1;
     }
     setDemoIndex(tempIndex);
     setTimeout(() => {
@@ -596,6 +807,7 @@ export default () => {
   const changeSpeedLevel = (item: number) => {
     setSpeed(item);
     setShowSpeedMenu(false);
+    setShowSpeedMenuBeforePlay(false);
   };
 
   const resizePalmRejectionPanel = (behavior: string) => {
@@ -681,22 +893,28 @@ export default () => {
   //   }
   // }, [list]);
 
-  const handleEnlargeThisCube = (item:coordinateData) => {
+  const handleEnlargeThisCube = (item: coordinateData) => {
     let thisId = item.coor;
     let thisCubeEle = document.getElementById(thisId);
     // console.log('thisCubeEle', thisCubeEle)
-    thisCubeEle?.classList.add('enlarge');
+    thisCubeEle?.classList.add("enlarge");
     let cubeList = [...document.querySelectorAll(".cube")];
-    cubeList.filter((i)=>{return (i !== thisCubeEle)}).forEach((c)=>{c.classList.remove('enlarge')})
-  }
+    cubeList
+      .filter((i) => {
+        return i !== thisCubeEle;
+      })
+      .forEach((c) => {
+        c.classList.remove("enlarge");
+      });
+  };
 
-  const playFromThisFrame = (index:number, canvaColor:string) => {
-    console.log('index', index)
+  const playFromThisFrame = (index: number, canvaColor: string) => {
+    console.log("index", index);
     let tempOrigin = [...list];
-    let fromThisFrame = tempOrigin.filter((item,key)=>{
-      return (key >= index)
-    })
-    console.log('fromThisFrame', fromThisFrame)
+    let fromThisFrame = tempOrigin.filter((item, key) => {
+      return key >= index;
+    });
+    console.log("fromThisFrame", fromThisFrame);
     tempList = [];
     setList([]);
     eraseAllCube();
@@ -715,19 +933,20 @@ export default () => {
     setTimeout(() => {
       setEnable(true);
     }, count * speed);
-  }
+  };
 
-  const removeThisFrame = (index:number) => {
-    console.log('index', index)
+  const removeThisFrame = (index: number) => {
+    console.log("index", index);
     let tempOrigin = [...list];
-    let othersFrame = tempOrigin.filter((item,key)=>{
-      return (key !== index)
-    })
-    othersFrame.forEach((item, index)=>{
+    let othersFrame = tempOrigin.filter((item, key) => {
+      return key !== index;
+    });
+    othersFrame.forEach((item, index) => {
       paintCubeSingle({ coor: item.coor, color: item.color });
-    })
+    });
     setList(othersFrame);
-  }
+  };
+  const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   return (
     <div className="pixel_canva_container">
@@ -797,11 +1016,16 @@ export default () => {
             {renderCube()}
           </div>
         </div>
-        {list.length ? (
+        {/* {list.length ? (
           <Fragment>
             <div
               className="debug_list"
-              style={{ overflow: "scroll", height: "300px", marginTop:'50px', position:'relative' }}
+              style={{
+                overflow: "scroll",
+                height: "300px",
+                marginTop: "50px",
+                position: "relative"
+              }}
             >
               {list.map((item, index) => {
                 return (
@@ -816,7 +1040,7 @@ export default () => {
                         color: "#2a8ab6",
                         fontSize: "18px",
                         textAlign: "start",
-                        width: "60px",
+                        width: "60px"
                       }}
                     >
                       {index}
@@ -827,7 +1051,7 @@ export default () => {
                         color: "#fff",
                         fontSize: "18px",
                         textAlign: "start",
-                        width: "100px",
+                        width: "100px"
                       }}
                     >
                       {item.coor}
@@ -837,18 +1061,26 @@ export default () => {
                         width: "20px",
                         height: "20px",
                         backgroundColor: item.color,
-                        marginRight:'15px'
+                        marginRight: "15px"
                       }}
                     ></div>
-                    <button onClick={()=>handleEnlargeThisCube(item)}>顯示</button>
-                    <button onClick={()=>playFromThisFrame(index, canvaColor)}>從此播放</button>
-                    <button onClick={(e)=>removeThisFrame(index)}>刪除此格</button>
+                    <button onClick={() => handleEnlargeThisCube(item)}>
+                      顯示
+                    </button>
+                    <button
+                      onClick={() => playFromThisFrame(index, canvaColor)}
+                    >
+                      從此播放
+                    </button>
+                    <button onClick={(e) => removeThisFrame(index)}>
+                      刪除此格
+                    </button>
                   </div>
                 );
               })}
             </div>
           </Fragment>
-        ) : null}
+        ) : null} */}
       </div>
       {prevDataFromLocal.length && galleryModalShow ? (
         <ModalTool
@@ -870,6 +1102,8 @@ export default () => {
             deleteThisPaint={deleteThisPaint}
             setGalleryModalShow={setGalleryModalShow}
             closeGalleryModal={closeGalleryModal}
+            setSpeedChangeModalShow={setSpeedChangeModalShow}
+            setCurrentPicked ={setCurrentPicked}
           ></GalleryPanel>
         </ModalTool>
       ) : null}
@@ -897,6 +1131,43 @@ export default () => {
             >
               Yes
             </div>
+          </div>
+        </ModalTool>
+      ) : null}
+
+      {speedChangeModalShow ? (
+        <ModalTool
+          modalShow={speedChangeModalShow}
+          modalCloseFunction={() => setSpeedChangeModalShow(false)}
+          modalWidth={"340px"}
+          modalHeight={"160"}
+          modalInnerBackground={"#0c1a2a"}
+          backgroundOpacity={0.5}
+          background={"#000000"}
+          zIndex={12}
+        >
+          <div className={`speed_change_wrap ${showSpeedMenuBeforePlay ? '':'changed'}`}>
+            <div className="speed_change_tip_text">
+             Change Play Speed Level? 
+              (Max:1)
+            </div>
+            <DropExpand
+              showMenu={showSpeedMenuBeforePlay}
+              setShowMenu={setShowSpeedMenuBeforePlay}
+              defaultValue={speed}
+              menuList={speedList}
+              action={changeSpeedLevel}
+
+            ></DropExpand>
+            <div className="btn_wrap">
+            <div
+              className={`btn speed_change_btn ${enable ? "" : "disable"}`}
+              onClick={() => play()}
+            >
+              Start
+            </div>
+            </div>
+
           </div>
         </ModalTool>
       ) : null}
@@ -969,4 +1240,3 @@ export default () => {
     </div>
   );
 };
-// palmRejectSizeList  ,palmRejectSizeIndex  ,setPalmRejectSizeIndex

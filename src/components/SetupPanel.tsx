@@ -86,7 +86,7 @@ export default (props: Props) => {
             onChange={(e) => changeColor(e.target)}
           />
         </div>
-        <div className="area speed_area">
+        {/* <div className="area speed_area">
           <div className="speed_tip">Speed</div>
           <DropExpand
             showMenu={showSpeedMenu}
@@ -95,7 +95,7 @@ export default (props: Props) => {
             menuList={speedList}
             action={changeSpeedLevel}
           ></DropExpand>
-        </div>
+        </div> */}
         <div className="area stroke_area">
           <div className="stroke_tip">Stroke</div>
 
