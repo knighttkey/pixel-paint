@@ -4,7 +4,7 @@ import React, {
   useState,
   MouseEvent,
   useEffect,
-  Fragment
+  Fragment,
 } from "react";
 import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
@@ -58,7 +58,7 @@ export default () => {
   const [speed, setSpeed] = useState<number>(5);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
-  const [penWidth, setPenWidth] = useState<number>(2);
+  const [penWidth, setPenWidth] = useState<number>(1);
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [eraseMode, setEraseMode] = useState(false);
@@ -75,7 +75,7 @@ export default () => {
     { w: 200, h: 300 },
     { w: 250, h: 400 },
     { w: 350, h: 500 },
-    { w: 450, h: 600 }
+    { w: 450, h: 600 },
   ];
 
   // console.log('navigator.userAgent', navigator.userAgent)
@@ -166,7 +166,7 @@ export default () => {
             [newList[0][1], newList[0][2]],
             newList[1],
             newList[2],
-            [newList[3][1], newList[3][2]]
+            [newList[3][1], newList[3][2]],
           ];
           break;
         case 5:
@@ -175,7 +175,7 @@ export default () => {
             [newList[1][1], newList[1][2], newList[1][3]],
             newList[2],
             [newList[3][1], newList[3][2], newList[3][3]],
-            [newList[4][2]]
+            [newList[4][2]],
           ];
           break;
         case 6:
@@ -185,7 +185,7 @@ export default () => {
             newList[2],
             newList[3],
             [newList[4][1], newList[4][2], newList[4][3], newList[4][4]],
-            [newList[5][2], newList[5][3]]
+            [newList[5][2], newList[5][3]],
           ];
           break;
 
@@ -349,7 +349,7 @@ export default () => {
     if (!canvaTouchEnable(e)) {
       // alert(`若欲使用${touchBehavior === 'finger' ? '觸控筆':'指尖'}繪圖，請修改設定`);
       setTouchTipShow(true);
-      
+
       return;
     }
 
@@ -419,8 +419,8 @@ export default () => {
         listData: list,
         id: new Date().getTime().toString(),
         thumbnail: thumbnail,
-        canvaColor: canvaColor
-      }
+        canvaColor: canvaColor,
+      },
     ];
     console.log("prepare", prepare);
     window.localStorage.setItem("pixelData", JSON.stringify(prepare));
@@ -433,12 +433,13 @@ export default () => {
       // setList([]);
       resetList();
       setGalleryModalShow(true);
+      setSetupPanelShow(false);
     }, 200);
     setTimeout(() => {
       if (listPanelRef.current) {
         listPanelRef.current.scrollTo({
           top: Number.MAX_SAFE_INTEGER,
-          behavior: "smooth"
+          behavior: "smooth",
         });
       }
     }, 250);
@@ -456,9 +457,16 @@ export default () => {
       //  console.log(r.target.result);
       try {
         let toParse = JSON.parse(r.target.result);
-        // console.log("toParse", toParse);
-        // console.log("toParse.listData", toParse.listData);
+        console.log("toParse", toParse);
+        console.log("toParse.listData", toParse.listData);
         setList(toParse.listData);
+        let listFromFile: coordinateData[] = toParse.listData;
+        listFromFile.forEach((item, key) => {
+          setTimeout(() => {
+            paintCubeSingle({ coor: item.coor, color: item.color });
+          }, speed * key);
+        });
+
         setCanvaColor(toParse.canvaColor);
       } catch (parseErr) {
         console.log("parseErr", parseErr);
@@ -506,7 +514,7 @@ export default () => {
   const exportData = (item: paintDataFromLocal) => {
     const content = JSON.stringify({
       listData: item.listData,
-      canvaColor: item.canvaColor ? item.canvaColor : canvaColor
+      canvaColor: item.canvaColor ? item.canvaColor : canvaColor,
     });
     let a = document.createElement("a");
     let file = new Blob([content], { type: "text/json" });
@@ -517,6 +525,7 @@ export default () => {
 
   const changeColor = (eventTarget: ColorPickTarget) => {
     setCurrentColor(eventTarget.value);
+    setEraseMode(false);
   };
   const changeCanvaColor = (eventTarget: ColorPickTarget) => {
     setCanvaColor(eventTarget.value);
@@ -625,25 +634,26 @@ export default () => {
 
   const visitGallery = () => {
     setGalleryModalShow(true);
-    // setSetupPanelShow(false);
-    let setupPanelEle = document.querySelector(".setup_panel_container");
-    if (!setupPanelEle) return;
-    let parentElement = setupPanelEle.parentElement;
-    if (!parentElement) return;
-    // console.log('parentElement', parentElement)
-    parentElement.classList.add("hide");
+    setSetupPanelShow(false);
+    // let setupPanelEle = document.querySelector(".setup_panel_container");
+    // if (!setupPanelEle) return;
+    // let parentElement = setupPanelEle.parentElement;
+    // if (!parentElement) return;
+    // // console.log('parentElement', parentElement)
+    // parentElement.classList.add("hide");
   };
 
   const closeGalleryModal = () => {
-    if (galleryModalShow) {
-      let setupPanelEle = document.querySelector(".setup_panel_container");
-      if (!setupPanelEle) return;
-      let parentElement = setupPanelEle.parentElement;
-      if (!parentElement) return;
-      // console.log('parentElement', parentElement)
-      parentElement.classList.remove("hide");
-    }
+    // if (galleryModalShow) {
+    //   let setupPanelEle = document.querySelector(".setup_panel_container");
+    //   if (!setupPanelEle) return;
+    //   let parentElement = setupPanelEle.parentElement;
+    //   if (!parentElement) return;
+    //   // console.log('parentElement', parentElement)
+    //   parentElement.classList.remove("hide");
+    // }
     setGalleryModalShow(false);
+    setSetupPanelShow(true);
   };
 
   const startBounce = () => {
@@ -655,12 +665,22 @@ export default () => {
       if (!toggleEle) return;
       toggleEle.classList.remove("must_bounce");
     }, 3500);
-  }
+  };
 
   const closeTouchTipModal = () => {
     setTouchTipShow(false);
     startBounce();
-  }
+  };
+
+  useEffect(() => {
+    let debugListEle = document.querySelector(".debug_list");
+    if (debugListEle) {
+      debugListEle.scrollTo({
+        top: Number.MAX_SAFE_INTEGER,
+        behavior: "smooth",
+      });
+    }
+  }, [list]);
 
   return (
     <div className="pixel_canva_container">
@@ -730,6 +750,54 @@ export default () => {
             {renderCube()}
           </div>
         </div>
+        {list.length ? (
+          <Fragment>
+            <div
+              className="debug_list"
+              style={{ overflowY: "scroll", height: "300px" }}
+            >
+              {list.map((item, index) => {
+                return (
+                  <div
+                    className="each_test_row"
+                    style={{ display: "flex", borderBottom: "1px solid green" }}
+                    key={index}
+                  >
+                    <div
+                      className="each_test_number"
+                      style={{
+                        color: "#2a8ab6",
+                        fontSize: "18px",
+                        textAlign: "start",
+                        width: "60px",
+                      }}
+                    >
+                      {index}
+                    </div>
+                    <div
+                      className="each_test_coor"
+                      style={{
+                        color: "#fff",
+                        fontSize: "18px",
+                        textAlign: "start",
+                        width: "100px",
+                      }}
+                    >
+                      {item.coor}
+                    </div>
+                    <div
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        backgroundColor: item.color,
+                      }}
+                    ></div>
+                  </div>
+                );
+              })}
+            </div>
+          </Fragment>
+        ) : null}
       </div>
       {prevDataFromLocal.length && galleryModalShow ? (
         <ModalTool
@@ -766,20 +834,19 @@ export default () => {
           zIndex={12}
         >
           <div className="touch_tip_wrap">
-          <div className="touch_tip_text">
-            若欲使用{touchBehavior === "finger" ? "觸控筆" : "指尖"}
-            繪圖<br/>請修改設定
-          </div>
-          <div
+            <div className="touch_tip_text">
+              若欲使用{touchBehavior === "finger" ? "觸控筆" : "指尖"}
+              繪圖
+              <br />
+              請修改設定
+            </div>
+            <div
               className={`btn touch_tip_btn ${enable ? "" : "disable"}`}
-              onClick={()=>closeTouchTipModal()}
+              onClick={() => closeTouchTipModal()}
             >
               Yes
             </div>
           </div>
-          
-
-
         </ModalTool>
       ) : null}
 
