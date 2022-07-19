@@ -509,15 +509,30 @@ export default () => {
       if (!currentPicked) return;
       setCanvaColor(currentPicked.canvaColor);
       setEnable(false);
+      let startTime:number = 0;
+      let endTime:number = 0;
       currentPicked.listData.forEach((item, key) => {
         setTimeout(() => {
+          if(key === 0) {
+            console.log('start',new Date().getTime());
+            startTime = new Date().getTime()
+          }
+          if(key === currentPicked.listData.length -1 ) {
+            console.log('end', new Date().getTime());
+            endTime = new Date().getTime();
+            console.log('speed * key', speed * key)
+          }
           tempList.push({ coor: item.coor, color: item.color });
           paintCubeSingle({ coor: item.coor, color: item.color });
           setList([...tempList]);
+          
         }, speed * key);
+       
         setCurrentPicked(undefined);
         setShowText(false);
       });
+      console.log('currentPicked.listData.length*speed', currentPicked.listData.length*speed)
+      console.log('endTime - startTime', endTime - startTime)
       let count = currentPicked.listData.length;
       // console.log('count', count)
       setTimeout(() => {
@@ -765,16 +780,16 @@ export default () => {
     return new Promise<string>((resolve, reject) => {
       const canvas = document.createElement("canvas");
       // canvas.style.backgroundColor = canvaColor;
-      canvas.height = 700;
-      canvas.width = 700;
+      const canvaSize = 1400;
+      canvas.height = canvaSize;
+      canvas.width = canvaSize;
       let ctx = canvas.getContext("2d");
       if (!ctx) return;
       if (!wrapRef.current) return;
       let parentRect = wrapRef.current.getBoundingClientRect();
-      ctx.clearRect(0, 0, 700, 700);
+      ctx.clearRect(0, 0, canvaSize, canvaSize);
       ctx.fillStyle = canvaColor;
-      ctx.fillRect(0, 0, 700, 700);
-      // ctx.fill = canvaColor;
+      ctx.fillRect(0, 0, canvaSize, canvaSize);
       list.forEach((item, key) => {
         if (!ctx) return;
 
@@ -784,7 +799,6 @@ export default () => {
           if (!ele) return;
           if (!ctx) return;
           let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
-          // .getPropertyValue("backgroundColor");
           console.log("eleBgColor", eleBgColor);
           let eleRect = ele.getBoundingClientRect();
           console.log("eleRect", eleRect);
@@ -796,18 +810,15 @@ export default () => {
           let left = eleRect.left - parentRect.left;
           let width = eleRect.width;
           let height = eleRect.height;
-          let topRatio = top / parentRect.height;
-          let leftRatio = top / parentRect.width;
-          let heightRatio = eleRect.height / parentRect.height;
-          let widthRatio = eleRect.width / parentRect.width;
           console.log("rect", top, left, width, height);
-          console.log("ratio", topRatio, leftRatio, heightRatio, widthRatio);
           ctx.fillStyle = eleBgColor;
-          ctx.fillRect(left, top, width, height);
+          const scaleRatio = canvaSize / 700;
+          ctx.fillRect(left*scaleRatio, top*scaleRatio, width*scaleRatio, height*scaleRatio);
+          console.log('801_ key * speed', key * speed)
         }, key * speed);
       });
 
-
+      console.log('list.length * speed', list.length * speed)
       function recordCanvas(canvas:any, videoLength:any) {
         const recordedChunks:any = [];
         const mediaRecorder = new MediaRecorder(
@@ -824,12 +835,16 @@ export default () => {
           window.URL.revokeObjectURL(url);
         }
         mediaRecorder.start();
-        window.setTimeout(() => {mediaRecorder.stop();}, 12000);
+        window.setTimeout(() => {mediaRecorder.stop();}, videoLength);
       }
 
-      recordCanvas(canvas, 2000);
+      recordCanvas(canvas, (list.length-1) * speed);
     });
   };
+
+  const downloadVideo = () => {
+    
+  }
 
   return (
     <div className="pixel_canva_container">
@@ -900,11 +915,6 @@ export default () => {
           </div>
         </div>
         <button onClick={() => prepareToExportVideo()}>準備輸出</button>
-        <video id="video" width="160" height="90" muted autoPlay controls>
-          <a>
-            <button></button>
-          </a>
-        </video>
         {/* {list.length ? (
           <Fragment>
             <div
@@ -993,6 +1003,7 @@ export default () => {
             closeGalleryModal={closeGalleryModal}
             setSpeedChangeModalShow={setSpeedChangeModalShow}
             setCurrentPicked={setCurrentPicked}
+            downloadVideo={downloadVideo}
           ></GalleryPanel>
         </ModalTool>
       ) : null}

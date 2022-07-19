@@ -15,6 +15,7 @@ type Props = {
   closeGalleryModal: Function;
   setSpeedChangeModalShow: Function;
   setCurrentPicked:Function;
+  downloadVideo:Function;
 };
 
 export default (props: Props) => {
@@ -28,7 +29,8 @@ export default (props: Props) => {
     setGalleryModalShow,
     closeGalleryModal,
     setSpeedChangeModalShow,
-    setCurrentPicked
+    setCurrentPicked,
+    downloadVideo
   } = props;
   const scrollList = (e: any) => {
     e.stopPropagation();
@@ -73,7 +75,13 @@ export default (props: Props) => {
                   className={`export_btn  ${enable ? "" : "disable"}`}
                   onClick={() => exportData(item)}
                 >
-                  Export
+                  ExportPath
+                </div>
+                <div
+                  className={`export_btn  ${enable ? "" : "disable"}`}
+                  onClick={() => downloadVideo(item)}
+                >
+                  Download
                 </div>
                 <div
                   className={`delete_icon  ${enable ? "" : "disable"}`}
