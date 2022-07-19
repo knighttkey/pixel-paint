@@ -18,7 +18,7 @@ import ModalTool from "./ModalTool";
 import SetupPanel from "./SetupPanel";
 import moment from "moment";
 // import Dropdown from "./Dropdown";
-import DropExpand from "./DropExpand";
+import DropExpandCenter from "./DropExpandCenter";
 
 type DragPoint = {
   x: number;
@@ -66,7 +66,7 @@ export default () => {
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [showSpeedMenuBeforePlay, setShowSpeedMenuBeforePlay] =
-    useState<Boolean>(true);
+    useState<Boolean>(false);
   const [eraseMode, setEraseMode] = useState(false);
   const [galleryModalShow, setGalleryModalShow] = useState(false);
   const [setupPanelShow, setSetupPanelShow] = useState(true);
@@ -76,9 +76,11 @@ export default () => {
   const [isPainting, setIsPainting] = useState<Boolean>(false);
   const [touchBehavior, setTouchBehavior] = useState<string>("finger");
   const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
+  const [loadingModalShow, setLoadingModalShow] = useState<Boolean>(false);
   const [cubeDivide, setCubeDivide] = useState<number>(50);
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
+  const [downloadEnable, setDownloadEnable] = useState(false);
   // console.log('eraseMode', eraseMode)
   const palmRejectSizeList: PalmRejectSize[] = [
     { w: 200, h: 300 },
@@ -146,6 +148,7 @@ export default () => {
     setList([]);
     setCanvaColor("transparent");
     eraseAllCube();
+    setDownloadEnable(false);
   };
 
   const resizeStroke = (cubeId: string, scale: number) => {
@@ -473,8 +476,8 @@ export default () => {
       //  console.log(r.target.result);
       try {
         let toParse = JSON.parse(r.target.result);
-        console.log("toParse", toParse);
-        console.log("toParse.listData", toParse.listData);
+        // console.log("toParse", toParse);
+        // console.log("toParse.listData", toParse.listData);
         setList(toParse.listData);
         let listFromFile: coordinateData[] = toParse.listData;
         listFromFile.forEach((item, key) => {
@@ -482,6 +485,7 @@ export default () => {
             paintCubeSingle({ coor: item.coor, color: item.color });
           }, speed * key);
         });
+        setDownloadEnable(true);
 
         setCanvaColor(toParse.canvaColor);
       } catch (parseErr) {
@@ -509,30 +513,33 @@ export default () => {
       if (!currentPicked) return;
       setCanvaColor(currentPicked.canvaColor);
       setEnable(false);
-      let startTime:number = 0;
-      let endTime:number = 0;
+      let startTime: number = 0;
+      let endTime: number = 0;
       currentPicked.listData.forEach((item, key) => {
         setTimeout(() => {
-          if(key === 0) {
-            console.log('start',new Date().getTime());
-            startTime = new Date().getTime()
+          if (key === 0) {
+            // console.log("start", new Date().getTime());
+            startTime = new Date().getTime();
           }
-          if(key === currentPicked.listData.length -1 ) {
-            console.log('end', new Date().getTime());
+          if (key === currentPicked.listData.length - 1) {
+            // console.log("end", new Date().getTime());
             endTime = new Date().getTime();
-            console.log('speed * key', speed * key)
+            // console.log("speed * key", speed * key);
           }
           tempList.push({ coor: item.coor, color: item.color });
           paintCubeSingle({ coor: item.coor, color: item.color });
           setList([...tempList]);
-          
         }, speed * key);
-       
+
         setCurrentPicked(undefined);
         setShowText(false);
       });
-      console.log('currentPicked.listData.length*speed', currentPicked.listData.length*speed)
-      console.log('endTime - startTime', endTime - startTime)
+      setDownloadEnable(true);
+      // console.log(
+      //   "currentPicked.listData.length*speed",
+      //   currentPicked.listData.length * speed
+      // );
+      // console.log("endTime - startTime", endTime - startTime);
       let count = currentPicked.listData.length;
       // console.log('count', count)
       setTimeout(() => {
@@ -555,8 +562,9 @@ export default () => {
     if (!currentPicked) return;
     let count = currentPicked.listData.length;
     setTimeout(() => {
-      console.log("open");
+      // console.log("open");
       setSetupPanelShow(true);
+      // setDownloadEnable(true);
     }, count * speed);
   };
 
@@ -642,7 +650,7 @@ export default () => {
     let tempIndex = palmRejectSizeIndex;
     switch (behavior) {
       case "minus":
-        console.log("縮小");
+        // console.log("minus");
         if (tempIndex !== 0) {
           tempIndex--;
           console.log("tempIndex", tempIndex);
@@ -650,10 +658,10 @@ export default () => {
         }
         break;
       case "add":
-        console.log("放大");
+        // console.log("enlarge");
         if (tempIndex !== 3) {
           tempIndex++;
-          console.log("tempIndex", tempIndex);
+          // console.log("tempIndex", tempIndex);
           setPalmRejectSizeIndex(tempIndex);
         }
         break;
@@ -737,12 +745,12 @@ export default () => {
   };
 
   const playFromThisFrame = (index: number, canvaColor: string) => {
-    console.log("index", index);
+    // console.log("index", index);
     let tempOrigin = [...list];
     let fromThisFrame = tempOrigin.filter((item, key) => {
       return key >= index;
     });
-    console.log("fromThisFrame", fromThisFrame);
+    // console.log("fromThisFrame", fromThisFrame);
     tempList = [];
     setList([]);
     eraseAllCube();
@@ -764,7 +772,7 @@ export default () => {
   };
 
   const removeThisFrame = (index: number) => {
-    console.log("index", index);
+    // console.log("index", index);
     let tempOrigin = [...list];
     let othersFrame = tempOrigin.filter((item, key) => {
       return key !== index;
@@ -777,8 +785,10 @@ export default () => {
   const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   const prepareToExportVideo = () => {
+    setLoadingModalShow(true);
     return new Promise<string>((resolve, reject) => {
       const canvas = document.createElement("canvas");
+      canvas.id = "targetCanvas";
       // canvas.style.backgroundColor = canvaColor;
       const canvaSize = 1400;
       canvas.height = canvaSize;
@@ -795,56 +805,62 @@ export default () => {
 
         setTimeout(() => {
           let ele = document.getElementById(item.coor);
-          console.log("ele", ele);
+          // console.log("ele", ele);
           if (!ele) return;
           if (!ctx) return;
           let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
-          console.log("eleBgColor", eleBgColor);
+          // console.log("eleBgColor", eleBgColor);
           let eleRect = ele.getBoundingClientRect();
-          console.log("eleRect", eleRect);
+          // console.log("eleRect", eleRect);
 
-          console.log("parentRect", parentRect);
-
+          // console.log("parentRect", parentRect);
 
           let top = eleRect.top - parentRect.top;
           let left = eleRect.left - parentRect.left;
           let width = eleRect.width;
           let height = eleRect.height;
-          console.log("rect", top, left, width, height);
+          // console.log("rect", top, left, width, height);
           ctx.fillStyle = eleBgColor;
           const scaleRatio = canvaSize / 700;
-          ctx.fillRect(left*scaleRatio, top*scaleRatio, width*scaleRatio, height*scaleRatio);
-          console.log('801_ key * speed', key * speed)
+          ctx.fillRect(
+            left * scaleRatio,
+            top * scaleRatio,
+            width * scaleRatio,
+            height * scaleRatio
+          );
+          // console.log("801_ key * speed", key * speed);
         }, key * speed);
       });
 
-      console.log('list.length * speed', list.length * speed)
-      function recordCanvas(canvas:any, videoLength:any) {
-        const recordedChunks:any = [];
-        const mediaRecorder = new MediaRecorder(
-          canvas.captureStream(25), {mimeType: 'video/webm; codecs=vp9'});
-        mediaRecorder.ondataavailable = 
-          event => recordedChunks.push(event.data);
+      // console.log("list.length * speed", list.length * speed);
+      function recordCanvas(canvas: any, videoLength: any) {
+        const recordedChunks: any = [];
+        const mediaRecorder = new MediaRecorder(canvas.captureStream(25), {
+          mimeType: "video/webm; codecs=vp9"
+        });
+        mediaRecorder.ondataavailable = (event) =>
+          recordedChunks.push(event.data);
         mediaRecorder.onstop = () => {
           const url = URL.createObjectURL(
-            new Blob(recordedChunks, {type: "video/webm"}));
+            new Blob(recordedChunks, { type: "video/webm" })
+          );
           const anchor = document.createElement("a");
           anchor.href = url;
           anchor.download = "video.webm";
           anchor.click();
           window.URL.revokeObjectURL(url);
-        }
+        };
         mediaRecorder.start();
-        window.setTimeout(() => {mediaRecorder.stop();}, videoLength);
+        window.setTimeout(() => {
+          mediaRecorder.stop();
+          // setDownloadEnable(false);
+          setLoadingModalShow(false);
+        }, videoLength);
       }
 
-      recordCanvas(canvas, (list.length-1) * speed);
+      recordCanvas(canvas, (list.length - 1) * speed);
     });
   };
-
-  const downloadVideo = () => {
-    
-  }
 
   return (
     <div className="pixel_canva_container">
@@ -852,7 +868,7 @@ export default () => {
         <div className="header">Pixel Painter</div>
         <div className="btn_area">
           <div className="btn_row">
-            <div className="tip_text">功能操作</div>
+            {/* <div className="tip_text">功能操作</div> */}
             <div
               className={`btn demo_btn ${enable ? "" : "disable"}`}
               onClick={demoPlay}
@@ -873,18 +889,23 @@ export default () => {
               />
               Import
             </div>
-            <div
-              className={`btn reset_btn ${enable ? "" : "disable"}`}
-              onClick={resetList}
-            >
-              Reset
-            </div>
-            <div
-              className={`btn save_btn ${enable ? "" : "disable"}`}
-              onClick={save}
-            >
-              Save
-            </div>
+            {list.length ? (
+              <div
+                className={`btn reset_btn ${enable ? "" : "disable"}`}
+                onClick={resetList}
+              >
+                Reset
+              </div>
+            ) : null}
+            {list.length ? (
+              <div
+                className={`btn save_btn ${enable ? "" : "disable"}`}
+                onClick={save}
+              >
+                Save
+              </div>
+            ) : null}
+
             <div
               className={`btn history_btn ${enable ? "" : "disable"}`}
               onClick={() => visitGallery()}
@@ -899,6 +920,14 @@ export default () => {
             >
               Setup
             </div>
+            {downloadEnable ? (
+              <div
+                className={`btn download_btn ${enable ? "" : "disable"}`}
+                onClick={() => prepareToExportVideo()}
+              >
+                Download
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="wrap_outer">
@@ -914,7 +943,10 @@ export default () => {
             {renderCube()}
           </div>
         </div>
-        <button onClick={() => prepareToExportVideo()}>準備輸出</button>
+        {/* {downloadEnable ? (
+          <button onClick={() => prepareToExportVideo()}>準備輸出</button>
+        ) : null} */}
+
         {/* {list.length ? (
           <Fragment>
             <div
@@ -1003,7 +1035,7 @@ export default () => {
             closeGalleryModal={closeGalleryModal}
             setSpeedChangeModalShow={setSpeedChangeModalShow}
             setCurrentPicked={setCurrentPicked}
-            downloadVideo={downloadVideo}
+            prepareToExportVideo={prepareToExportVideo}
           ></GalleryPanel>
         </ModalTool>
       ) : null}
@@ -1040,7 +1072,7 @@ export default () => {
           modalShow={speedChangeModalShow}
           modalCloseFunction={() => setSpeedChangeModalShow(false)}
           modalWidth={"340px"}
-          modalHeight={"160"}
+          modalHeight={"160px"}
           modalInnerBackground={"#0c1a2a"}
           backgroundOpacity={0.5}
           background={"#000000"}
@@ -1054,13 +1086,13 @@ export default () => {
             <div className="speed_change_tip_text">
               Change Play Speed Level? (Max:1)
             </div>
-            <DropExpand
+            <DropExpandCenter
               showMenu={showSpeedMenuBeforePlay}
               setShowMenu={setShowSpeedMenuBeforePlay}
               defaultValue={speed}
               menuList={speedList}
               action={changeSpeedLevel}
-            ></DropExpand>
+            ></DropExpandCenter>
             <div className="btn_wrap">
               <div
                 className={`btn speed_change_btn ${enable ? "" : "disable"}`}
@@ -1069,6 +1101,25 @@ export default () => {
                 Start
               </div>
             </div>
+          </div>
+        </ModalTool>
+      ) : null}
+      {loadingModalShow ? (
+        <ModalTool
+          modalShow={loadingModalShow}
+          modalCloseFunction={() => setLoadingModalShow(false)}
+          modalWidth={"340px"}
+          modalHeight={"160px"}
+          modalInnerBackground={"#0c1a2a95"}
+          backgroundOpacity={0.5}
+          background={"#000000"}
+          zIndex={12}
+        >
+          <div className="loading">
+            <div className="loading_tip">Loading</div>
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div>
           </div>
         </ModalTool>
       ) : null}
