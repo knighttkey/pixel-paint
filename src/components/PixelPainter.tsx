@@ -786,80 +786,143 @@ export default () => {
 
   const prepareToExportVideo = () => {
     setLoadingModalShow(true);
-    return new Promise<string>((resolve, reject) => {
-      const canvas = document.createElement("canvas");
-      canvas.id = "targetCanvas";
-      // canvas.style.backgroundColor = canvaColor;
-      const canvaSize = 1400;
-      canvas.height = canvaSize;
-      canvas.width = canvaSize;
-      let ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      if (!wrapRef.current) return;
-      let parentRect = wrapRef.current.getBoundingClientRect();
-      ctx.clearRect(0, 0, canvaSize, canvaSize);
-      ctx.fillStyle = canvaColor;
-      ctx.fillRect(0, 0, canvaSize, canvaSize);
-      list.forEach((item, key) => {
+      // const createCanvas = () => {
+      //   return new Promise((resolve,reject)=>{
+
+        
+        const canvas = document.createElement("canvas");
+        // const canvas = document.getElementById("targetCanvas");
+        // if (!canvas) return;
+        let appEle = document.querySelector(".App");
+        console.log("appEle", appEle);
+        if (!appEle) return;
+        appEle.classList.add('download_time');
+        // let contanierEle = document.querySelector(".paint_body");
+        // console.log("contanierEle", contanierEle);
+        // if (!contanierEle) return;
+        // contanierEle.appendChild(canvas);
+        // canvas.id = "targetCanvas";
+        // canvas.style.backgroundColor = canvaColor;
+        const canvaSize = 1400;
+        canvas.height = canvaSize;
+        canvas.width = canvaSize;
+        let ctx = canvas.getContext("2d");
         if (!ctx) return;
-
-        setTimeout(() => {
-          let ele = document.getElementById(item.coor);
-          // console.log("ele", ele);
-          if (!ele) return;
+        if (!wrapRef.current) return;
+        let parentRect = wrapRef.current.getBoundingClientRect();
+        // console.log("parentRect", parentRect);
+        ctx.clearRect(0, 0, canvaSize, canvaSize);
+        ctx.fillStyle = canvaColor;
+        ctx.fillRect(0, 0, canvaSize, canvaSize);
+        console.log('list', list)
+        list.forEach((item, key) => {
+          console.log('key', key, item.color, key*speed, item.coor)
           if (!ctx) return;
-          let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
-          // console.log("eleBgColor", eleBgColor);
-          let eleRect = ele.getBoundingClientRect();
-          // console.log("eleRect", eleRect);
-
-          // console.log("parentRect", parentRect);
-
-          let top = eleRect.top - parentRect.top;
-          let left = eleRect.left - parentRect.left;
-          let width = eleRect.width;
-          let height = eleRect.height;
-          // console.log("rect", top, left, width, height);
-          ctx.fillStyle = eleBgColor;
-          const scaleRatio = canvaSize / 700;
-          ctx.fillRect(
-            left * scaleRatio,
-            top * scaleRatio,
-            width * scaleRatio,
-            height * scaleRatio
-          );
-          // console.log("801_ key * speed", key * speed);
-        }, key * speed);
-      });
-
+  
+          setTimeout(() => {
+            let ele = document.getElementById(item.coor);
+            // console.log("ele", ele);
+            if (!ele) return;
+            if (!ctx) return;
+            let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
+            // console.log("eleBgColor", eleBgColor);
+            let eleRect = ele.getBoundingClientRect();
+            // console.log("eleRect", eleRect);
+  
+            // console.log("parentRect", parentRect);
+  
+            let top = eleRect.top - parentRect.top;
+            let left = eleRect.left - parentRect.left;
+            let width = eleRect.width;
+            let height = eleRect.height;
+            // console.log("rect", top, left, width, height);
+            ctx.fillStyle = item.color;
+            const scaleRatio = canvaSize / parentRect.width;
+            // console.log("scaleRatio", scaleRatio);
+            // console.log(
+            //   "scaleRatioCTX",
+            //   left * scaleRatio,
+            //   top * scaleRatio,
+            //   width * scaleRatio,
+            //   height * scaleRatio
+            // );
+  
+            ctx.fillRect(
+              left * scaleRatio,
+              top * scaleRatio,
+              width * scaleRatio,
+              height * scaleRatio
+            );
+            // console.log("801_ key * speed", key * speed);
+            // if(key === list.length-1) {
+            //   resolve(canvas);
+            // }
+          }, (key+1) * speed);
+          
+        });
+      // })
+      // }
+      // createCanvas().then((canvas)=>{
+      //   console.log('res_canvas', canvas)
+        
+      // })
       // console.log("list.length * speed", list.length * speed);
-      function recordCanvas(canvas: any, videoLength: any) {
+      const recordCanvas = async (canvas: any, videoLength: any) => {
+        console.log('videoLength', videoLength)
         const recordedChunks: any = [];
-        const mediaRecorder = new MediaRecorder(canvas.captureStream(25), {
+        const mediaRecorder = new MediaRecorder(canvas.captureStream(15), {
           mimeType: "video/webm; codecs=vp9"
         });
-        mediaRecorder.ondataavailable = (event) =>
-          recordedChunks.push(event.data);
-        mediaRecorder.onstop = () => {
-          const url = URL.createObjectURL(
-            new Blob(recordedChunks, { type: "video/webm" })
-          );
-          const anchor = document.createElement("a");
-          anchor.href = url;
-          anchor.download = "video.webm";
-          anchor.click();
-          window.URL.revokeObjectURL(url);
-        };
         mediaRecorder.start();
-        window.setTimeout(() => {
+        // let videoEle =document.getElementById("video");
+        // if(!videoEle) return;
+        // videoEle.srcObject = mediaRecorder.stream;
+        
+        // setTimeout(() => {
+          mediaRecorder.ondataavailable = (event) =>
+            recordedChunks.push(event.data);
+            
+          // }, 0);
+          console.log('mediaRecorder', mediaRecorder)
+          mediaRecorder.onstop = () => {
+            console.log('recordedChunks', recordedChunks)
+            //------------------------------------------------------
+            // const blob = recordedChunks[0];
+            // var reader = new FileReader();
+            // reader.readAsDataURL(blob);
+            // reader.onloadend = (w) => {
+            //   console.log('w', w)
+            //   console.log('w.target.result', w.target.result)
+            //   const anchor = document.createElement("a");
+            //   anchor.href = w.target.result;
+            //   anchor.download = "video.webm";
+            //   anchor.click();
+            // }
+            //------------------------------------------------------
+            const url = URL.createObjectURL(
+              new Blob(recordedChunks, { type: "video/webm" })
+            );
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = "video.webm";
+            anchor.click();
+            window.URL.revokeObjectURL(url);
+          };
+        
+        setTimeout(() => {
           mediaRecorder.stop();
           // setDownloadEnable(false);
           setLoadingModalShow(false);
-        }, videoLength);
+          let appEle = document.querySelector(".App");
+          console.log("appEle", appEle);
+          if (!appEle) return;
+          appEle.classList.remove('download_time');
+        }, 10000);
       }
-
-      recordCanvas(canvas, (list.length - 1) * speed);
-    });
+        recordCanvas(canvas, (list.length) * speed);
+        
+      
+    
   };
 
   return (
@@ -943,6 +1006,8 @@ export default () => {
             {renderCube()}
           </div>
         </div>
+        <canvas id="targetCanvas" style={{zIndex:'-1', opacity:'0'}}></canvas>
+        {/* <video id='video' muted autoPlay style={{width:'180px', height:'320px'}}></video> */}
         {/* {downloadEnable ? (
           <button onClick={() => prepareToExportVideo()}>準備輸出</button>
         ) : null} */}
@@ -1124,35 +1189,37 @@ export default () => {
         </ModalTool>
       ) : null}
 
-      <DragPanel
-        id={"functionPanel"}
-        background={"transparent"}
-        childStartX={0.08}
-        childStartY={0.1}
-        show={setupPanelShow}
-        setShow={setSetupPanelShow}
-      >
-        <SetupPanel
-          canvaColor={canvaColor}
-          changeCanvaColor={changeCanvaColor}
-          currentColor={currentColor}
-          changeColor={changeColor}
-          showSpeedMenu={showSpeedMenu}
-          setShowSpeedMenu={setShowSpeedMenu}
-          speed={speed}
-          changeSpeedLevel={changeSpeedLevel}
-          showPenWidthMenu={showPenWidthMenu}
-          setShowPenWidthMenu={setShowPenWidthMenu}
-          penWidth={penWidth}
-          changePenWidth={changePenWidth}
-          eraseMode={eraseMode}
-          setEraseMode={setEraseMode}
-          palmRejectShow={palmRejectShow}
-          setPalmRejectShow={setPalmRejectShow}
-          touchBehavior={touchBehavior}
-          setTouchBehavior={setTouchBehavior}
-        />
-      </DragPanel>
+      {setupPanelShow ? (
+        <DragPanel
+          id={"functionPanel"}
+          background={"transparent"}
+          childStartX={0.08}
+          childStartY={0.1}
+          show={setupPanelShow}
+          setShow={setSetupPanelShow}
+        >
+          <SetupPanel
+            canvaColor={canvaColor}
+            changeCanvaColor={changeCanvaColor}
+            currentColor={currentColor}
+            changeColor={changeColor}
+            showSpeedMenu={showSpeedMenu}
+            setShowSpeedMenu={setShowSpeedMenu}
+            speed={speed}
+            changeSpeedLevel={changeSpeedLevel}
+            showPenWidthMenu={showPenWidthMenu}
+            setShowPenWidthMenu={setShowPenWidthMenu}
+            penWidth={penWidth}
+            changePenWidth={changePenWidth}
+            eraseMode={eraseMode}
+            setEraseMode={setEraseMode}
+            palmRejectShow={palmRejectShow}
+            setPalmRejectShow={setPalmRejectShow}
+            touchBehavior={touchBehavior}
+            setTouchBehavior={setTouchBehavior}
+          />
+        </DragPanel>
+      ) : null}
     </div>
   );
 };

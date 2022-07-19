@@ -7,4 +7,8 @@
   /* overflow: hidden; */
   /* overflow-y: scroll;
   overflow-x: hidden; */
+
+}
+.App.download_time {
+  position: fixed;
 }
