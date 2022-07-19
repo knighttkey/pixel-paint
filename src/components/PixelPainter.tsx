@@ -18,6 +18,10 @@ import ModalTool from "./ModalTool";
 import SetupPanel from "./SetupPanel";
 import moment from "moment";
 // import Dropdown from "./Dropdown";
+// import { createFFmpeg } from 'FFmpeg';
+// const ffmpeg = createFFmpeg({
+//   log: true
+// });
 import DropExpandCenter from "./DropExpandCenter";
 
 type DragPoint = {
@@ -917,7 +921,7 @@ export default () => {
           console.log("appEle", appEle);
           if (!appEle) return;
           appEle.classList.remove('download_time');
-        }, 10000);
+        }, videoLength+3000);
       }
         recordCanvas(canvas, (list.length) * speed);
         
