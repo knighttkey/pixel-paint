@@ -18,10 +18,6 @@ import ModalTool from "./ModalTool";
 import SetupPanel from "./SetupPanel";
 import moment from "moment";
 // import Dropdown from "./Dropdown";
-// import { createFFmpeg } from 'FFmpeg';
-// const ffmpeg = createFFmpeg({
-//   log: true
-// });
 import DropExpandCenter from "./DropExpandCenter";
 
 type DragPoint = {
@@ -875,9 +871,11 @@ export default () => {
       function recordCanvas (canvas: any, videoLength: any) {
         console.log('videoLength', videoLength)
         const recordedChunks: any = [];
-        const mediaRecorder = new MediaRecorder(canvas.captureStream(15), {
-          mimeType: "video/webm; codecs=vp9"
-        });
+        // var options = {mimeType: 'video/webm;codecs=h264'}; 
+        var options = { mimeType: "video/webm; codecs=vp9"}; 
+        const mediaRecorder = new MediaRecorder(canvas.captureStream(30), options
+        // { mimeType: "video/webm; codecs=vp9"}
+        );
         mediaRecorder.start();
         // let videoEle =document.getElementById("video");
         // if(!videoEle) return;
