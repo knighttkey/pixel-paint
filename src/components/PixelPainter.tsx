@@ -29,7 +29,7 @@ interface ColorPickTarget extends EventTarget {
 }
 export interface paintDataFromLocal {
   id: string;
-  listData: coordinateData[];
+  listData: coordinateData[][];
   thumbnail: string;
   canvaColor: string;
 }
@@ -44,11 +44,17 @@ interface PalmRejectSize {
   h: number;
 }
 
+interface WholeData {
+  ele: HTMLDivElement;
+  id: string;
+  color: string;
+}
+
 export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const listPanelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [list, setList] = useState<coordinateData[]>([]);
+  const [list, setList] = useState<coordinateData[][]>([]);
   // console.log("list", list);
 
   const [showText, setShowText] = useState<boolean>(false);
@@ -304,56 +310,110 @@ export default () => {
     // console.log("erase_coor", coor);
 
     let currentChanged = getCubeId(coor);
-    // console.log("currentChanged", currentChanged);
+    console.log("currentChanged", currentChanged);
     if (!currentChanged) return;
     let currentChangedWithoutColor = currentChanged.map((item: any, index) => {
       if (!item) return;
       return { coor: item.id };
     });
-    // console.log("currentChangedWithoutColor", currentChangedWithoutColor);
+    console.log("currentChangedWithoutColor", currentChangedWithoutColor);
     if (!currentChangedWithoutColor) return;
     let withoutColor = list.map((i) => {
-      return { coor: i.coor };
+      const innerArray = i.map((innerItem) => {
+        return { coor: innerItem.coor};
+      });
+      console.log("innerArray", innerArray);
+      return innerArray;
     });
-    // console.log("withoutColor", withoutColor);
-    let compareResult = currentChangedWithoutColor.filter((x) =>
-      R.includes(x, withoutColor)
+    console.log("withoutColor", withoutColor);
+    // let compareResult = currentChangedWithoutColor.filter((x) =>
+    //   R.includes(x, withoutColor)
+    // );
+    // let compareResult = withoutColor.filter((x) =>
+    // {
+    //   console.log('x', x)
+    //   return JSON.stringify(x) === JSON.stringify(currentChangedWithoutColor)
+    //   // return R.includes(currentChangedWithoutColor, withoutColor)
+    // }
+    // );
+    let compareResult = withoutColor.filter((x) =>
+    {
+      console.log('x', x)
+      return currentChangedWithoutColor.some(y => R.includes(y, x));
+      // return R.includes(currentChangedWithoutColor, withoutColor)
+    }
     );
+    //  R.includes(currentChangedWithoutColor, withoutColor)
+    // let compareResult = R.includes(currentChangedWithoutColor, withoutColor)
+    // let compareResult = currentChangedWithoutColor.some(y => R.includes(y, x));
 
-    // console.log("erase_compareResult", compareResult);
+    console.log("erase_compareResult", compareResult);
 
-    compareResult.forEach((item) => {
-      if (!item) return;
-      let ele = document.getElementById(item.coor);
-      if (!ele) return;
-      let targetIndex = tempList
-        .map((i) => {
-          return i.coor;
-        })
-        .indexOf(item.coor);
-      if (targetIndex >= 0) {
-        tempList.splice(targetIndex, 1);
-      }
-      eraseCubeSingle(item);
-      setList(tempList);
-    });
+    // compareResult.forEach((item) => {
+      // if (!item) return;
+      // item.forEach((innerItem) => {
+      //   // let ele = document.getElementById(innerItem.coor);
+      //   // if (!ele) return;
+      //   let aaa = tempList.map((i) => {
+      //     return (
+      //       i.map((j)=>{
+      //         return j.coor;
+      //       })
+      //       )
+      //     })
+      //     console.log('aaa', aaa)
+        // let targetIndex = aaa
+        //   .indexOf(item);
+        // if (targetIndex >= 0) {
+        //   tempList.splice(targetIndex, 1);
+        // }
+        // eraseCubeSingle(innerItem);
+      // })
+
+      // currentChangedWithoutColor.some(y => R.includes(y, x));
+
+      
+    //   setList(tempList);
+    // });
+    // let compareResultsss = compareResult.map((x) =>
+    // {
+    //   console.log('___x', x)
+    // // return tempList.some(y => R.includes(y, x));
+    // }
   };
 
   useEffect(() => {
     if (detectList.length) {
-      // console.log("detectList", detectList);
+      console.log("detectList", detectList);
       let lastChanged = getCubeId(detectList[detectList.length - 1]);
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
-        // console.log("lastChanged", lastChanged);
-        lastChanged.forEach((item: any, key) => {
-          if (!item) return;
-          if (eraseMode) {
-            // eraseCubeSingle({ coor: item.id });
-          } else {
-            paintCubeSingle({ coor: item.id, color: item.color });
-          }
-        });
+        console.log("lastChanged", lastChanged);
+        // lastChanged.forEach((item: any, key) => {
+        //   console.log('item', item)
+        //   if (!item) return;
+        //   if (eraseMode) {
+        //     // eraseCubeSingle({ coor: item.id });
+        //   } else {
+        //     paintCubeSingle([lastChanged]);
+        //     // const coorFormatArray = item.map((innerItem:WholeData) => {
+        //     //   return { coor: innerItem.id, color: innerItem.color };
+        //     // });
+        //     // console.log("coorFormatArray", coorFormatArray);
+        //     // paintCubeSingle(coorFormatArray);
+        //   }
+        // });
+        let aaa = lastChanged.map((item:any)=>{
+          // if(!item) return;
+          return ({coor:item.id, color:item.color})
+        })
+        console.log('aaa', aaa)
+        if(!aaa) return;
+        paintCubeSingle(aaa)
+        // aaa.forEach((item)=>{
+        //   paintCubeSingle([item]);
+        // })
+        
       }
     }
   }, [detectList]);
@@ -377,18 +437,20 @@ export default () => {
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
     // console.log("coor", coor);
 
-    if (R.includes(coor, temp)) {
-    } else {
+    // if (R.includes(coor, temp)) {
+    // } else {
       temp.push(coor);
-    }
-    // console.log("temp", temp);
+    // }
+    console.log("temp", temp);
     setDetectList(temp);
   };
 
-  const paintCubeSingle = (position: coordinateData) => {
-    let cubeEle = document.getElementById(position.coor);
-    if (!cubeEle) return;
-    cubeEle.style.backgroundColor = position.color;
+  const paintCubeSingle = (positionArray: coordinateData[]) => {
+    positionArray.forEach((positionItem) => {
+      let cubeEle = document.getElementById(positionItem.coor);
+      if (!cubeEle) return;
+      cubeEle.style.backgroundColor = positionItem.color;
+    });
   };
   const eraseCubeSingle = (position: { coor: string }) => {
     let cubeEle = document.getElementById(position.coor);
@@ -415,14 +477,20 @@ export default () => {
     let allCubeData = detectList.map((item) => {
       return getCubeId(item);
     });
+    console.log("allCubeData", allCubeData);
     let flattenList = R.flatten(allCubeData);
     // console.log("allCubeData", allCubeData);
     // console.log("flattenList", flattenList);
-    flattenList.forEach((item: any, index) => {
+    allCubeData.forEach((item: any, index) => {
       if (!item) return;
-      tempList.push({ coor: item.id, color: item.color });
+      let innerObject = item.map(
+        (innerItem: WholeData) => {
+          return { coor: innerItem.id, color: innerItem.color };
+        }
+      );
+      tempList.push(innerObject);
     });
-    // console.log('tempList', tempList)
+    console.log("tempList", tempList);
     setList(R.uniq(tempList));
     setDetectList([]);
   };
@@ -479,10 +547,14 @@ export default () => {
         // console.log("toParse", toParse);
         // console.log("toParse.listData", toParse.listData);
         setList(toParse.listData);
-        let listFromFile: coordinateData[] = toParse.listData;
+        let listFromFile: coordinateData[][] = toParse.listData;
         listFromFile.forEach((item, key) => {
           setTimeout(() => {
-            paintCubeSingle({ coor: item.coor, color: item.color });
+            const coorFormatArray = item.map((innerItem) => {
+              return { coor: innerItem.coor, color: innerItem.color };
+            });
+            console.log("coorFormatArray", coorFormatArray);
+            paintCubeSingle(coorFormatArray);
           }, speed * key);
         });
         setDownloadEnable(true);
@@ -513,21 +585,15 @@ export default () => {
       if (!currentPicked) return;
       setCanvaColor(currentPicked.canvaColor);
       setEnable(false);
-      let startTime: number = 0;
-      let endTime: number = 0;
+
       currentPicked.listData.forEach((item, key) => {
         setTimeout(() => {
-          if (key === 0) {
-            // console.log("start", new Date().getTime());
-            startTime = new Date().getTime();
-          }
-          if (key === currentPicked.listData.length - 1) {
-            // console.log("end", new Date().getTime());
-            endTime = new Date().getTime();
-            // console.log("speed * key", speed * key);
-          }
-          tempList.push({ coor: item.coor, color: item.color });
-          paintCubeSingle({ coor: item.coor, color: item.color });
+          // tempList.push({ coor: item.coor, color: item.color });
+          tempList.push(item);
+          paintCubeSingle(item);
+          // item.forEach((innerItem)=>{
+          //   paintCubeSingle({ coor: innerItem.coor, color: innerItem.color });
+          // })
           setList([...tempList]);
         }, speed * key);
 
@@ -535,11 +601,6 @@ export default () => {
         setShowText(false);
       });
       setDownloadEnable(true);
-      // console.log(
-      //   "currentPicked.listData.length*speed",
-      //   currentPicked.listData.length * speed
-      // );
-      // console.log("endTime - startTime", endTime - startTime);
       let count = currentPicked.listData.length;
       // console.log('count', count)
       setTimeout(() => {
@@ -744,189 +805,189 @@ export default () => {
       });
   };
 
-  const playFromThisFrame = (index: number, canvaColor: string) => {
-    // console.log("index", index);
-    let tempOrigin = [...list];
-    let fromThisFrame = tempOrigin.filter((item, key) => {
-      return key >= index;
-    });
-    // console.log("fromThisFrame", fromThisFrame);
-    tempList = [];
-    setList([]);
-    eraseAllCube();
-    setEnable(false);
-    fromThisFrame.forEach((item, key) => {
-      setTimeout(() => {
-        tempList.push({ coor: item.coor, color: item.color });
-        paintCubeSingle({ coor: item.coor, color: item.color });
-        setList([...tempList]);
-      }, speed * key);
-      setCurrentPicked(undefined);
-      // setShowText(false);
-    });
-    let count = fromThisFrame.length;
-    // console.log('count', count)
-    setTimeout(() => {
-      setEnable(true);
-    }, count * speed);
-  };
+  // const playFromThisFrame = (index: number, canvaColor: string) => {
+  //   // console.log("index", index);
+  //   let tempOrigin = [...list];
+  //   let fromThisFrame = tempOrigin.filter((item, key) => {
+  //     return key >= index;
+  //   });
+  //   // console.log("fromThisFrame", fromThisFrame);
+  //   tempList = [];
+  //   setList([]);
+  //   eraseAllCube();
+  //   setEnable(false);
+  //   fromThisFrame.forEach((item, key) => {
+  //     setTimeout(() => {
+  //       tempList.push({ coor: item.coor, color: item.color });
+  //       paintCubeSingle({ coor: item.coor, color: item.color });
+  //       setList([...tempList]);
+  //     }, speed * key);
+  //     setCurrentPicked(undefined);
+  //     // setShowText(false);
+  //   });
+  //   let count = fromThisFrame.length;
+  //   // console.log('count', count)
+  //   setTimeout(() => {
+  //     setEnable(true);
+  //   }, count * speed);
+  // };
 
-  const removeThisFrame = (index: number) => {
-    // console.log("index", index);
-    let tempOrigin = [...list];
-    let othersFrame = tempOrigin.filter((item, key) => {
-      return key !== index;
-    });
-    othersFrame.forEach((item, index) => {
-      paintCubeSingle({ coor: item.coor, color: item.color });
-    });
-    setList(othersFrame);
-  };
+  // const removeThisFrame = (index: number) => {
+  //   // console.log("index", index);
+  //   let tempOrigin = [...list];
+  //   let othersFrame = tempOrigin.filter((item, key) => {
+  //     return key !== index;
+  //   });
+  //   othersFrame.forEach((item, index) => {
+  //     paintCubeSingle({ coor: item.coor, color: item.color });
+  //   });
+  //   setList(othersFrame);
+  // };
   const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   const prepareToExportVideo = () => {
     setLoadingModalShow(true);
-      // const createCanvas = () => {
-      //   return new Promise((resolve,reject)=>{
+    // const createCanvas = () => {
+    //   return new Promise((resolve,reject)=>{
 
-        
-        const canvas = document.createElement("canvas");
-        // const canvas = document.getElementById("targetCanvas");
-        // if (!canvas) return;
+    const canvas = document.createElement("canvas");
+    // const canvas = document.getElementById("targetCanvas");
+    // if (!canvas) return;
+    let appEle = document.querySelector(".App");
+    console.log("appEle", appEle);
+    if (!appEle) return;
+    appEle.classList.add("download_time");
+    // let contanierEle = document.querySelector(".paint_body");
+    // console.log("contanierEle", contanierEle);
+    // if (!contanierEle) return;
+    // contanierEle.appendChild(canvas);
+    // canvas.id = "targetCanvas";
+    // canvas.style.backgroundColor = canvaColor;
+    const canvaSize = 1400;
+    canvas.height = canvaSize;
+    canvas.width = canvaSize;
+    let ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    if (!wrapRef.current) return;
+    let parentRect = wrapRef.current.getBoundingClientRect();
+    // console.log("parentRect", parentRect);
+    ctx.clearRect(0, 0, canvaSize, canvaSize);
+    ctx.fillStyle = canvaColor;
+    ctx.fillRect(0, 0, canvaSize, canvaSize);
+    console.log("list", list);
+    recordCanvas(canvas, (list.length + 10) * speed);
+    list.forEach((item, key) => {
+      console.log("key", key, item.color, key * speed, item.coor);
+      if (!ctx) return;
+
+      setTimeout(() => {
+        let ele = document.getElementById(item.coor);
+        // console.log("ele", ele);
+        if (!ele) return;
+        if (!ctx) return;
+        let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
+        // console.log("eleBgColor", eleBgColor);
+        let eleRect = ele.getBoundingClientRect();
+        // console.log("eleRect", eleRect);
+
+        // console.log("parentRect", parentRect);
+
+        let top = eleRect.top - parentRect.top;
+        let left = eleRect.left - parentRect.left;
+        let width = eleRect.width;
+        let height = eleRect.height;
+        // console.log("rect", top, left, width, height);
+        ctx.fillStyle = item.color;
+        const scaleRatio = canvaSize / parentRect.width;
+        // console.log("scaleRatio", scaleRatio);
+        // console.log(
+        //   "scaleRatioCTX",
+        //   left * scaleRatio,
+        //   top * scaleRatio,
+        //   width * scaleRatio,
+        //   height * scaleRatio
+        // );
+
+        ctx.fillRect(
+          left * scaleRatio,
+          top * scaleRatio,
+          width * scaleRatio,
+          height * scaleRatio
+        );
+        // console.log("801_ key * speed", key * speed);
+        // if(key === list.length-1) {
+        //   resolve(canvas);
+        // }
+      }, key * speed);
+    });
+    // })
+    // }
+    // createCanvas().then((canvas)=>{
+    //   console.log('res_canvas', canvas)
+
+    // })
+    // console.log("list.length * speed", list.length * speed);
+    function recordCanvas(canvas: any, videoLength: any) {
+      console.log("videoLength", videoLength);
+      const recordedChunks: any = [];
+      // var options = {mimeType: 'video/webm;codecs=h264'};
+      var options = { mimeType: "video/webm; codecs=vp9" };
+      const mediaRecorder = new MediaRecorder(
+        canvas.captureStream(30),
+        options
+        // { mimeType: "video/webm; codecs=vp9"}
+      );
+      mediaRecorder.start();
+      // let videoEle =document.getElementById("video");
+      // if(!videoEle) return;
+      // videoEle.srcObject = mediaRecorder.stream;
+
+      // setTimeout(() => {
+      mediaRecorder.ondataavailable = (event) =>
+        recordedChunks.push(event.data);
+
+      // }, 0);
+      console.log("mediaRecorder", mediaRecorder);
+      mediaRecorder.onstop = () => {
+        console.log("recordedChunks", recordedChunks);
+        //------------------------------------------------------
+        // const blob = recordedChunks[0];
+        // var reader = new FileReader();
+        // reader.readAsDataURL(blob);
+        // reader.onloadend = (w) => {
+        //   console.log('w', w)
+        //   console.log('w.target.result', w.target.result)
+        //   const anchor = document.createElement("a");
+        //   anchor.href = w.target.result;
+        //   anchor.download = "video.webm";
+        //   anchor.click();
+        // }
+        //------------------------------------------------------
+        const url = URL.createObjectURL(
+          new Blob(recordedChunks, { type: "video/webm" })
+        );
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = "video.webm";
+        anchor.click();
+        window.URL.revokeObjectURL(url);
+      };
+
+      setTimeout(() => {
+        mediaRecorder.stop();
+        // setDownloadEnable(false);
+        setLoadingModalShow(false);
         let appEle = document.querySelector(".App");
         console.log("appEle", appEle);
         if (!appEle) return;
-        appEle.classList.add('download_time');
-        // let contanierEle = document.querySelector(".paint_body");
-        // console.log("contanierEle", contanierEle);
-        // if (!contanierEle) return;
-        // contanierEle.appendChild(canvas);
-        // canvas.id = "targetCanvas";
-        // canvas.style.backgroundColor = canvaColor;
-        const canvaSize = 1400;
-        canvas.height = canvaSize;
-        canvas.width = canvaSize;
-        let ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        if (!wrapRef.current) return;
-        let parentRect = wrapRef.current.getBoundingClientRect();
-        // console.log("parentRect", parentRect);
-        ctx.clearRect(0, 0, canvaSize, canvaSize);
-        ctx.fillStyle = canvaColor;
-        ctx.fillRect(0, 0, canvaSize, canvaSize);
-        console.log('list', list)
-        recordCanvas(canvas, (list.length+10) * speed);
-        list.forEach((item, key) => {
-          console.log('key', key, item.color, key*speed, item.coor)
-          if (!ctx) return;
-  
-          setTimeout(() => {
-            let ele = document.getElementById(item.coor);
-            // console.log("ele", ele);
-            if (!ele) return;
-            if (!ctx) return;
-            let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
-            // console.log("eleBgColor", eleBgColor);
-            let eleRect = ele.getBoundingClientRect();
-            // console.log("eleRect", eleRect);
-  
-            // console.log("parentRect", parentRect);
-  
-            let top = eleRect.top - parentRect.top;
-            let left = eleRect.left - parentRect.left;
-            let width = eleRect.width;
-            let height = eleRect.height;
-            // console.log("rect", top, left, width, height);
-            ctx.fillStyle = item.color;
-            const scaleRatio = canvaSize / parentRect.width;
-            // console.log("scaleRatio", scaleRatio);
-            // console.log(
-            //   "scaleRatioCTX",
-            //   left * scaleRatio,
-            //   top * scaleRatio,
-            //   width * scaleRatio,
-            //   height * scaleRatio
-            // );
-  
-            ctx.fillRect(
-              left * scaleRatio,
-              top * scaleRatio,
-              width * scaleRatio,
-              height * scaleRatio
-            );
-            // console.log("801_ key * speed", key * speed);
-            // if(key === list.length-1) {
-            //   resolve(canvas);
-            // }
-          }, (key) * speed);
-          
-        });
-      // })
-      // }
-      // createCanvas().then((canvas)=>{
-      //   console.log('res_canvas', canvas)
-        
-      // })
-      // console.log("list.length * speed", list.length * speed);
-      function recordCanvas (canvas: any, videoLength: any) {
-        console.log('videoLength', videoLength)
-        const recordedChunks: any = [];
-        // var options = {mimeType: 'video/webm;codecs=h264'}; 
-        var options = { mimeType: "video/webm; codecs=vp9"}; 
-        const mediaRecorder = new MediaRecorder(canvas.captureStream(30), options
-        // { mimeType: "video/webm; codecs=vp9"}
-        );
-        mediaRecorder.start();
-        // let videoEle =document.getElementById("video");
-        // if(!videoEle) return;
-        // videoEle.srcObject = mediaRecorder.stream;
-        
-        // setTimeout(() => {
-          mediaRecorder.ondataavailable = (event) =>
-            recordedChunks.push(event.data);
-            
-          // }, 0);
-          console.log('mediaRecorder', mediaRecorder)
-          mediaRecorder.onstop = () => {
-            console.log('recordedChunks', recordedChunks)
-            //------------------------------------------------------
-            // const blob = recordedChunks[0];
-            // var reader = new FileReader();
-            // reader.readAsDataURL(blob);
-            // reader.onloadend = (w) => {
-            //   console.log('w', w)
-            //   console.log('w.target.result', w.target.result)
-            //   const anchor = document.createElement("a");
-            //   anchor.href = w.target.result;
-            //   anchor.download = "video.webm";
-            //   anchor.click();
-            // }
-            //------------------------------------------------------
-            const url = URL.createObjectURL(
-              new Blob(recordedChunks, { type: "video/webm" })
-            );
-            const anchor = document.createElement("a");
-            anchor.href = url;
-            anchor.download = "video.webm";
-            anchor.click();
-            window.URL.revokeObjectURL(url);
-          };
-        
-        setTimeout(() => {
-          mediaRecorder.stop();
-          // setDownloadEnable(false);
-          setLoadingModalShow(false);
-          let appEle = document.querySelector(".App");
-          console.log("appEle", appEle);
-          if (!appEle) return;
-          appEle.classList.remove('download_time');
-        }, videoLength+3000);
-      }
-        
-        
-      
-    
+        appEle.classList.remove("download_time");
+      }, videoLength + 3000);
+    }
   };
+
+  const prevStep = () => {};
+
+  const nextStep = () => {};
 
   return (
     <div className="pixel_canva_container">
@@ -1009,7 +1070,10 @@ export default () => {
             {renderCube()}
           </div>
         </div>
-        <canvas id="targetCanvas" style={{zIndex:'-1', opacity:'0'}}></canvas>
+        <canvas
+          id="targetCanvas"
+          style={{ zIndex: "-1", opacity: "0" }}
+        ></canvas>
         {/* <video id='video' muted autoPlay style={{width:'180px', height:'320px'}}></video> */}
         {/* {downloadEnable ? (
           <button onClick={() => prepareToExportVideo()}>準備輸出</button>
