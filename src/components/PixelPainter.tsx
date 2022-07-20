@@ -819,6 +819,7 @@ export default () => {
         ctx.fillStyle = canvaColor;
         ctx.fillRect(0, 0, canvaSize, canvaSize);
         console.log('list', list)
+        recordCanvas(canvas, (list.length+10) * speed);
         list.forEach((item, key) => {
           console.log('key', key, item.color, key*speed, item.coor)
           if (!ctx) return;
@@ -861,7 +862,7 @@ export default () => {
             // if(key === list.length-1) {
             //   resolve(canvas);
             // }
-          }, (key+1) * speed);
+          }, (key) * speed);
           
         });
       // })
@@ -871,7 +872,7 @@ export default () => {
         
       // })
       // console.log("list.length * speed", list.length * speed);
-      const recordCanvas = async (canvas: any, videoLength: any) => {
+      function recordCanvas (canvas: any, videoLength: any) {
         console.log('videoLength', videoLength)
         const recordedChunks: any = [];
         const mediaRecorder = new MediaRecorder(canvas.captureStream(15), {
@@ -923,7 +924,7 @@ export default () => {
           appEle.classList.remove('download_time');
         }, videoLength+3000);
       }
-        recordCanvas(canvas, (list.length) * speed);
+        
         
       
     
