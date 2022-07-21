@@ -9,9 +9,9 @@ import React, {
 import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
 import html2canvas from "html2canvas";
-import starryNight from "./../../jsonFile_16578030.json";
-import wantItAll from "./../../jsonFile_16576374.json";
-import wretched from "./../../jsonFile_wretched.json";
+import starryNight from "./../../jsonFile_2022_07_21_A.json";
+import wantItAll from "./../../jsonFile_2022_07_21_B.json";
+import wretched from "./../../jsonFile_2022_07_21_C.json";
 import DragPanel from "./DragPanel";
 import GalleryPanel from "./GalleryPanel";
 import ModalTool from "./ModalTool";
@@ -299,87 +299,42 @@ export default () => {
   const eraseMove = (e: React.TouchEvent) => {
     e.stopPropagation();
     if (!canvaTouchEnable(e)) return;
-    // console.log('!canvaTouchEnable(e)', !canvaTouchEnable(e))
 
     if (!wrapRef.current) return;
     let parentRect = wrapRef.current.getBoundingClientRect();
     let clientXX = e.touches[0].clientX - parentRect.left;
     let clientYY = e.touches[0].clientY - parentRect.top;
-    // let coor = { x: 8*Math.floor(clientXX/8), y: 8*Math.floor(clientYY/8) };
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
-    // console.log("erase_coor", coor);
 
-    let currentChanged = getCubeId(coor);
-    console.log("currentChanged", currentChanged);
-    if (!currentChanged) return;
-    let currentChangedWithoutColor = currentChanged.map((item: any, index) => {
+    let eraseChanged = getCubeId(coor)?.map(item=>{
       if (!item) return;
       return { coor: item.id };
     });
-    console.log("currentChangedWithoutColor", currentChangedWithoutColor);
-    if (!currentChangedWithoutColor) return;
-    let withoutColor = list.map((i) => {
-      const innerArray = i.map((innerItem) => {
-        return { coor: innerItem.coor};
-      });
-      console.log("innerArray", innerArray);
-      return innerArray;
-    });
-    console.log("withoutColor", withoutColor);
-    // let compareResult = currentChangedWithoutColor.filter((x) =>
-    //   R.includes(x, withoutColor)
-    // );
-    // let compareResult = withoutColor.filter((x) =>
-    // {
-    //   console.log('x', x)
-    //   return JSON.stringify(x) === JSON.stringify(currentChangedWithoutColor)
-    //   // return R.includes(currentChangedWithoutColor, withoutColor)
-    // }
-    // );
-    let compareResult = withoutColor.filter((x) =>
-    {
-      console.log('x', x)
-      return currentChangedWithoutColor.some(y => R.includes(y, x));
-      // return R.includes(currentChangedWithoutColor, withoutColor)
-    }
-    );
-    //  R.includes(currentChangedWithoutColor, withoutColor)
-    // let compareResult = R.includes(currentChangedWithoutColor, withoutColor)
-    // let compareResult = currentChangedWithoutColor.some(y => R.includes(y, x));
+    console.log("eraseChanged", eraseChanged);
+    
+      if(!eraseChanged) return;
+      let fla = R.flatten(eraseChanged.map((i)=>{
+        if(!i) return;
+        return i.coor;
+      }));
 
-    console.log("erase_compareResult", compareResult);
-
-    // compareResult.forEach((item) => {
-      // if (!item) return;
-      // item.forEach((innerItem) => {
-      //   // let ele = document.getElementById(innerItem.coor);
-      //   // if (!ele) return;
-      //   let aaa = tempList.map((i) => {
-      //     return (
-      //       i.map((j)=>{
-      //         return j.coor;
-      //       })
-      //       )
-      //     })
-      //     console.log('aaa', aaa)
-        // let targetIndex = aaa
-        //   .indexOf(item);
-        // if (targetIndex >= 0) {
-        //   tempList.splice(targetIndex, 1);
-        // }
-        // eraseCubeSingle(innerItem);
-      // })
-
-      // currentChangedWithoutColor.some(y => R.includes(y, x));
-
-      
-    //   setList(tempList);
-    // });
-    // let compareResultsss = compareResult.map((x) =>
-    // {
-    //   console.log('___x', x)
-    // // return tempList.some(y => R.includes(y, x));
-    // }
+      let prepare = [...list];
+      let eraseResult = prepare.map((i,key)=>{
+        i.forEach(k => {
+          if(R.includes(k.coor, fla)) {
+            eraseCubeSingle(k);
+          }
+        })
+        return (i.filter((j)=>{
+          return(
+            !R.includes(j.coor, fla)
+            )
+          }))
+        }).filter((i)=>{
+          return i.length;
+        })
+        prepare = eraseResult;
+        setList(prepare);
   };
 
   useEffect(() => {
@@ -389,31 +344,11 @@ export default () => {
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
         console.log("lastChanged", lastChanged);
-        // lastChanged.forEach((item: any, key) => {
-        //   console.log('item', item)
-        //   if (!item) return;
-        //   if (eraseMode) {
-        //     // eraseCubeSingle({ coor: item.id });
-        //   } else {
-        //     paintCubeSingle([lastChanged]);
-        //     // const coorFormatArray = item.map((innerItem:WholeData) => {
-        //     //   return { coor: innerItem.id, color: innerItem.color };
-        //     // });
-        //     // console.log("coorFormatArray", coorFormatArray);
-        //     // paintCubeSingle(coorFormatArray);
-        //   }
-        // });
-        let aaa = lastChanged.map((item:any)=>{
-          // if(!item) return;
-          return ({coor:item.id, color:item.color})
-        })
-        console.log('aaa', aaa)
-        if(!aaa) return;
-        paintCubeSingle(aaa)
-        // aaa.forEach((item)=>{
-        //   paintCubeSingle([item]);
-        // })
-        
+        let modify = lastChanged.map((item: any) => {
+          return { coor: item.id, color: item.color };
+        });
+        if (!modify) return;
+        paintCubeSingle(modify);
       }
     }
   }, [detectList]);
@@ -437,10 +372,10 @@ export default () => {
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
     // console.log("coor", coor);
 
-    // if (R.includes(coor, temp)) {
-    // } else {
+    if (R.includes(coor, temp)) {
+    } else {
       temp.push(coor);
-    // }
+    }
     console.log("temp", temp);
     setDetectList(temp);
   };
@@ -452,7 +387,7 @@ export default () => {
       cubeEle.style.backgroundColor = positionItem.color;
     });
   };
-  const eraseCubeSingle = (position: { coor: string }) => {
+  const eraseCubeSingle = (position: coordinateData) => {
     let cubeEle = document.getElementById(position.coor);
     if (!cubeEle) return;
     cubeEle.style.backgroundColor = "transparent";
@@ -474,23 +409,24 @@ export default () => {
   const paintEnd = (e: any) => {
     setIsPainting(false);
     // if (!canvaTouchEnable(e)) return;
-    let allCubeData = detectList.map((item) => {
+    let allCubeData = R.uniq(detectList.map((item) => {
       return getCubeId(item);
-    });
+    }));
     console.log("allCubeData", allCubeData);
     let flattenList = R.flatten(allCubeData);
     // console.log("allCubeData", allCubeData);
     // console.log("flattenList", flattenList);
+    let tempPrepare: coordinateData[] = [];
     allCubeData.forEach((item: any, index) => {
       if (!item) return;
-      let innerObject = item.map(
-        (innerItem: WholeData) => {
-          return { coor: innerItem.id, color: innerItem.color };
-        }
-      );
+      let innerObject = item.map((innerItem: WholeData) => {
+        return { coor: innerItem.id, color: innerItem.color };
+      });
+      // console.log('innerObject', innerObject)
       tempList.push(innerObject);
     });
-    console.log("tempList", tempList);
+    // tempList.push(R.uniq(tempPrepare));
+    console.log("paintEnd_tempList", tempList);
     setList(R.uniq(tempList));
     setDetectList([]);
   };
@@ -670,6 +606,20 @@ export default () => {
     });
   };
 
+  const updateFormat = () => {
+    let demoList = [starryNight, wantItAll, wretched];
+    let fff = demoList[2].listData.map((item, index)=>{
+      return [item];
+    })
+
+    let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "", listData:fff, canvaColor:'#7bc6ff' };
+    console.log('fff', fff)
+    resetList();
+    setCanvaColor(demoList[2].canvaColor);
+    // setList(fff);
+    setCurrentPicked(tempObj);
+    setShowText(true);
+  }
   const demoPlay = () => {
     let prevSpeed = speed;
 
@@ -1144,6 +1094,7 @@ export default () => {
             </div>
           </Fragment>
         ) : null} */}
+        {/* <button onClick={()=>updateFormat()}>轉檔</button> */}
       </div>
       {prevDataFromLocal.length && galleryModalShow ? (
         <ModalTool
