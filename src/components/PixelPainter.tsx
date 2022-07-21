@@ -4,7 +4,7 @@ import React, {
   useState,
   MouseEvent,
   useEffect,
-  Fragment
+  Fragment,
 } from "react";
 import "./../styles/PixelPainter.scss";
 import * as R from "ramda";
@@ -87,13 +87,15 @@ export default () => {
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
-  const [offsetListForNext, setOffsetListForNext] = useState<coordinateData[][]>([]);
+  const [offsetListForNext, setOffsetListForNext] = useState<
+    coordinateData[][]
+  >([]);
   // console.log('eraseMode', eraseMode)
   const palmRejectSizeList: PalmRejectSize[] = [
     { w: 200, h: 300 },
     { w: 250, h: 400 },
     { w: 350, h: 500 },
-    { w: 450, h: 600 }
+    { w: 450, h: 600 },
   ];
 
   // console.log('navigator.userAgent', navigator.userAgent)
@@ -185,7 +187,7 @@ export default () => {
             [newList[0][1], newList[0][2]],
             newList[1],
             newList[2],
-            [newList[3][1], newList[3][2]]
+            [newList[3][1], newList[3][2]],
           ];
           break;
         case 5:
@@ -194,7 +196,7 @@ export default () => {
             [newList[1][1], newList[1][2], newList[1][3]],
             newList[2],
             [newList[3][1], newList[3][2], newList[3][3]],
-            [newList[4][2]]
+            [newList[4][2]],
           ];
           break;
         case 6:
@@ -204,7 +206,7 @@ export default () => {
             newList[2],
             newList[3],
             [newList[4][1], newList[4][2], newList[4][3], newList[4][4]],
-            [newList[5][2], newList[5][3]]
+            [newList[5][2], newList[5][3]],
           ];
           break;
 
@@ -274,7 +276,7 @@ export default () => {
                 key={cubeKey}
                 style={{
                   width: `${700 / cubeDivide}px`,
-                  height: `${700 / cubeDivide}px`
+                  height: `${700 / cubeDivide}px`,
                 }}
               ></div>
             );
@@ -307,35 +309,37 @@ export default () => {
     let clientYY = e.touches[0].clientY - parentRect.top;
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
 
-    let eraseChanged = getCubeId(coor)?.map(item=>{
+    let eraseChanged = getCubeId(coor)?.map((item) => {
       if (!item) return;
       return { coor: item.id };
     });
     // console.log("eraseChanged", eraseChanged);
-    
-      if(!eraseChanged) return;
-      let fla = R.flatten(eraseChanged.map((i)=>{
-        if(!i) return;
-        return i.coor;
-      }));
 
-      let prepare = [...list];
-      let eraseResult = prepare.map((i,key)=>{
-        i.forEach(k => {
-          if(R.includes(k.coor, fla)) {
+    if (!eraseChanged) return;
+    let fla = R.flatten(
+      eraseChanged.map((i) => {
+        if (!i) return;
+        return i.coor;
+      })
+    );
+
+    let prepare = [...list];
+    let eraseResult = prepare
+      .map((i, key) => {
+        i.forEach((k) => {
+          if (R.includes(k.coor, fla)) {
             eraseCubeSingle(k);
           }
-        })
-        return (i.filter((j)=>{
-          return(
-            !R.includes(j.coor, fla)
-            )
-          }))
-        }).filter((i)=>{
-          return i.length;
-        })
-        prepare = eraseResult;
-        setList(prepare);
+        });
+        return i.filter((j) => {
+          return !R.includes(j.coor, fla);
+        });
+      })
+      .filter((i) => {
+        return i.length;
+      });
+    prepare = eraseResult;
+    setList(prepare);
   };
 
   useEffect(() => {
@@ -417,9 +421,11 @@ export default () => {
   const paintEnd = (e: any) => {
     setIsPainting(false);
     // if (!canvaTouchEnable(e)) return;
-    let allCubeData = R.uniq(detectList.map((item) => {
-      return getCubeId(item);
-    }));
+    let allCubeData = R.uniq(
+      detectList.map((item) => {
+        return getCubeId(item);
+      })
+    );
     // console.log("allCubeData", allCubeData);
     allCubeData.forEach((item: any, index) => {
       if (!item) return;
@@ -440,8 +446,8 @@ export default () => {
         listData: list,
         id: new Date().getTime().toString(),
         thumbnail: thumbnail,
-        canvaColor: canvaColor
-      }
+        canvaColor: canvaColor,
+      },
     ];
     console.log("prepare", prepare);
     window.localStorage.setItem("pixelData", JSON.stringify(prepare));
@@ -460,7 +466,7 @@ export default () => {
       if (listPanelRef.current) {
         listPanelRef.current.scrollTo({
           top: Number.MAX_SAFE_INTEGER,
-          behavior: "smooth"
+          behavior: "smooth",
         });
       }
     }, 250);
@@ -569,7 +575,7 @@ export default () => {
   const exportData = (item: paintDataFromLocal) => {
     const content = JSON.stringify({
       listData: item.listData,
-      canvaColor: item.canvaColor ? item.canvaColor : canvaColor
+      canvaColor: item.canvaColor ? item.canvaColor : canvaColor,
     });
     let a = document.createElement("a");
     let file = new Blob([content], { type: "text/json" });
@@ -832,7 +838,7 @@ export default () => {
       if (!ctx) return;
 
       setTimeout(() => {
-        item.forEach((innerItem)=>{
+        item.forEach((innerItem) => {
           let ele = document.getElementById(innerItem.coor);
           // console.log("ele", ele);
           if (!ele) return;
@@ -842,7 +848,7 @@ export default () => {
           let eleRect = ele.getBoundingClientRect();
           // console.log("eleRect", eleRect);
           // console.log("parentRect", parentRect);
-  
+
           let top = eleRect.top - parentRect.top;
           let left = eleRect.left - parentRect.left;
           let width = eleRect.width;
@@ -850,15 +856,14 @@ export default () => {
           // console.log("rect", top, left, width, height);
           ctx.fillStyle = innerItem.color;
           const scaleRatio = canvaSize / parentRect.width;
-  
+
           ctx.fillRect(
             left * scaleRatio,
             top * scaleRatio,
             width * scaleRatio,
             height * scaleRatio
           );
-        })
-       
+        });
       }, key * speed);
     });
     // })
@@ -933,18 +938,18 @@ export default () => {
     tempListOffset.push(tempListForPrev[tempListForPrev.length - 1]);
     setOffsetListForNext(tempListOffset);
     setList(tempListForPrev);
-      prevCube(tempListForPrev[tempListForPrev.length - 1]);
+    prevCube(tempListForPrev[tempListForPrev.length - 1]);
   };
 
   const nextStep = () => {
-    console.log('offsetListForNext', offsetListForNext)
+    console.log("offsetListForNext", offsetListForNext);
     let aaa = [...offsetListForNext];
-    console.log('aaa', aaa)
-    let bbb = aaa.splice(aaa.length-1,1);
-    console.log('bbb', bbb)
+    console.log("aaa", aaa);
+    let bbb = aaa.splice(aaa.length - 1, 1);
+    console.log("bbb", bbb);
     let tempListForNext = [...list];
     tempListForNext.concat(bbb);
-    console.log('tempListForNext', tempListForNext)
+    console.log("tempListForNext", tempListForNext);
     setList(tempListForNext);
   };
 
