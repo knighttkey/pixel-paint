@@ -87,6 +87,7 @@ export default () => {
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
+  const [offsetListForNext, setOffsetListForNext] = useState<coordinateData[][]>([]);
   // console.log('eraseMode', eraseMode)
   const palmRejectSizeList: PalmRejectSize[] = [
     { w: 200, h: 300 },
@@ -348,7 +349,7 @@ export default () => {
           return { coor: item.id, color: item.color };
         });
         if (!modify) return;
-        paintCubeSingle(modify);
+        paintCube(modify);
       }
     }
   }, [detectList]);
@@ -380,11 +381,18 @@ export default () => {
     setDetectList(temp);
   };
 
-  const paintCubeSingle = (positionArray: coordinateData[]) => {
+  const paintCube = (positionArray: coordinateData[]) => {
     positionArray.forEach((positionItem) => {
       let cubeEle = document.getElementById(positionItem.coor);
       if (!cubeEle) return;
       cubeEle.style.backgroundColor = positionItem.color;
+    });
+  };
+  const prevCube = (positionArray: coordinateData[]) => {
+    positionArray.forEach((positionItem) => {
+      let cubeEle = document.getElementById(positionItem.coor);
+      if (!cubeEle) return;
+      cubeEle.style.backgroundColor = "transparent";
     });
   };
   const eraseCubeSingle = (position: coordinateData) => {
@@ -483,7 +491,7 @@ export default () => {
               return { coor: innerItem.coor, color: innerItem.color };
             });
             console.log("coorFormatArray", coorFormatArray);
-            paintCubeSingle(coorFormatArray);
+            paintCube(coorFormatArray);
           }, speed * key);
         });
         setDownloadEnable(true);
@@ -519,9 +527,9 @@ export default () => {
         setTimeout(() => {
           // tempList.push({ coor: item.coor, color: item.color });
           tempList.push(item);
-          paintCubeSingle(item);
+          paintCube(item);
           // item.forEach((innerItem)=>{
-          //   paintCubeSingle({ coor: innerItem.coor, color: innerItem.color });
+          //   paintCube({ coor: innerItem.coor, color: innerItem.color });
           // })
           setList([...tempList]);
         }, speed * key);
@@ -763,7 +771,7 @@ export default () => {
   //   fromThisFrame.forEach((item, key) => {
   //     setTimeout(() => {
   //       tempList.push({ coor: item.coor, color: item.color });
-  //       paintCubeSingle({ coor: item.coor, color: item.color });
+  //       paintCube({ coor: item.coor, color: item.color });
   //       setList([...tempList]);
   //     }, speed * key);
   //     setCurrentPicked(undefined);
@@ -783,7 +791,7 @@ export default () => {
   //     return key !== index;
   //   });
   //   othersFrame.forEach((item, index) => {
-  //     paintCubeSingle({ coor: item.coor, color: item.color });
+  //     paintCube({ coor: item.coor, color: item.color });
   //   });
   //   setList(othersFrame);
   // };
@@ -918,9 +926,27 @@ export default () => {
     }
   };
 
-  const prevStep = () => {};
+  const prevStep = () => {
+    let tempListForPrev = [...list];
+    tempListForPrev.splice(tempListForPrev.length - 1, 1);
+    let tempListOffset = [...offsetListForNext];
+    tempListOffset.push(tempListForPrev[tempListForPrev.length - 1]);
+    setOffsetListForNext(tempListOffset);
+    setList(tempListForPrev);
+      prevCube(tempListForPrev[tempListForPrev.length - 1]);
+  };
 
-  const nextStep = () => {};
+  const nextStep = () => {
+    console.log('offsetListForNext', offsetListForNext)
+    let aaa = [...offsetListForNext];
+    console.log('aaa', aaa)
+    let bbb = aaa.splice(aaa.length-1,1);
+    console.log('bbb', bbb)
+    let tempListForNext = [...list];
+    tempListForNext.concat(bbb);
+    console.log('tempListForNext', tempListForNext)
+    setList(tempListForNext);
+  };
 
   return (
     <div className="pixel_canva_container">
@@ -1011,6 +1037,8 @@ export default () => {
         {/* {downloadEnable ? (
           <button onClick={() => prepareToExportVideo()}>準備輸出</button>
         ) : null} */}
+        <button onClick={() => prevStep()}>前一步</button>
+        <button onClick={() => nextStep()}>下一步</button>
 
         {/* {list.length ? (
           <Fragment>
