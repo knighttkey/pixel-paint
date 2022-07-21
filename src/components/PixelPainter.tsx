@@ -68,7 +68,7 @@ export default () => {
   const [speed, setSpeed] = useState<number>(5);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
-  const [penWidth, setPenWidth] = useState<number>(1);
+  const [penWidth, setPenWidth] = useState<number>(2);
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [showSpeedMenuBeforePlay, setShowSpeedMenuBeforePlay] =
@@ -310,7 +310,7 @@ export default () => {
       if (!item) return;
       return { coor: item.id };
     });
-    console.log("eraseChanged", eraseChanged);
+    // console.log("eraseChanged", eraseChanged);
     
       if(!eraseChanged) return;
       let fla = R.flatten(eraseChanged.map((i)=>{
@@ -339,11 +339,11 @@ export default () => {
 
   useEffect(() => {
     if (detectList.length) {
-      console.log("detectList", detectList);
+      // console.log("detectList", detectList);
       let lastChanged = getCubeId(detectList[detectList.length - 1]);
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
-        console.log("lastChanged", lastChanged);
+        // console.log("lastChanged", lastChanged);
         let modify = lastChanged.map((item: any) => {
           return { coor: item.id, color: item.color };
         });
@@ -376,7 +376,7 @@ export default () => {
     } else {
       temp.push(coor);
     }
-    console.log("temp", temp);
+    // console.log("temp", temp);
     setDetectList(temp);
   };
 
@@ -412,21 +412,14 @@ export default () => {
     let allCubeData = R.uniq(detectList.map((item) => {
       return getCubeId(item);
     }));
-    console.log("allCubeData", allCubeData);
-    let flattenList = R.flatten(allCubeData);
     // console.log("allCubeData", allCubeData);
-    // console.log("flattenList", flattenList);
-    let tempPrepare: coordinateData[] = [];
     allCubeData.forEach((item: any, index) => {
       if (!item) return;
       let innerObject = item.map((innerItem: WholeData) => {
         return { coor: innerItem.id, color: innerItem.color };
       });
-      // console.log('innerObject', innerObject)
       tempList.push(innerObject);
     });
-    // tempList.push(R.uniq(tempPrepare));
-    console.log("paintEnd_tempList", tempList);
     setList(R.uniq(tempList));
     setDetectList([]);
   };
@@ -606,20 +599,21 @@ export default () => {
     });
   };
 
-  const updateFormat = () => {
-    let demoList = [starryNight, wantItAll, wretched];
-    let fff = demoList[2].listData.map((item, index)=>{
-      return [item];
-    })
+  // const updateFormat = () => {
+  //   let demoList = [starryNight, wantItAll, wretched];
+  //   // let fff = demoList[2].listData.map((item, index)=>{
+  //   //   return [item];
+  //   // })
 
-    let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "", listData:fff, canvaColor:'#7bc6ff' };
-    console.log('fff', fff)
-    resetList();
-    setCanvaColor(demoList[2].canvaColor);
-    // setList(fff);
-    setCurrentPicked(tempObj);
-    setShowText(true);
-  }
+  //   // let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "", listData:fff, canvaColor:'#7bc6ff' };
+  //   // console.log('fff', fff)
+  //   let tempObj = {...demoList[demoIndex]}
+  //   resetList();
+  //   setCanvaColor(tempObj.canvaColor);
+  //   // setList(fff);
+  //   setCurrentPicked(tempObj);
+  //   setShowText(true);
+  // }
   const demoPlay = () => {
     let prevSpeed = speed;
 
@@ -824,50 +818,39 @@ export default () => {
     ctx.clearRect(0, 0, canvaSize, canvaSize);
     ctx.fillStyle = canvaColor;
     ctx.fillRect(0, 0, canvaSize, canvaSize);
-    console.log("list", list);
     recordCanvas(canvas, (list.length + 10) * speed);
     list.forEach((item, key) => {
-      console.log("key", key, item.color, key * speed, item.coor);
+      // console.log("key", key, item.color, key * speed, item.coor);
       if (!ctx) return;
 
       setTimeout(() => {
-        let ele = document.getElementById(item.coor);
-        // console.log("ele", ele);
-        if (!ele) return;
-        if (!ctx) return;
-        let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
-        // console.log("eleBgColor", eleBgColor);
-        let eleRect = ele.getBoundingClientRect();
-        // console.log("eleRect", eleRect);
-
-        // console.log("parentRect", parentRect);
-
-        let top = eleRect.top - parentRect.top;
-        let left = eleRect.left - parentRect.left;
-        let width = eleRect.width;
-        let height = eleRect.height;
-        // console.log("rect", top, left, width, height);
-        ctx.fillStyle = item.color;
-        const scaleRatio = canvaSize / parentRect.width;
-        // console.log("scaleRatio", scaleRatio);
-        // console.log(
-        //   "scaleRatioCTX",
-        //   left * scaleRatio,
-        //   top * scaleRatio,
-        //   width * scaleRatio,
-        //   height * scaleRatio
-        // );
-
-        ctx.fillRect(
-          left * scaleRatio,
-          top * scaleRatio,
-          width * scaleRatio,
-          height * scaleRatio
-        );
-        // console.log("801_ key * speed", key * speed);
-        // if(key === list.length-1) {
-        //   resolve(canvas);
-        // }
+        item.forEach((innerItem)=>{
+          let ele = document.getElementById(innerItem.coor);
+          // console.log("ele", ele);
+          if (!ele) return;
+          if (!ctx) return;
+          let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
+          // console.log("eleBgColor", eleBgColor);
+          let eleRect = ele.getBoundingClientRect();
+          // console.log("eleRect", eleRect);
+          // console.log("parentRect", parentRect);
+  
+          let top = eleRect.top - parentRect.top;
+          let left = eleRect.left - parentRect.left;
+          let width = eleRect.width;
+          let height = eleRect.height;
+          // console.log("rect", top, left, width, height);
+          ctx.fillStyle = innerItem.color;
+          const scaleRatio = canvaSize / parentRect.width;
+  
+          ctx.fillRect(
+            left * scaleRatio,
+            top * scaleRatio,
+            width * scaleRatio,
+            height * scaleRatio
+          );
+        })
+       
       }, key * speed);
     });
     // })
