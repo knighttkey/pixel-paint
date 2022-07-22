@@ -68,7 +68,7 @@ export default () => {
   const [speed, setSpeed] = useState<number>(5);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
-  const [penWidth, setPenWidth] = useState<number>(2);
+  const [penWidth, setPenWidth] = useState<number>(1);
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [showSpeedMenuBeforePlay, setShowSpeedMenuBeforePlay] =
@@ -83,7 +83,7 @@ export default () => {
   const [touchBehavior, setTouchBehavior] = useState<string>("finger");
   const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
   const [loadingModalShow, setLoadingModalShow] = useState<Boolean>(false);
-  const [cubeDivide, setCubeDivide] = useState<number>(50);
+  const [cubeDivide, setCubeDivide] = useState<number>(15);
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
@@ -100,6 +100,12 @@ export default () => {
 
   // console.log('navigator.userAgent', navigator.userAgent)
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
+let parentWidth = 0;
+  // useEffect(()=>{
+  //   if(!wrapRef.current) return;
+  //   parentWidth = wrapRef.current.getBoundingClientRect().width;
+  // },[])
+
 
   const reportWindowSize = (event: any) => {
     let rootContainer: HTMLDivElement | null = document.querySelector(
@@ -117,6 +123,9 @@ export default () => {
         window.innerWidth.toString()
       );
     }
+
+    if(!wrapRef.current) return;
+    parentWidth = wrapRef.current.getBoundingClientRect().width;
   };
 
   useEffect(() => {
@@ -313,7 +322,7 @@ export default () => {
       if (!item) return;
       return { coor: item.id };
     });
-    // console.log("eraseChanged", eraseChanged);
+    console.log("eraseChanged", eraseChanged);
 
     if (!eraseChanged) return;
     let fla = R.flatten(
@@ -321,35 +330,166 @@ export default () => {
         if (!i) return;
         return i.coor;
       })
-    );
+      );
+      console.log('fla', fla)
 
     let prepare = [...list];
-    let eraseResult = prepare
-      .map((i, key) => {
-        i.forEach((k) => {
-          if (R.includes(k.coor, fla)) {
-            eraseCubeSingle(k);
-          }
-        });
-        return i.filter((j) => {
-          return !R.includes(j.coor, fla);
-        });
+
+
+    let flaPrepare = R.flatten(prepare);
+    console.log('prepare', prepare)
+    console.log('flaPrepare', flaPrepare)
+
+    const deleteCube = (i:coordinateData[]) => {
+      i.forEach((j, key)=>{
+        if(R.includes(j , flaPrepare)) {
+          prepare.forEach((innerU, rr)=>{
+            console.log('innerU', innerU)
+            console.log('j', j)
+            let targetIndex = innerU.indexOf(j)
+            console.log('targetIndex', targetIndex);
+            if(targetIndex >=0) {
+              
+              innerU.splice(targetIndex, 1);
+            }
+          })
+        }
       })
-      .filter((i) => {
+    }
+
+    let eraseResultA = prepare.map((i)=>{
+      let b = i.filter((j)=>{
+        return (
+          R.includes(j.coor, fla)
+          )
+        })
+        console.log('____________b', b)
+      return b;
+      }).filter(k=>{return k.length})
+      
+      console.log('eraseResultA', eraseResultA)
+      eraseResultA.forEach((i)=>{
+        eraseCubeMulti(i);
+        // i 要抹除的cube
+        deleteCube(i);
+        
+      })
+      let finalPrepare = prepare.filter((i)=>{
         return i.length;
-      });
-    prepare = eraseResult;
-    setList(prepare);
+      })
+      console.log('finalPrepare', finalPrepare)
+
+    // let eraseResult = prepare
+    //   .map((i, key) => {
+    //     console.log('=====================================================')
+    //     let eee = i.filter((j) => {
+    //       return R.includes(j.coor, fla);
+    //     });
+    //     if(eee.length) {
+    //       console.log('eee', eee)
+    //       eraseCubeMulti(eee);
+    //     }
+    //     console.log('i', i)
+    //     let ttt = i.filter((j) => {
+    //       return !R.includes(j.coor, fla);
+    //     });
+    //     console.log('ttt', ttt)
+    //     console.log('=====================================================')
+    //     // return ttt;
+
+    //     return ttt
+    //   }).filter((i)=>{
+    //     return i.length;
+    //   })
+      // .filter((i) => {
+      //   return i.length;
+      // });
+      // console.log('eraseResult', eraseResult)
+      // eraseResult.reduce(function(accu, curV, curI, array) {
+      //   if(accu) {
+      //     console.log('--------------------')
+      //     console.log('accu', accu)
+      //     console.log('curV', curV)
+      //     console.log('curI', curI)
+      //     console.log('array', array)
+      //     console.log('--------------------')
+      //     // let compareResult = accu.some(x => R.includes(x, curV));
+      //     // console.log('compareResult',compareResult)
+      //     let getIt = curV.find(x => R.includes(x, accu));
+      //     console.log('getIt', getIt)
+      //     let getIndex = curV.indexOf(getIt);
+      //     let bb = curV.splice(getIndex, 1);
+      //     console.log('bb', bb)
+      //     array[curI] = curV;
+      //   }
+
+
+      // })
+
+      // let flaDD = R.flatten(eraseResult);
+    // let toErase = prepare
+    //   .map((i, key) => {
+    //     return i.filter((j) => {
+    //       return !R.includes(j, flaDD);
+    //     });
+    //   })
+    //   .filter((i) => {
+    //     return i.length;
+    //   });
+    // console.log('prepare', prepare)
+    // let toErase = R.without(eraseResult, prepare);
+
+
+    //   console.log('toErase', toErase)
+    //   console.log('eraseResult', eraseResult)
+      
+    //   console.log('flaDD', flaDD)
+    //   let hhhi = eraseResult.map((item)=>{
+    //     let www = item.map(inner => {
+    //       if(item.length === 1 && R.includes(inner, flaDD)) {
+    //         return undefined;
+    //       } else {
+    //         return inner;
+    //       }
+    //     }).filter((i)=>{
+    //       return i;
+    //     })
+    //     // console.log('www', www)
+    //     return www
+    //   }).filter((i)=>{
+    //     return i.length;
+    //   })
+    //   // console.log('hhhi', hhhi)
+    //   let flb = R.flatten(hhhi);
+      // let toErase = prepare
+      // .map((i) => {
+      //   return i.filter((j) => {
+      //     return !R.includes(j, flb);
+      //   });
+      // })
+      // .filter((i) => {
+      //   return i.length;
+      // });
+      // console.log('toErase', toErase)
+      // toErase.forEach((p)=>{
+      //   eraseCubeMulti(p);
+      // })
+
+    // prepare = R.uniq(eraseResult);
+    setList(finalPrepare);
   };
 
   useEffect(() => {
     if (detectList.length) {
       // console.log("detectList", detectList);
-      let lastChanged = getCubeId(detectList[detectList.length - 1]);
+      let lastChanged = getCubeId(detectList[detectList.length - 1])?.filter((i)=> {return i});
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
+        // console.log("----------ccccc-------------------");
         // console.log("lastChanged", lastChanged);
         let modify = lastChanged.map((item: any) => {
+          // console.log('item', item)
+          if(!item) return;
           return { coor: item.id, color: item.color };
         });
         if (!modify) return;
@@ -402,7 +542,14 @@ export default () => {
   const eraseCubeSingle = (position: coordinateData) => {
     let cubeEle = document.getElementById(position.coor);
     if (!cubeEle) return;
-    cubeEle.style.backgroundColor = "transparent";
+    cubeEle.style.backgroundColor = "blue";
+  };
+  const eraseCubeMulti = (positionArray: coordinateData[]) => {
+    positionArray.forEach((positionItem) => {
+    let cubeEle = document.getElementById(positionItem.coor);
+    if (!cubeEle) return;
+    cubeEle.style.backgroundColor = "red";
+    });
   };
 
   const eraseAllCube = () => {
@@ -426,14 +573,69 @@ export default () => {
         return getCubeId(item);
       })
     );
-    // console.log("allCubeData", allCubeData);
+    console.log("allCubeData", allCubeData);
+    let oop = allCubeData.map((i)=>{
+      return (i.map(j=>{
+        return j?.id;
+      }))
+    })
+    console.log('oop', oop)
+
+
+    allCubeData.reduce(function(accu, curV, curI, array) {
+      console.log('accu', accu)
+      if(curV&&curI>=1) {
+        console.log('--------------------')
+        console.log('accu', accu)
+        let prev = array[curI - 1];
+          console.log('prev',prev)
+        
+        console.log('curV', curV)
+        console.log('curI', curI)
+        console.log('array', array)
+        console.log('--------------------')
+        // let compareResult = accu.some(x => R.includes(x, curV));
+        // console.log('compareResult',compareResult)
+        let tempCurV = curV.filter((i)=>{
+          return (
+            !R.includes(i, prev)
+            )
+          })
+          console.log('tempCurV', tempCurV)
+        // let getIt = curV.find(x => R.includes(x, accu));
+        // console.log('getIt', getIt)
+        // let getIndex = curV.indexOf(getIt);
+        // let bb = curV.splice(getIndex, 1);
+        // console.log('bb', bb)
+        
+        array[curI] = tempCurV;
+      }
+
+
+    })
+    
+
+
     allCubeData.forEach((item: any, index) => {
       if (!item) return;
       let innerObject = item.map((innerItem: WholeData) => {
+        // console.log('innerItem', innerItem)
+        if(!innerItem) return;
+        // if(R.includes(innerItem.id, oop[index-1])){
+        //   console.log('依樣');
+
+        // }
         return { coor: innerItem.id, color: innerItem.color };
+      }).filter((it:any)=> {
+        return it !== undefined
       });
       tempList.push(innerObject);
     });
+
+ 
+
+    console.log('tempList', tempList)
+
     setList(R.uniq(tempList));
     setDetectList([]);
   };
@@ -938,7 +1140,9 @@ export default () => {
     tempListOffset.push(tempListForPrev[tempListForPrev.length - 1]);
     setOffsetListForNext(tempListOffset);
     setList(tempListForPrev);
-    prevCube(tempListForPrev[tempListForPrev.length - 1]);
+    if(tempListForPrev.length > 1) {
+      prevCube(tempListForPrev[tempListForPrev.length - 1]);
+    }
   };
 
   const nextStep = () => {
