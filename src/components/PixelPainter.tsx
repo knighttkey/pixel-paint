@@ -68,7 +68,7 @@ export default () => {
   const [speed, setSpeed] = useState<number>(5);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
-  const [penWidth, setPenWidth] = useState<number>(1);
+  const [penWidth, setPenWidth] = useState<number>(2);
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [showSpeedMenuBeforePlay, setShowSpeedMenuBeforePlay] =
@@ -322,7 +322,7 @@ let parentWidth = 0;
       if (!item) return;
       return { coor: item.id };
     });
-    console.log("eraseChanged", eraseChanged);
+    // console.log("eraseChanged", eraseChanged);
 
     if (!eraseChanged) return;
     let fla = R.flatten(
@@ -331,23 +331,23 @@ let parentWidth = 0;
         return i.coor;
       })
       );
-      console.log('fla', fla)
+      // console.log('fla', fla)
 
     let prepare = [...list];
 
 
     let flaPrepare = R.flatten(prepare);
-    console.log('prepare', prepare)
-    console.log('flaPrepare', flaPrepare)
+    // console.log('prepare', prepare)
+    // console.log('flaPrepare', flaPrepare)
 
     const deleteCube = (i:coordinateData[]) => {
       i.forEach((j, key)=>{
         if(R.includes(j , flaPrepare)) {
           prepare.forEach((innerU, rr)=>{
-            console.log('innerU', innerU)
-            console.log('j', j)
+            // console.log('innerU', innerU)
+            // console.log('j', j)
             let targetIndex = innerU.indexOf(j)
-            console.log('targetIndex', targetIndex);
+            // console.log('targetIndex', targetIndex);
             if(targetIndex >=0) {
               
               innerU.splice(targetIndex, 1);
@@ -363,11 +363,11 @@ let parentWidth = 0;
           R.includes(j.coor, fla)
           )
         })
-        console.log('____________b', b)
+        // console.log('____________b', b)
       return b;
       }).filter(k=>{return k.length})
       
-      console.log('eraseResultA', eraseResultA)
+      // console.log('eraseResultA', eraseResultA)
       eraseResultA.forEach((i)=>{
         eraseCubeMulti(i);
         // i 要抹除的cube
@@ -377,7 +377,7 @@ let parentWidth = 0;
       let finalPrepare = prepare.filter((i)=>{
         return i.length;
       })
-      console.log('finalPrepare', finalPrepare)
+      // console.log('finalPrepare', finalPrepare)
 
     setList(finalPrepare);
   };
@@ -477,7 +477,7 @@ let parentWidth = 0;
         return getCubeId(item);
       })
       );
-      console.log('allCubeData', allCubeData)
+      // console.log('allCubeData', allCubeData)
     // let oop = allCubeData.map((i)=>{
     //   if(!i) return;
     //   return (i.map(j=>{
@@ -535,7 +535,7 @@ let parentWidth = 0;
 
  
 
-    console.log('tempList', tempList)
+    // console.log('tempList', tempList)
 
     setList(R.uniq(tempList));
     setDetectList([]);
