@@ -487,17 +487,17 @@ let parentWidth = 0;
     // console.log('oop', oop)
 
     allCubeData.reduce(function(accu:any, curV:any, curI:number, array:any) {
-      console.log('accu', accu)
+      // console.log('accu', accu)
       if(curV&&curI>=1) {
-        console.log('--------------------')
-        console.log('accu', accu)
+        // console.log('--------------------')
+        // console.log('accu', accu)
         let prev = array[curI - 1];
-          console.log('prev',prev)
+        //   console.log('prev',prev)
         
-        console.log('curV', curV)
-        console.log('curI', curI)
-        console.log('array', array)
-        console.log('--------------------')
+        // console.log('curV', curV)
+        // console.log('curI', curI)
+        // console.log('array', array)
+        // console.log('--------------------')
 
         // let compareResult = accu.some(x => R.includes(x, curV));
         // console.log('compareResult',compareResult)
@@ -506,7 +506,7 @@ let parentWidth = 0;
               !R.includes(i, prev)
               )
             })
-            console.log('tempCurV', tempCurV)
+            // console.log('tempCurV', tempCurV)
             array[curI] = tempCurV;
         
       }
@@ -590,10 +590,24 @@ let parentWidth = 0;
       //  console.log(r.target.result);
       try {
         let toParse = JSON.parse(r.target.result);
-        // console.log("toParse", toParse);
-        // console.log("toParse.listData", toParse.listData);
-        setList(toParse.listData);
-        let listFromFile: coordinateData[][] = toParse.listData;
+        console.log("toParse", toParse);
+        console.log("toParse.listData", toParse.listData);
+        let modify = [];
+        function isSingleLayer(item: coordinateData): item is coordinateData {
+          return (item as coordinateData).coor !== undefined;
+        }
+        if (isSingleLayer(toParse.listData[0])) {
+          console.log('A')
+          modify = toParse.listData.map((coorItem: coordinateData)=>{
+            return ([coorItem]);
+          })
+        } else {
+          console.log('B')
+          modify = toParse.listData;
+        }
+        setList(modify);
+
+        let listFromFile: coordinateData[][] = modify;
         listFromFile.forEach((item, key) => {
           setTimeout(() => {
             const coorFormatArray = item.map((innerItem) => {
