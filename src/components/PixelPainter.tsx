@@ -573,17 +573,17 @@ let parentWidth = 0;
       detectList.map((item) => {
         return getCubeId(item);
       })
-    );
-    console.log("allCubeData", allCubeData);
-    let oop = allCubeData.map((i)=>{
-      return (i.map(j=>{
-        return j?.id;
-      }))
-    })
-    console.log('oop', oop)
+      );
+      console.log('allCubeData', allCubeData)
+    // let oop = allCubeData.map((i)=>{
+    //   if(!i) return;
+    //   return (i.map(j=>{
+    //     return j?.id;
+    //   }))
+    // })
+    // console.log('oop', oop)
 
-
-    allCubeData.reduce(function(accu, curV, curI, array) {
+    allCubeData.reduce(function(accu:any, curV:any, curI:number, array:any) {
       console.log('accu', accu)
       if(curV&&curI>=1) {
         console.log('--------------------')
@@ -595,25 +595,22 @@ let parentWidth = 0;
         console.log('curI', curI)
         console.log('array', array)
         console.log('--------------------')
+
         // let compareResult = accu.some(x => R.includes(x, curV));
         // console.log('compareResult',compareResult)
-        let tempCurV = curV.filter((i)=>{
-          return (
-            !R.includes(i, prev)
-            )
-          })
-          console.log('tempCurV', tempCurV)
-        // let getIt = curV.find(x => R.includes(x, accu));
-        // console.log('getIt', getIt)
-        // let getIndex = curV.indexOf(getIt);
-        // let bb = curV.splice(getIndex, 1);
-        // console.log('bb', bb)
+          let tempCurV = curV.filter((i:any)=>{
+            return (
+              !R.includes(i, prev)
+              )
+            })
+            console.log('tempCurV', tempCurV)
+            array[curI] = tempCurV;
         
-        array[curI] = tempCurV;
       }
-
-
-    })
+      return array;
+    }
+    )
+    // , {} as {accu:any,curV:WholeData[], curI:number, array:WholeData[][]})
     
 
 
