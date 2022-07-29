@@ -144,8 +144,8 @@
         width: 100%;
         user-select: none;
         -webkit-user-select: none;
-        width: 700px;
-        height: 700px;
+        // width: 700px;
+        // height: 700px;
         .hour {
           margin: 0;
           .cube {
@@ -155,7 +155,7 @@
             -webkit-user-select: none;
             pointer-events: none;
             position: relative;
-            border: 1px solid blue; 
+            // border: 1px solid blue; 
             &.selected {
               background-color: rgb(0, 255, 136);
             }

@@ -83,7 +83,7 @@ export default () => {
   const [touchBehavior, setTouchBehavior] = useState<string>("finger");
   const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
   const [loadingModalShow, setLoadingModalShow] = useState<Boolean>(false);
-  const [cubeDivide, setCubeDivide] = useState<number>(15);
+  const [cubeDivide, setCubeDivide] = useState<number>(50);
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
@@ -525,8 +525,9 @@ let parentWidth = 0;
     setDetectList(temp);
   };
 
-  const paintCube = (positionArray: coordinateData[]) => {
+  const paintCube = (positionArray: (coordinateData | undefined)[]) => {
     positionArray.forEach((positionItem) => {
+      if(!positionItem) return;
       let cubeEle = document.getElementById(positionItem.coor);
       if (!cubeEle) return;
       cubeEle.style.backgroundColor = positionItem.color;
@@ -548,7 +549,7 @@ let parentWidth = 0;
     positionArray.forEach((positionItem) => {
     let cubeEle = document.getElementById(positionItem.coor);
     if (!cubeEle) return;
-    cubeEle.style.backgroundColor = "red";
+    cubeEle.style.backgroundColor = "transparent";
     });
   };
 
@@ -1246,8 +1247,8 @@ let parentWidth = 0;
         {/* {downloadEnable ? (
           <button onClick={() => prepareToExportVideo()}>準備輸出</button>
         ) : null} */}
-        <button onClick={() => prevStep()}>前一步</button>
-        <button onClick={() => nextStep()}>下一步</button>
+        {/* <button onClick={() => prevStep()}>前一步</button> */}
+        {/* <button onClick={() => nextStep()}>下一步</button> */}
 
         {/* {list.length ? (
           <Fragment>
