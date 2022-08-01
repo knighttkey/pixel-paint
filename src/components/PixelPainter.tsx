@@ -34,14 +34,9 @@ export interface paintDataFromLocal {
   canvaColor: string;
 }
 
-interface coordinateData {
+export interface coordinateData {
   coor: string;
   color: string;
-}
-
-interface PalmRejectSize {
-  w: number;
-  h: number;
 }
 
 interface WholeData {
@@ -88,12 +83,6 @@ export default () => {
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
   // console.log('eraseMode', eraseMode)
-  const palmRejectSizeList: PalmRejectSize[] = [
-    { w: 200, h: 300 },
-    { w: 250, h: 400 },
-    { w: 350, h: 500 },
-    { w: 450, h: 600 }
-  ];
 
   // console.log('navigator.userAgent', navigator.userAgent)
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
@@ -432,6 +421,7 @@ export default () => {
     // console.log('tempList', tempList)
     setList(R.uniq(tempList));
     setDetectList([]);
+    setOffsetListForNext([]);
   };
 
   const save = async () => {
@@ -792,11 +782,8 @@ export default () => {
         if (!ele) return;
         if (!ctx) return;
         let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
-        // console.log("eleBgColor", eleBgColor);
-        let eleRect = ele.getBoundingClientRect();
-        // console.log("eleRect", eleRect);
 
-        // console.log("parentRect", parentRect);
+        let eleRect = ele.getBoundingClientRect();
 
         let top = eleRect.top - parentRect.top;
         let left = eleRect.left - parentRect.left;
@@ -805,14 +792,6 @@ export default () => {
         // console.log("rect", top, left, width, height);
         ctx.fillStyle = item.color;
         const scaleRatio = canvaSize / parentRect.width;
-        // console.log("scaleRatio", scaleRatio);
-        // console.log(
-        //   "scaleRatioCTX",
-        //   left * scaleRatio,
-        //   top * scaleRatio,
-        //   width * scaleRatio,
-        //   height * scaleRatio
-        // );
 
         ctx.fillRect(
           left * scaleRatio,
@@ -820,10 +799,6 @@ export default () => {
           width * scaleRatio,
           height * scaleRatio
         );
-        // console.log("801_ key * speed", key * speed);
-        // if(key === list.length-1) {
-        //   resolve(canvas);
-        // }
       }, key * speed);
     });
     // })
@@ -897,11 +872,33 @@ export default () => {
       cubeEle.style.backgroundColor = "transparent";
   };
 
+  const [offsetListForNext, setOffsetListForNext] = useState<
+    coordinateData[]
+  >([]);
+
   const prevStep = () => {
     let tempListForPrev = [...list];
+    // console.log('tempListForPrev.length - 1 < 0', tempListForPrev.length - 1 < 0)
+    if(tempListForPrev.length - 1 < 0) return;
     prevCube(tempListForPrev[tempListForPrev.length - 1]);
+    let tempListOffset = [...offsetListForNext];
+    tempListOffset.push(tempListForPrev[tempListForPrev.length - 1]);
+    setOffsetListForNext(tempListOffset);
     tempListForPrev.splice(tempListForPrev.length - 1, 1);
     setList(tempListForPrev);
+    // console.log('offsetListForNext', offsetListForNext)
+  };
+
+  const nextStep = () => {
+    // console.log('offsetListForNext', offsetListForNext)
+    let erasedPoint = [...offsetListForNext];
+    let tempListForNext = [...list];
+    tempListForNext.push(erasedPoint[erasedPoint.length - 1]);
+    setList(tempListForNext);
+    if(erasedPoint.length - 1 < 0) return;
+    paintCubeSingle(erasedPoint[erasedPoint.length - 1]);
+    erasedPoint.splice(erasedPoint.length - 1, 1);
+    setOffsetListForNext(erasedPoint);
   };
 
   return (
@@ -993,7 +990,7 @@ export default () => {
         {/* {downloadEnable ? (
           <button onClick={() => prepareToExportVideo()}>準備輸出</button>
         ) : null} */}
-
+          <button onClick={() => nextStep()}>下一步</button>  
         {/* {list.length ? (
           <Fragment>
             <div
@@ -1200,6 +1197,9 @@ export default () => {
             touchBehavior={touchBehavior}
             setTouchBehavior={setTouchBehavior}
             prevStep={prevStep}
+            nextStep={nextStep}
+            offsetListForNext={offsetListForNext}
+            list={list}
           />
         </DragPanel>
       ) : null}

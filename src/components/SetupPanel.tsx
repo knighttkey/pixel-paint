@@ -2,6 +2,8 @@ import "./../styles/SetupPanel.scss";
 import DropExpand from "./DropExpand";
 import SwitchToggle from "./SwitchToggle";
 import undoIcon from "/images/rotate-left.svg";
+import redoIcon from "/images/rotate-right.svg";
+import {coordinateData} from "./PixelPainter";
 
 type Props = {
   canvaColor: string;
@@ -23,6 +25,9 @@ type Props = {
   touchBehavior:string, 
   setTouchBehavior: Function;
   prevStep:Function;
+  nextStep:Function;
+  offsetListForNext: coordinateData[];
+  list:coordinateData[];
 };
 
 export default (props: Props) => {
@@ -45,7 +50,10 @@ export default (props: Props) => {
     setPalmRejectShow,
     touchBehavior,
     setTouchBehavior,
-    prevStep
+    prevStep,
+    nextStep,
+    offsetListForNext,
+    list
   } = props;
   
   const srokeWidthList = [1, 2, 3, 4, 5, 6];
@@ -118,14 +126,6 @@ export default (props: Props) => {
             setToggleOn={setEraseMode}
           ></SwitchToggle>
         </div>
-        {/* <div className="area palm_reject_area">
-          <div className="palm_reject_tip">Palm</div>
-          <SwitchToggle
-            toggleOn={palmRejectShow}
-            switchAction={() => {}}
-            setToggleOn={setPalmRejectShow}
-          ></SwitchToggle>
-        </div> */}
         <div className={`area touch_type_area ${touchBehavior === 'stylus'?'custom_green':''}`} id='touchBehavior'>
           <div className={`touch_type_tip ${touchBehavior==='finger' ? '' :'custom_green'}`}>{touchBehavior=== 'finger' ? 'Finger':'Stylus'}</div>
           <SwitchToggle
@@ -138,9 +138,16 @@ export default (props: Props) => {
         <div className="area prev_step_area">
           <div className="prev_step_tip">Undo</div>
 
-          <div className="prev_btn"  onClick={()=>prevStep()}>
-            {/* Prev */}
+          <div className={`prev_btn ${list.length === 0 ? 'disable':''}`}  onClick={()=>list.length === 0 ? null : prevStep()}>
             <div className="prev_icon" style={{ backgroundImage: `url(${undoIcon})` }}></div>
+
+          </div>
+        </div>
+        <div className="area next_step_area">
+          <div className="next_step_tip">Redo</div>
+
+          <div className={`next_btn ${offsetListForNext.length === 0 ? 'disable':''}`}  onClick={()=>offsetListForNext.length === 0 ? null : nextStep()}>
+            <div className="next_icon" style={{ backgroundImage: `url(${redoIcon})` }}></div>
 
           </div>
         </div>

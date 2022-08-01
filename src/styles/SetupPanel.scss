@@ -124,18 +124,18 @@
           }
     
         }
-        .prev_step_area {
+        .prev_step_area,.next_step_area {
           width: 100%;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          .prev_step_tip {
+          .prev_step_tip,.next_step_tip {
             color:var(--main);
             font-weight: 600;
             height: 30px;
             line-height: 30px;
           }
-          .prev_btn {
+          .prev_btn,.next_btn {
             width: 30px;
             height: 25px;
             color: var(--main);
@@ -151,6 +151,11 @@
             // margin:0 10px;
             position: relative;
             cursor: pointer;
+            &.disable {
+              pointer-events: none;
+              cursor: initial;
+              opacity: 0.5;
+            }
             // &:hover {
             //   background-color: var(--main);
             //   color: #0c1a2a;
@@ -163,6 +168,15 @@
               background-size: contain;
               filter: invert(44%) sepia(99%) saturate(334%) hue-rotate(154deg) brightness(88%) contrast(98%);
               transform:rotate(-20deg)
+            }
+            .next_icon {
+              width: 20px;
+              height: 20px;
+              background-repeat: no-repeat;
+              background-position: center;
+              background-size: contain;
+              filter: invert(44%) sepia(99%) saturate(334%) hue-rotate(154deg) brightness(88%) contrast(98%);
+              transform:rotate(20deg)
             }
           }
 
