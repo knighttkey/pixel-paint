@@ -78,7 +78,7 @@ export default () => {
   const [touchBehavior, setTouchBehavior] = useState<string>("finger");
   const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
   const [loadingModalShow, setLoadingModalShow] = useState<Boolean>(false);
-  const [cubeDivide, setCubeDivide] = useState<number>(10);
+  const [cubeDivide, setCubeDivide] = useState<number>(50);
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
@@ -299,24 +299,24 @@ export default () => {
     // console.log("erase_coor", coor);
 
     let currentChanged = getCubeId(coor);
-    console.log("currentChanged", currentChanged);
+    // console.log("currentChanged", currentChanged);
     if (!currentChanged) return;
     let currentChangedWithoutColor = currentChanged.map((item: any, index) => {
       if (!item) return;
       return { coor: item.id };
     });
-    console.log("currentChangedWithoutColor", currentChangedWithoutColor);
+    // console.log("currentChangedWithoutColor", currentChangedWithoutColor);
     if (!currentChangedWithoutColor) return;
     let withoutColor = list.map((i) => {
       return { coor: i.coor };
     });
 
-    console.log("withoutColor", withoutColor);
+    // console.log("withoutColor", withoutColor);
     let compareResult = currentChangedWithoutColor.filter((x) =>
       R.includes(x, withoutColor)
     );
 
-    console.log("erase_compareResult", compareResult);
+    // console.log("erase_compareResult", compareResult);
 
     compareResult.forEach((item) => {
       if (!item) return;
@@ -773,7 +773,7 @@ export default () => {
     console.log("list", list);
     recordCanvas(canvas, (list.length + 10) * speed);
     list.forEach((item, key) => {
-      console.log("key", key, item.color, key * speed, item.coor);
+      // console.log("key", key, item.color, key * speed, item.coor);
       if (!ctx) return;
 
       setTimeout(() => {
