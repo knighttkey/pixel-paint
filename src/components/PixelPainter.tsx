@@ -384,11 +384,11 @@ export default () => {
     let coor = { x: Math.floor(clientXX), y: Math.floor(clientYY) };
     // console.log("coor", coor);
 
-    // if (R.includes(coor, temp)) {
-    // } else {
+    if (R.includes(coor, temp)) {
+    } else {
       temp.push(coor);
-    // }
-    console.log("temp", temp);
+    }
+    // console.log("temp", temp);
     setDetectList(temp);
   };
 
@@ -636,31 +636,6 @@ export default () => {
     setSpeed(item);
     setShowSpeedMenu(false);
     setShowSpeedMenuBeforePlay(false);
-  };
-
-  const resizePalmRejectionPanel = (behavior: string) => {
-    let tempIndex = palmRejectSizeIndex;
-    switch (behavior) {
-      case "minus":
-        // console.log("minus");
-        if (tempIndex !== 0) {
-          tempIndex--;
-          console.log("tempIndex", tempIndex);
-          setPalmRejectSizeIndex(tempIndex);
-        }
-        break;
-      case "add":
-        // console.log("enlarge");
-        if (tempIndex !== 3) {
-          tempIndex++;
-          // console.log("tempIndex", tempIndex);
-          setPalmRejectSizeIndex(tempIndex);
-        }
-        break;
-
-      default:
-        break;
-    }
   };
 
   const getTouchBehavior = (e: any) => {
@@ -916,9 +891,18 @@ export default () => {
     }
   };
 
-  const prevStep = () => {};
+  const prevCube = (position: coordinateData) => {
+      let cubeEle = document.getElementById(position.coor);
+      if (!cubeEle) return;
+      cubeEle.style.backgroundColor = "transparent";
+  };
 
-  const nextStep = () => {};
+  const prevStep = () => {
+    let tempListForPrev = [...list];
+    prevCube(tempListForPrev[tempListForPrev.length - 1]);
+    tempListForPrev.splice(tempListForPrev.length - 1, 1);
+    setList(tempListForPrev);
+  };
 
   return (
     <div className="pixel_canva_container">
@@ -1215,6 +1199,7 @@ export default () => {
             setPalmRejectShow={setPalmRejectShow}
             touchBehavior={touchBehavior}
             setTouchBehavior={setTouchBehavior}
+            prevStep={prevStep}
           />
         </DragPanel>
       ) : null}
