@@ -29,7 +29,7 @@ interface ColorPickTarget extends EventTarget {
 }
 export interface paintDataFromLocal {
   id: string;
-  listData: coordinateData[][];
+  listData: coordinateData[];
   thumbnail: string;
   canvaColor: string;
 }
@@ -54,7 +54,7 @@ export default () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const listPanelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [list, setList] = useState<coordinateData[][]>([]);
+  const [list, setList] = useState<coordinateData[]>([]);
   // console.log("list", list);
 
   const [showText, setShowText] = useState<boolean>(false);
@@ -83,7 +83,7 @@ export default () => {
   const [touchBehavior, setTouchBehavior] = useState<string>("finger");
   const [touchTipShow, setTouchTipShow] = useState<Boolean>(false);
   const [loadingModalShow, setLoadingModalShow] = useState<Boolean>(false);
-  const [cubeDivide, setCubeDivide] = useState<number>(50);
+  const [cubeDivide, setCubeDivide] = useState<number>(10);
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
@@ -319,101 +319,48 @@ export default () => {
     console.log("currentChangedWithoutColor", currentChangedWithoutColor);
     if (!currentChangedWithoutColor) return;
     let withoutColor = list.map((i) => {
-      const innerArray = i.map((innerItem) => {
-        return { coor: innerItem.coor};
-      });
-      console.log("innerArray", innerArray);
-      return innerArray;
+      return { coor: i.coor };
     });
+
     console.log("withoutColor", withoutColor);
-    // let compareResult = currentChangedWithoutColor.filter((x) =>
-    //   R.includes(x, withoutColor)
-    // );
-    // let compareResult = withoutColor.filter((x) =>
-    // {
-    //   console.log('x', x)
-    //   return JSON.stringify(x) === JSON.stringify(currentChangedWithoutColor)
-    //   // return R.includes(currentChangedWithoutColor, withoutColor)
-    // }
-    // );
-    let compareResult = withoutColor.filter((x) =>
-    {
-      console.log('x', x)
-      return currentChangedWithoutColor.some(y => R.includes(y, x));
-      // return R.includes(currentChangedWithoutColor, withoutColor)
-    }
+    let compareResult = currentChangedWithoutColor.filter((x) =>
+      R.includes(x, withoutColor)
     );
-    //  R.includes(currentChangedWithoutColor, withoutColor)
-    // let compareResult = R.includes(currentChangedWithoutColor, withoutColor)
-    // let compareResult = currentChangedWithoutColor.some(y => R.includes(y, x));
 
     console.log("erase_compareResult", compareResult);
 
-    // compareResult.forEach((item) => {
-      // if (!item) return;
-      // item.forEach((innerItem) => {
-      //   // let ele = document.getElementById(innerItem.coor);
-      //   // if (!ele) return;
-      //   let aaa = tempList.map((i) => {
-      //     return (
-      //       i.map((j)=>{
-      //         return j.coor;
-      //       })
-      //       )
-      //     })
-      //     console.log('aaa', aaa)
-        // let targetIndex = aaa
-        //   .indexOf(item);
-        // if (targetIndex >= 0) {
-        //   tempList.splice(targetIndex, 1);
-        // }
-        // eraseCubeSingle(innerItem);
-      // })
-
-      // currentChangedWithoutColor.some(y => R.includes(y, x));
-
-      
-    //   setList(tempList);
-    // });
-    // let compareResultsss = compareResult.map((x) =>
-    // {
-    //   console.log('___x', x)
-    // // return tempList.some(y => R.includes(y, x));
-    // }
+    compareResult.forEach((item) => {
+      if (!item) return;
+      let ele = document.getElementById(item.coor);
+      if (!ele) return;
+      let targetIndex = tempList
+        .map((i) => {
+          return i.coor;
+        })
+        .indexOf(item.coor);
+      if (targetIndex >= 0) {
+        tempList.splice(targetIndex, 1);
+      }
+      eraseCubeSingle(item);
+      setList(tempList);
+    });
   };
 
   useEffect(() => {
     if (detectList.length) {
-      console.log("detectList", detectList);
+      // console.log("detectList", detectList);
       let lastChanged = getCubeId(detectList[detectList.length - 1]);
       // console.log("lastChanged", lastChanged);
       if (lastChanged) {
-        console.log("lastChanged", lastChanged);
-        // lastChanged.forEach((item: any, key) => {
-        //   console.log('item', item)
-        //   if (!item) return;
-        //   if (eraseMode) {
-        //     // eraseCubeSingle({ coor: item.id });
-        //   } else {
-        //     paintCubeSingle([lastChanged]);
-        //     // const coorFormatArray = item.map((innerItem:WholeData) => {
-        //     //   return { coor: innerItem.id, color: innerItem.color };
-        //     // });
-        //     // console.log("coorFormatArray", coorFormatArray);
-        //     // paintCubeSingle(coorFormatArray);
-        //   }
-        // });
-        let aaa = lastChanged.map((item:any)=>{
-          // if(!item) return;
-          return ({coor:item.id, color:item.color})
-        })
-        console.log('aaa', aaa)
-        if(!aaa) return;
-        paintCubeSingle(aaa)
-        // aaa.forEach((item)=>{
-        //   paintCubeSingle([item]);
-        // })
-        
+        // console.log("lastChanged", lastChanged);
+        lastChanged.forEach((item: any, key) => {
+          if (!item) return;
+          if (eraseMode) {
+            // eraseCubeSingle({ coor: item.id });
+          } else {
+            paintCubeSingle({ coor: item.id, color: item.color });
+          }
+        });
       }
     }
   }, [detectList]);
@@ -445,12 +392,10 @@ export default () => {
     setDetectList(temp);
   };
 
-  const paintCubeSingle = (positionArray: coordinateData[]) => {
-    positionArray.forEach((positionItem) => {
-      let cubeEle = document.getElementById(positionItem.coor);
-      if (!cubeEle) return;
-      cubeEle.style.backgroundColor = positionItem.color;
-    });
+  const paintCubeSingle = (position: coordinateData) => {
+    let cubeEle = document.getElementById(position.coor);
+    if (!cubeEle) return;
+    cubeEle.style.backgroundColor = position.color;
   };
   const eraseCubeSingle = (position: { coor: string }) => {
     let cubeEle = document.getElementById(position.coor);
@@ -477,20 +422,14 @@ export default () => {
     let allCubeData = detectList.map((item) => {
       return getCubeId(item);
     });
-    console.log("allCubeData", allCubeData);
     let flattenList = R.flatten(allCubeData);
     // console.log("allCubeData", allCubeData);
     // console.log("flattenList", flattenList);
-    allCubeData.forEach((item: any, index) => {
+    flattenList.forEach((item: any, index) => {
       if (!item) return;
-      let innerObject = item.map(
-        (innerItem: WholeData) => {
-          return { coor: innerItem.id, color: innerItem.color };
-        }
-      );
-      tempList.push(innerObject);
+      tempList.push({ coor: item.id, color: item.color });
     });
-    console.log("tempList", tempList);
+    // console.log('tempList', tempList)
     setList(R.uniq(tempList));
     setDetectList([]);
   };
@@ -547,14 +486,10 @@ export default () => {
         // console.log("toParse", toParse);
         // console.log("toParse.listData", toParse.listData);
         setList(toParse.listData);
-        let listFromFile: coordinateData[][] = toParse.listData;
+        let listFromFile: coordinateData[] = toParse.listData;
         listFromFile.forEach((item, key) => {
           setTimeout(() => {
-            const coorFormatArray = item.map((innerItem) => {
-              return { coor: innerItem.coor, color: innerItem.color };
-            });
-            console.log("coorFormatArray", coorFormatArray);
-            paintCubeSingle(coorFormatArray);
+            paintCubeSingle({ coor: item.coor, color: item.color });
           }, speed * key);
         });
         setDownloadEnable(true);
@@ -588,12 +523,8 @@ export default () => {
 
       currentPicked.listData.forEach((item, key) => {
         setTimeout(() => {
-          // tempList.push({ coor: item.coor, color: item.color });
-          tempList.push(item);
-          paintCubeSingle(item);
-          // item.forEach((innerItem)=>{
-          //   paintCubeSingle({ coor: innerItem.coor, color: innerItem.color });
-          // })
+          tempList.push({ coor: item.coor, color: item.color });
+          paintCubeSingle({ coor: item.coor, color: item.color });
           setList([...tempList]);
         }, speed * key);
 
