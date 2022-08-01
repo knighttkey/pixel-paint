@@ -485,7 +485,7 @@ let parentWidth = 0;
     //   }))
     // })
     // console.log('oop', oop)
-
+      if(!allCubeData.length) return;
     allCubeData.reduce(function(accu:any, curV:any, curI:number, array:any) {
       // console.log('accu', accu)
       if(curV&&curI>=1) {
@@ -1161,7 +1161,7 @@ let parentWidth = 0;
         {/* {downloadEnable ? (
           <button onClick={() => prepareToExportVideo()}>準備輸出</button>
         ) : null} */}
-        {/* <button onClick={() => prevStep()}>前一步</button> */}
+        <button onClick={() => prevStep()}>前一步</button>
         {/* <button onClick={() => nextStep()}>下一步</button> */}
 
         {/* {list.length ? (
@@ -1370,6 +1370,7 @@ let parentWidth = 0;
             setPalmRejectShow={setPalmRejectShow}
             touchBehavior={touchBehavior}
             setTouchBehavior={setTouchBehavior}
+            prevStep={prevStep}
           />
         </DragPanel>
       ) : null}

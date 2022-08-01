@@ -1,7 +1,7 @@
 import "./../styles/SetupPanel.scss";
 import DropExpand from "./DropExpand";
 import SwitchToggle from "./SwitchToggle";
-
+import undoIcon from "/images/rotate-left.svg";
 type Props = {
   canvaColor: string;
   changeCanvaColor: Function;
@@ -21,6 +21,7 @@ type Props = {
   setPalmRejectShow:Function;
   touchBehavior:string, 
   setTouchBehavior: Function;
+  prevStep:Function;
 };
 
 export default (props: Props) => {
@@ -42,7 +43,8 @@ export default (props: Props) => {
     palmRejectShow,
     setPalmRejectShow,
     touchBehavior,
-    setTouchBehavior
+    setTouchBehavior,
+    prevStep
   } = props;
   
   const srokeWidthList = [1, 2, 3, 4, 5, 6];
@@ -131,6 +133,15 @@ export default (props: Props) => {
             setToggleOn={switchTouchBehavior}
             customGreen={true}
           ></SwitchToggle>
+        </div>
+        <div className="area prev_step_area">
+          <div className="prev_step_tip">Undo</div>
+
+          <div className="prev_btn"  onClick={()=>prevStep()}>
+            {/* Prev */}
+            <div className="prev_icon" style={{ backgroundImage: `url(${undoIcon})` }}></div>
+
+          </div>
         </div>
       </div>
     </div>
