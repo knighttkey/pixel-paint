@@ -136,16 +136,12 @@ export default (props: Props) => {
           ></SwitchToggle>
         </div>
         <div className="area prev_step_area">
-          <div className="prev_step_tip">Undo</div>
+
 
           <div className={`prev_btn ${list.length === 0 ? 'disable':''}`}  onClick={()=>list.length === 0 ? null : prevStep()}>
             <div className="prev_icon" style={{ backgroundImage: `url(${undoIcon})` }}></div>
 
           </div>
-        </div>
-        <div className="area next_step_area">
-          <div className="next_step_tip">Redo</div>
-
           <div className={`next_btn ${offsetListForNext.length === 0 ? 'disable':''}`}  onClick={()=>offsetListForNext.length === 0 ? null : nextStep()}>
             <div className="next_icon" style={{ backgroundImage: `url(${redoIcon})` }}></div>
 

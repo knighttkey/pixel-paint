@@ -129,6 +129,9 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
+          border-top: 1px dashed var(--main);
+          padding-top: 15px;
+          margin-top: 10px;
           .prev_step_tip,.next_step_tip {
             color:var(--main);
             font-weight: 600;
