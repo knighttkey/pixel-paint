@@ -12,6 +12,9 @@ import html2canvas from "html2canvas";
 import starryNight from "./../../jsonFile_16578030.json";
 import wantItAll from "./../../jsonFile_16576374.json";
 import wretched from "./../../jsonFile_wretched.json";
+import shibaDog from "./../../jsonFile_shibaDog.json";
+import scream from "./../../jsonFile_scream.json";
+import yellingACat from "./../../jsonFile_womanYellingACat.json";
 import DragPanel from "./DragPanel";
 import GalleryPanel from "./GalleryPanel";
 import ModalTool from "./ModalTool";
@@ -83,7 +86,6 @@ export default () => {
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
   // console.log('eraseMode', eraseMode)
-
   // console.log('navigator.userAgent', navigator.userAgent)
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
 
@@ -594,7 +596,14 @@ export default () => {
   const demoPlay = () => {
     let prevSpeed = speed;
 
-    let demoList = [starryNight, wantItAll, wretched];
+    let demoList = [
+      starryNight,
+      wantItAll,
+      // wretched,
+      shibaDog,
+      scream,
+      yellingACat
+    ];
     let tempObj = { ...demoList[demoIndex], id: "", thumbnail: "" };
     // setList([]);
     resetList();
@@ -605,7 +614,7 @@ export default () => {
     let count = starryNight.listData.length;
     // console.log('count', count)
     let tempIndex = 0;
-    if (demoIndex === 2) {
+    if (demoIndex === demoList.length - 1) {
       tempIndex = 0;
     } else {
       tempIndex = demoIndex + 1;
@@ -867,19 +876,19 @@ export default () => {
   };
 
   const prevCube = (position: coordinateData) => {
-      let cubeEle = document.getElementById(position.coor);
-      if (!cubeEle) return;
-      cubeEle.style.backgroundColor = "transparent";
+    let cubeEle = document.getElementById(position.coor);
+    if (!cubeEle) return;
+    cubeEle.style.backgroundColor = "transparent";
   };
 
-  const [offsetListForNext, setOffsetListForNext] = useState<
-    coordinateData[]
-  >([]);
+  const [offsetListForNext, setOffsetListForNext] = useState<coordinateData[]>(
+    []
+  );
 
   const prevStep = () => {
     let tempListForPrev = [...list];
     // console.log('tempListForPrev.length - 1 < 0', tempListForPrev.length - 1 < 0)
-    if(tempListForPrev.length - 1 < 0) return;
+    if (tempListForPrev.length - 1 < 0) return;
     prevCube(tempListForPrev[tempListForPrev.length - 1]);
     let tempListOffset = [...offsetListForNext];
     tempListOffset.push(tempListForPrev[tempListForPrev.length - 1]);
@@ -895,7 +904,7 @@ export default () => {
     let tempListForNext = [...list];
     tempListForNext.push(erasedPoint[erasedPoint.length - 1]);
     setList(tempListForNext);
-    if(erasedPoint.length - 1 < 0) return;
+    if (erasedPoint.length - 1 < 0) return;
     paintCubeSingle(erasedPoint[erasedPoint.length - 1]);
     erasedPoint.splice(erasedPoint.length - 1, 1);
     setOffsetListForNext(erasedPoint);
@@ -990,7 +999,7 @@ export default () => {
         {/* {downloadEnable ? (
           <button onClick={() => prepareToExportVideo()}>準備輸出</button>
         ) : null} */}
-          <button onClick={() => nextStep()}>下一步</button>  
+        <button onClick={() => nextStep()}>下一步</button>
         {/* {list.length ? (
           <Fragment>
             <div
