@@ -926,11 +926,11 @@ export default () => {
 
     var mediaRecorder = new MediaStreamRecorder(stream);
     mediaRecorder.mimeType = 'image/gif';
-    mediaRecorder.frameRate = 15;
-    mediaRecorder.canvas = {
-      width: 1400,
-      height: 1400
-    }
+    // mediaRecorder.frameRate = 15;
+    // mediaRecorder.canvas = {
+    //   width: 1400,
+    //   height: 1400
+    // }
 
     // mediaRecorder.frameInterval = 10;
     console.log('mediaRecorder', mediaRecorder)
@@ -977,7 +977,7 @@ export default () => {
       if (!appEle) return;
       appEle.classList.remove("download_time");
     },  (list.length + 10) * 30);
-    console.log('(list.length + 10) * speed', (list.length + 10) * 10)
+    console.log('(list.length + 10) * speed', (list.length + 10) * 30)
 
 
   };

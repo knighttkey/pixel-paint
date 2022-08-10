@@ -1605,8 +1605,10 @@ function GifRecorder(mediaStream) {
     this.start = function(timeSlice) {
         timeSlice = timeSlice || 1000;
 
+        // var imageWidth = this.videoWidth || 320;
+        // var imageHeight = this.videoHeight || 240;
         var imageWidth = this.videoWidth || 320;
-        var imageHeight = this.videoHeight || 240;
+        var imageHeight = this.videoHeight || 320;
 
         canvas.width = video.width = imageWidth;
         canvas.height = video.height = imageHeight;
@@ -1617,13 +1619,15 @@ function GifRecorder(mediaStream) {
         // void setRepeat(int iter)
         // Sets the number of times the set of GIF frames should be played.
         // Default is 1; 0 means play indefinitely.
-        gifEncoder.setRepeat(0);
+        // gifEncoder.setRepeat(0);
+        gifEncoder.setRepeat(1);
 
         // void setFrameRate(Number fps)
         // Sets frame rate in frames per second.
         // Equivalent to setDelay(1000/fps).
         // Using "setDelay" instead of "setFrameRate"
-        gifEncoder.setDelay(this.frameRate || this.speed || 200);
+        // gifEncoder.setDelay(this.frameRate || this.speed || 200);
+        gifEncoder.setDelay(30);
 
         // void setQuality(int quality)
         // Sets quality of color quantization (conversion of images to the
