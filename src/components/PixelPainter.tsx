@@ -1080,7 +1080,7 @@ export default () => {
                 className={`btn download_btn ${enable ? "" : "disable"}`}
                 onClick={() => prepareToExportGif()}
               >
-                Download
+                Gif
               </div>
             ) : null}
             {downloadEnable ? (
@@ -1088,7 +1088,7 @@ export default () => {
                 className={`btn download_btn ${enable ? "" : "disable"}`}
                 onClick={() => prepareToExportVideo()}
               >
-                DownloadV
+                Video
               </div>
             ) : null}
           </div>
@@ -1110,77 +1110,6 @@ export default () => {
           id="targetCanvas"
           style={{ zIndex: "-1", opacity: "0" }}
         ></canvas>
-        {/* <video id='video' muted autoPlay style={{width:'180px', height:'320px'}}></video> */}
-        {/* {downloadEnable ? (
-          <button onClick={() => prepareToExportVideo()}>準備輸出</button>
-        ) : null} */}
-        {/* <img id='preview-gif' style={{width:'300px', height:'300px'}}/> */}
-        {/* <button onClick={() => nextStep()}>下一步</button> */}
-        {/* {list.length ? (
-          <Fragment>
-            <div
-              className="debug_list"
-              style={{
-                overflow: "scroll",
-                height: "300px",
-                marginTop: "50px",
-                position: "relative"
-              }}
-            >
-              {list.map((item, index) => {
-                return (
-                  <div
-                    className="each_test_row"
-                    style={{ display: "flex", borderBottom: "1px solid green" }}
-                    key={index}
-                  >
-                    <div
-                      className="each_test_number"
-                      style={{
-                        color: "#2a8ab6",
-                        fontSize: "18px",
-                        textAlign: "start",
-                        width: "60px"
-                      }}
-                    >
-                      {index}
-                    </div>
-                    <div
-                      className="each_test_coor"
-                      style={{
-                        color: "#fff",
-                        fontSize: "18px",
-                        textAlign: "start",
-                        width: "100px"
-                      }}
-                    >
-                      {item.coor}
-                    </div>
-                    <div
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        backgroundColor: item.color,
-                        marginRight: "15px"
-                      }}
-                    ></div>
-                    <button onClick={() => handleEnlargeThisCube(item)}>
-                      顯示
-                    </button>
-                    <button
-                      onClick={() => playFromThisFrame(index, canvaColor)}
-                    >
-                      從此播放
-                    </button>
-                    <button onClick={(e) => removeThisFrame(index)}>
-                      刪除此格
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </Fragment>
-        ) : null} */}
       </div>
       {prevDataFromLocal.length && galleryModalShow ? (
         <ModalTool
