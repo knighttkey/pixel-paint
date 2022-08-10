@@ -1,5 +1,4 @@
 // Last time updated: 2016-07-03 8:51:35 AM UTC
-
 // links:
 // Open-Sourced: https://github.com/streamproc/MediaStreamRecorder
 // https://cdn.WebRTC-Experiment.com/MediaStreamRecorder.js
@@ -1335,7 +1334,12 @@ function WhammyRecorderHelper(mediaStream, root) {
             video = this.video.cloneNode();
         } else {
             video = document.createElement('video');
-            video.src = URL.createObjectURL(mediaStream);
+            // video.src = URL.createObjectURL(mediaStream);
+            try {
+                video.srcObject = mediaStream;
+              } catch (error) {
+                video.src = URL.createObjectURL(mediaStream);
+              }
 
             video.width = this.video.width;
             video.height = this.video.height;
@@ -1620,7 +1624,7 @@ function GifRecorder(mediaStream) {
         // Sets the number of times the set of GIF frames should be played.
         // Default is 1; 0 means play indefinitely.
         // gifEncoder.setRepeat(0);
-        gifEncoder.setRepeat(1);
+        gifEncoder.setRepeat(-1); // -1 is no-repeat
 
         // void setFrameRate(Number fps)
         // Sets frame rate in frames per second.

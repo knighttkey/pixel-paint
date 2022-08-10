@@ -895,7 +895,7 @@ export default () => {
     ctx.clearRect(0, 0, canvaSize, canvaSize);
     ctx.fillStyle = canvaColor;
     ctx.fillRect(0, 0, canvaSize, canvaSize);
-    let stream = canvas.captureStream(60);
+    let stream = canvas.captureStream(5);
     const recordedChunks: any = [];
     list.forEach((item, key) => {
       if (!ctx) return;
@@ -921,15 +921,15 @@ export default () => {
           width * scaleRatio,
           height * scaleRatio
         );
-      }, key * 30);
+      }, key * 15);
     });
 
     var mediaRecorder = new MediaStreamRecorder(stream);
     mediaRecorder.mimeType = 'image/gif';
     mediaRecorder.frameRate = 15;
     mediaRecorder.canvas = {
-      width: 1400,
-      height: 1400
+      width: 320,
+      height: 320
     }
 
     // mediaRecorder.frameInterval = 10;
@@ -942,16 +942,16 @@ export default () => {
 
     mediaRecorder.onstop = function () {
       console.log('recordedChunks', recordedChunks)
-      const url = URL.createObjectURL(
-        new Blob(recordedChunks, { type: "image/gif" })
-      );
-      // const videoEle = document.createElement('video');
-      const anchor = document.createElement("a");
-      // videoEle.src = url;
-      anchor.href = url;
-      anchor.download = "ssssss.webm";
-      anchor.click();
-      window.URL.revokeObjectURL(url);
+      // const url = URL.createObjectURL(
+      //   new Blob(recordedChunks, { type: "image/gif" })
+      // );
+      // // const videoEle = document.createElement('video');
+      // const anchor = document.createElement("a");
+      // // videoEle.src = url;
+      // anchor.href = url;
+      // anchor.download = "ssssss.webm";
+      // anchor.click();
+      // window.URL.revokeObjectURL(url);
     }
 
 
@@ -960,24 +960,27 @@ export default () => {
       mediaRecorder.stop()
       console.log('recordedChunks', recordedChunks)
 
-      const url = URL.createObjectURL(
-        new Blob(recordedChunks, { type: "image/gif" })
-      );
-      // const videoEle = document.createElement('video');
-      const anchor = document.createElement("a");
-      // videoEle.src = url;
-      anchor.href = url;
-      anchor.download = "ssssss.gif";
-      anchor.click();
-      window.URL.revokeObjectURL(url);
-
+      // const url = URL.createObjectURL(
+      //   new Blob(recordedChunks, { type: "image/gif" })
+      // );
+      // // const videoEle = document.createElement('video');
+      // const anchor = document.createElement("a");
+      // // videoEle.src = url;
+      // anchor.href = url;
+      // anchor.download = "ssssss.gif";
+      // anchor.click();
+      // window.URL.revokeObjectURL(url);
+      let hh = new Blob(recordedChunks, { type: "image/gif" })
+      console.log('hh', hh)
+      mediaRecorder.save( hh, 'aaa.gif')
+      
       setLoadingModalShow(false);
       let appEle = document.querySelector(".App");
       console.log("appEle", appEle);
       if (!appEle) return;
       appEle.classList.remove("download_time");
-    },  (list.length + 10) * 30);
-    console.log('(list.length + 10) * speed', (list.length + 10) * 10)
+    },  (list.length + 10) * 15);
+    console.log('(list.length + 10) * speed', (list.length + 10) * speed)
 
 
   };
