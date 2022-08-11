@@ -921,12 +921,12 @@ export default () => {
           width * scaleRatio,
           height * scaleRatio
         );
-      }, key * 15);
+      }, key * 30);
     });
 
     var mediaRecorder = new MediaStreamRecorder(stream);
     mediaRecorder.mimeType = 'image/gif';
-    mediaRecorder.frameRate = 15;
+    mediaRecorder.frameRate = 30;
     mediaRecorder.canvas = {
       width: 320,
       height: 320
@@ -979,7 +979,7 @@ export default () => {
       console.log("appEle", appEle);
       if (!appEle) return;
       appEle.classList.remove("download_time");
-    },  (list.length + 10) * 15);
+    },  (list.length + 10) * 30);
     console.log('(list.length + 10) * speed', (list.length + 10) * speed)
 
 
