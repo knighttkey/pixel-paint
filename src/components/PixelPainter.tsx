@@ -1102,9 +1102,14 @@ export default () => {
   };
 
   const prevCube = (position: coordinateData) => {
+    let prevCubeList= list.filter((item)=>{
+      return item.coor === position.coor && item.color!== position.color;
+    })
+    let prevCube = prevCubeList[prevCubeList.length - 1];
+    let prevColor = prevCube ? prevCube.color : "transparent";
     let cubeEle = document.getElementById(position.coor);
     if (!cubeEle) return;
-    cubeEle.style.backgroundColor = "transparent";
+      cubeEle.style.backgroundColor = prevColor;
   };
 
   const [offsetListForNext, setOffsetListForNext] = useState<coordinateData[]>(
