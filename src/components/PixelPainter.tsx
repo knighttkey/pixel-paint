@@ -87,6 +87,9 @@ export default () => {
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
+  const [videoFile, setVideoFile] = useState<any>({          text: 'url',
+    title: 'some_title',
+    url: document.location.href});
   // console.log('eraseMode', eraseMode)
   // console.log('navigator.userAgent', navigator.userAgent)
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
@@ -1055,14 +1058,111 @@ export default () => {
       );
       // const videoEle = document.createElement('video');
       // const anchor = document.createElement("a");
-      // // videoEle.src = url;
+      // videoEle.src = url;
+      // videoEle.playsInline = true;
+      // document.body.appendChild(videoEle);
       // anchor.href = url;
       // anchor.download = "ssssss.webm";
-      // anchor.click();
+      // setTimeout(() => {
+      //   anchor.click();
+      //   window.URL.revokeObjectURL(url);
+      //   // window.location.href = url;
+      //   // window.open(url, "_blank");
+      // }, 500);
+      let blob2 = new Blob([blob], { type: "application/octet-stream" })
+
+      function blobToDataURL(blob2, callback) {
+        let a = new FileReader();
+        console.log('a', a)
+        a.onload = function (e) { callback(e.target.result); }
+        a.readAsDataURL(blob2);
+        
+    }
+    const filesArray = [
+      new File([blob2], "GreetingCard.webm", {
+        type: blob.type,
+        lastModified: new Date().getTime(),
+      }),
+    ];
+      blobToDataURL(blob2, (e)=>{
+        console.log('e', e)
+        console.log('base64')
+        window.open(e, "_blank");
+        // navigator.share({files: filesArray});
+        console.log('url', url)
+        let yy = {
+          text: url,
+          title: 'some_title',
+          url: document.location.href
+        }
+        setVideoFile(yy);
+        // window.location = e;
+        // const anchor = document.createElement("a");
+        // const videoEle = document.createElement('video');
+        // videoEle.src = url;
+        // videoEle.width = 320;
+        // videoEle.height = 320;
+        // videoEle.muted = true;
+        // videoEle.controls = true;
+        // videoEle.playsInline = true;
+        // let appEle = document.querySelector(".App");
+        // appEle.appendChild(videoEle);
+        // anchor.href = e;
+        // anchor.download = "ssssssss210151s.webm";
+        // anchor.click();
+      })
+
+
+      // const downloadBlob = (fileName, blob) => {
+      //   const link = document.createElement('a');
+      //   link.href = URL.createObjectURL(blob);
+      //   link.target = '_blank';
+      //   link.download = fileName;
+      //   document.body.appendChild(link);
+      //   link.click();
+      // }
+      
+      // // const blobcc = new Blob([blob], { type: 'video/mp4' });
+      // const blobcc = new Blob([blob], { type: 'application/octet-stream' });
+      // console.log('blobcc', blobcc)
+      // downloadBlob('myfile.mp4', blobcc)
+
+// reader.readAsDataURL(out);
+//       let bbb = blobToBase64(blob);
+//       console.log('bbb', bbb)
+//       function blobToBase64(blob) {
+//         return new Promise((resolve, _) => {
+//           const reader = new FileReader();
+//           reader.onloadend = () => resolve(reader.result);
+//           reader.readAsDataURL(blob);
+//         });
+      // }
+      // let hh = new Blob([blob], { type: "video/webm" })
+      // console.log('hh', hh)s
+      // mediaRecorder.save( hh, 'aaa.webm')
+
+      // var uInt8Array = blob;
+      // var i = uInt8Array.length;
+      // var binaryString = new Array(i);
+      // while (i--) {
+      //   binaryString[i] = String.fromCharCode(uInt8Array[i]);
+      // }
+      // var data = binaryString.join('');
+  
+      // var base64 = window.btoa(data);
+  
+      // var dataUrl = 'data:application/octet-stream;charset=utf-16le;base64,' + base64;
+
+
       // window.URL.revokeObjectURL(url);
-      let hh = new Blob([blob], { type: "video/webm" })
-      console.log('hh', hh)
-      mediaRecorder.save( hh, 'aaa.webm')
+      // window.open(url, "_blank");
+      // var out = new Blob([url], {type: 'application/webm'});
+      // var reader = new FileReader();
+      // console.log('out', out)
+      // reader.readAsDataURL(out);
+      // reader.onload = function(e){
+      //   window.location.href = reader.result;
+      // }
     };
 
     mediaRecorder.onstop = function () {
@@ -1100,6 +1200,16 @@ export default () => {
 
 
   };
+
+  const shareVideo = () => {
+    console.log('videoFile', videoFile)
+    navigator.share(videoFile)
+  }
+
+  const shareVideoTest = () => {
+    console.log('navigator.canShare(videoFile)', navigator.canShare(videoFile))
+    alert(navigator.canShare(videoFile).toString())
+  }
 
   const prevCube = (position: coordinateData) => {
     let prevCubeList= list.filter((item)=>{
@@ -1141,6 +1251,11 @@ export default () => {
     setOffsetListForNext(erasedPoint);
   };
 
+  // let yyu = navigator.canShare(videoFile).toString()
+  // let bb = document.getElementById("uuyt");
+  // if(bb) {
+  //   bb.innerHTML = yyu;
+  // }
   return (
     <div className="pixel_canva_container">
       <div className="paint_body">
@@ -1215,6 +1330,9 @@ export default () => {
                 Video
               </div>
             ) : null}
+            <button onClick={shareVideo}>分享</button>
+            <button onClick={shareVideoTest}>分享</button>
+            <div id="uuyt" ></div>
           </div>
         </div>
         <div className="wrap_outer">
