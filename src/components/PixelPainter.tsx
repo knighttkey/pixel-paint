@@ -985,121 +985,6 @@ export default () => {
 
   };
 
-  const prepareToExportVideo2 = async () => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-    setLoadingModalShow(true);
-    const canvas = document.createElement("canvas");
-
-    let appEle = document.querySelector(".App");
-    console.log("appEle", appEle);
-    if (!appEle) return;
-    appEle.classList.add("download_time");
-    const canvaSize = 1400;
-    canvas.height = canvaSize;
-    canvas.width = canvaSize;
-    let ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    if (!wrapRef.current) return;
-    let parentRect = wrapRef.current.getBoundingClientRect();
-    // console.log("parentRect", parentRect);
-    ctx.clearRect(0, 0, canvaSize, canvaSize);
-    ctx.fillStyle = canvaColor;
-    ctx.fillRect(0, 0, canvaSize, canvaSize);
-    let stream = canvas.captureStream(30);
-    const recordedChunks: any = [];
-    list.forEach((item, key) => {
-      if (!ctx) return;
-      setTimeout(() => {
-        let ele = document.getElementById(item.coor);
-        // console.log("ele", ele);
-        if (!ele) return;
-        if (!ctx) return;
-        let eleBgColor = window.getComputedStyle(ele, null).backgroundColor;
-
-        let eleRect = ele.getBoundingClientRect();
-
-        let top = eleRect.top - parentRect.top;
-        let left = eleRect.left - parentRect.left;
-        let width = eleRect.width;
-        let height = eleRect.height;
-        ctx.fillStyle = item.color;
-        const scaleRatio = canvaSize / parentRect.width;
-
-        ctx.fillRect(
-          left * scaleRatio,
-          top * scaleRatio,
-          width * scaleRatio,
-          height * scaleRatio
-        );
-      }, key * speed);
-    });
-
-    var mediaRecorder = new MediaStreamRecorder(stream);
-    mediaRecorder.mimeType = "video/webm; codecs=vp9";
-    // mediaRecorder.frameRate = 15;
-    mediaRecorder.video = stream;
-    mediaRecorder.canvas = {
-      width: 320,
-      height: 320
-    }
-    mediaRecorder.videoWidth = 320;
-    mediaRecorder.videoHeight = 320;
-
-    // mediaRecorder.frameInterval = 10;
-    console.log('mediaRecorder', mediaRecorder)
-    
-    mediaRecorder.ondataavailable = function (blob:Blob) {
-      console.log('blob', blob)
-      recordedChunks.push(blob);
-      const url = URL.createObjectURL(
-        new Blob([blob], { type: "video/webm" })
-      );
-      // const videoEle = document.createElement('video');
-      // const anchor = document.createElement("a");
-      // // videoEle.src = url;
-      // anchor.href = url;
-      // anchor.download = "ssssss.webm";
-      // anchor.click();
-      // window.URL.revokeObjectURL(url);
-      let hh = new Blob([blob], { type: "video/webm" })
-      console.log('hh', hh)
-      mediaRecorder.save( hh, 'aaa.webm')
-    };
-
-    mediaRecorder.onstop = function () {
-      console.log('recordedChunks', recordedChunks)
-      // const url = URL.createObjectURL(
-      //   new Blob(recordedChunks, { type: "video/webm" })
-      // );
-      // // const videoEle = document.createElement('video');
-      // const anchor = document.createElement("a");
-      // // videoEle.src = url;
-      // anchor.href = url;
-      // anchor.download = "ssssss.webm";
-      // anchor.click();
-      // window.URL.revokeObjectURL(url);
-    }
-
-
-    mediaRecorder.start();
-    setTimeout(() => {
-      mediaRecorder.stop()
-      // console.log('recordedChunks', recordedChunks)
-
-
-      // let hh = new Blob(recordedChunks, { type: "video/webm" })
-      // console.log('hh', hh)
-      // mediaRecorder.save( hh, 'aaa.webm')
-      
-      setLoadingModalShow(false);
-      let appEle = document.querySelector(".App");
-      console.log("appEle", appEle);
-      if (!appEle) return;
-      appEle.classList.remove("download_time");
-    },  (list.length + 10) * speed);
-    console.log('(list.length + 10) * speed', (list.length + 10) * speed)
-
-
-  };
 
   const prevCube = (position: coordinateData) => {
     let prevCubeList= list.filter((item)=>{
@@ -1199,18 +1084,18 @@ export default () => {
             >
               Setup
             </div>
-            {downloadEnable ? (
+            {/* {downloadEnable ? (
               <div
                 className={`btn download_btn ${enable ? "" : "disable"}`}
                 onClick={() => prepareToExportGif()}
               >
                 Gif
               </div>
-            ) : null}
+            ) : null} */}
             {downloadEnable ? (
               <div
                 className={`btn download_btn ${enable ? "" : "disable"}`}
-                onClick={() => prepareToExportVideo2()}
+                onClick={() => prepareToExportVideo()}
               >
                 Video
               </div>
