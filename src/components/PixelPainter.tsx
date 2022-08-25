@@ -23,7 +23,7 @@ import moment from "moment";
 import DropExpandCenter from "./DropExpandCenter";
 
 // var MediaStreamRecorder = require('msr');
-const MediaStreamRecorder = require('./../utils/MediaStreamRecorder.js');
+const MediaStreamRecorder = require("./../utils/MediaStreamRecorder.js");
 // import MediaStreamRecorder from './../utils/MediaStreamRecorder.js';
 type DragPoint = {
   x: number;
@@ -36,6 +36,12 @@ export interface paintDataFromLocal {
   id: string;
   listData: coordinateData[];
   thumbnail: string;
+  canvaColor: string;
+}
+
+interface paintData {
+  id: string;
+  listData: coordinateData[];
   canvaColor: string;
 }
 
@@ -68,7 +74,7 @@ export default () => {
   const [speed, setSpeed] = useState<number>(5);
   const [canvaColor, setCanvaColor] = useState<string>("#0c1117"); //#0c1a2a
   const [enable, setEnable] = useState<Boolean>(true);
-  const [penWidth, setPenWidth] = useState<number>(1);
+  const [penWidth, setPenWidth] = useState<number>(4);
   const [showPenWidthMenu, setShowPenWidthMenu] = useState<Boolean>(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState<Boolean>(false);
   const [showSpeedMenuBeforePlay, setShowSpeedMenuBeforePlay] =
@@ -87,8 +93,89 @@ export default () => {
   const [speedChangeModalShow, setSpeedChangeModalShow] =
     useState<Boolean>(false);
   const [downloadEnable, setDownloadEnable] = useState(false);
-  // console.log('eraseMode', eraseMode)
-  // console.log('navigator.userAgent', navigator.userAgent)
+
+  const [dataWithEachFrame, setDataWithEachFrame] = useState<FakeData[]>([]);
+  const [eachFrame, setEachFrame] = useState<paintDataFromLocal[]>();
+  const frameWrapRef = useRef<HTMLDivElement>(null);
+  const [animationModalShow, setAnimationModalShow] = useState<Boolean>(false);
+
+  if (dataWithEachFrame.length) {
+    console.log("dataWithEachFrame", dataWithEachFrame);
+  }
+
+  interface FakeData {
+    id: string;
+    dataName: string;
+    dataTime: string;
+    eachFrame: paintDataFromLocal[] | [];
+  }
+  let fakeData: FakeData = {
+    id: "111",
+    dataName: "test",
+    dataTime: "2022-08-14",
+    eachFrame: [
+      { id: "122", listData: [], canvaColor: "#333333", thumbnail: "" }
+    ]
+  };
+
+  const saveThisFrame = async () => {
+    let tempFakeList: FakeData[] = [...dataWithEachFrame];
+    let fakeData: FakeData = {
+      id: "111",
+      dataName: "test",
+      dataTime: "2022-08-14",
+      eachFrame: []
+    };
+    let fakeInner: paintDataFromLocal = {
+      id: "122",
+      listData: list,
+      canvaColor: "#333333",
+      thumbnail: await createThumbnail()
+    };
+
+    // tempFakeList.push(fakeData);
+    console.log("tempFakeList", tempFakeList);
+    // if(tempFakeList.length) {
+    //   let firstData = tempFakeList[0];
+    //   firstData.eachFrame.push(fakeInner);
+    //   tempFakeList[0] = firstData;
+    // } else {
+    //   fakeData.eachFrame.push(fakeInner);
+    //   tempFakeList.push(fakeData);
+    //   setDataWithEachFrame(tempFakeList);
+    // }
+    let tempEachFrame = [...eachFrame];
+    setEachFrame(tempEachFrame);
+  };
+  const createThumbnail = () => {
+    return new Promise<string>((resolve, reject) => {
+      if (!wrapRef.current) return;
+
+      html2canvas(wrapRef.current)
+        .then((canvas) => {
+          console.log("canvas", canvas);
+          let dataUrl = canvas.toDataURL("image/jpeg");
+          // console.log('dataUrl', dataUrl)
+          // canvas.getContext('2d');
+          // const url = URL.createObjectURL(dataUrl);
+          resolve(dataUrl);
+        })
+        .catch((err) => {
+          console.log("err", err);
+          reject(err);
+        });
+    });
+  };
+
+  useEffect(() => {
+    let wrapItem = frameWrapRef.current;
+    window.addEventListener("wheel", function (e) {
+      if (!wrapItem) return;
+      if (e.deltaY > 0) wrapItem.scrollLeft += 100;
+      else wrapItem.scrollLeft -= 100;
+    });
+  }, []);
+
   const isMobile = navigator.userAgent.indexOf(" Mobile ") !== -1;
 
   const reportWindowSize = (event: any) => {
@@ -712,44 +799,6 @@ export default () => {
       });
   };
 
-  // const playFromThisFrame = (index: number, canvaColor: string) => {
-  //   // console.log("index", index);
-  //   let tempOrigin = [...list];
-  //   let fromThisFrame = tempOrigin.filter((item, key) => {
-  //     return key >= index;
-  //   });
-  //   // console.log("fromThisFrame", fromThisFrame);
-  //   tempList = [];
-  //   setList([]);
-  //   eraseAllCube();
-  //   setEnable(false);
-  //   fromThisFrame.forEach((item, key) => {
-  //     setTimeout(() => {
-  //       tempList.push({ coor: item.coor, color: item.color });
-  //       paintCubeSingle({ coor: item.coor, color: item.color });
-  //       setList([...tempList]);
-  //     }, speed * key);
-  //     setCurrentPicked(undefined);
-  //     // setShowText(false);
-  //   });
-  //   let count = fromThisFrame.length;
-  //   // console.log('count', count)
-  //   setTimeout(() => {
-  //     setEnable(true);
-  //   }, count * speed);
-  // };
-
-  // const removeThisFrame = (index: number) => {
-  //   // console.log("index", index);
-  //   let tempOrigin = [...list];
-  //   let othersFrame = tempOrigin.filter((item, key) => {
-  //     return key !== index;
-  //   });
-  //   othersFrame.forEach((item, index) => {
-  //     paintCubeSingle({ coor: item.coor, color: item.color });
-  //   });
-  //   setList(othersFrame);
-  // };
   const speedList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   const prepareToExportVideo = () => {
@@ -829,11 +878,9 @@ export default () => {
       // if(!videoEle) return;
       // videoEle.srcObject = mediaRecorder.stream;
 
-      // setTimeout(() => {
       mediaRecorder.ondataavailable = (event) =>
         recordedChunks.push(event.data);
 
-      // }, 0);
       console.log("mediaRecorder", mediaRecorder);
       mediaRecorder.onstop = () => {
         console.log("recordedChunks", recordedChunks);
@@ -853,14 +900,13 @@ export default () => {
         const url = URL.createObjectURL(
           new Blob(recordedChunks, { type: "video/webm" })
         );
-        const videoEle = document.createElement('video');
+        const videoEle = document.createElement("video");
         const anchor = document.createElement("a");
         videoEle.src = url;
         anchor.href = url;
         anchor.download = "video.webm";
         anchor.click();
         window.URL.revokeObjectURL(url);
-
       };
 
       setTimeout(() => {
@@ -875,8 +921,8 @@ export default () => {
     }
   };
 
-  const prepareToExportGif = async () => {                 
-    // setSpeed(60);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+  const prepareToExportGif = async () => {
+    // setSpeed(60);
     setLoadingModalShow(true);
     const canvas = document.createElement("canvas");
 
@@ -925,23 +971,23 @@ export default () => {
     });
 
     var mediaRecorder = new MediaStreamRecorder(stream);
-    mediaRecorder.mimeType = 'image/gif';
+    mediaRecorder.mimeType = "image/gif";
     mediaRecorder.frameRate = 30;
     mediaRecorder.canvas = {
       width: 320,
       height: 320
-    }
+    };
 
     // mediaRecorder.frameInterval = 10;
-    console.log('mediaRecorder', mediaRecorder)
-    
-    mediaRecorder.ondataavailable = function (blob:Blob) {
-      console.log('blob', blob)
+    console.log("mediaRecorder", mediaRecorder);
+
+    mediaRecorder.ondataavailable = function (blob: Blob) {
+      console.log("blob", blob);
       recordedChunks.push(blob);
     };
 
     mediaRecorder.onstop = function () {
-      console.log('recordedChunks', recordedChunks)
+      console.log("recordedChunks", recordedChunks);
       // const url = URL.createObjectURL(
       //   new Blob(recordedChunks, { type: "image/gif" })
       // );
@@ -952,13 +998,12 @@ export default () => {
       // anchor.download = "ssssss.webm";
       // anchor.click();
       // window.URL.revokeObjectURL(url);
-    }
-
+    };
 
     mediaRecorder.start();
     setTimeout(() => {
-      mediaRecorder.stop()
-      console.log('recordedChunks', recordedChunks)
+      mediaRecorder.stop();
+      console.log("recordedChunks", recordedChunks);
 
       // const url = URL.createObjectURL(
       //   new Blob(recordedChunks, { type: "image/gif" })
@@ -970,31 +1015,28 @@ export default () => {
       // anchor.download = "ssssss.gif";
       // anchor.click();
       // window.URL.revokeObjectURL(url);
-      let hh = new Blob(recordedChunks, { type: "image/gif" })
-      console.log('hh', hh)
-      mediaRecorder.save( hh, 'aaa.gif')
-      
+      let hh = new Blob(recordedChunks, { type: "image/gif" });
+      console.log("hh", hh);
+      mediaRecorder.save(hh, "aaa.gif");
+
       setLoadingModalShow(false);
       let appEle = document.querySelector(".App");
       console.log("appEle", appEle);
       if (!appEle) return;
       appEle.classList.remove("download_time");
-    },  (list.length + 10) * 30);
-    console.log('(list.length + 10) * speed', (list.length + 10) * speed)
-
-
+    }, (list.length + 10) * 30);
+    console.log("(list.length + 10) * speed", (list.length + 10) * speed);
   };
 
-
   const prevCube = (position: coordinateData) => {
-    let prevCubeList= list.filter((item)=>{
-      return item.coor === position.coor && item.color!== position.color;
-    })
+    let prevCubeList = list.filter((item) => {
+      return item.coor === position.coor && item.color !== position.color;
+    });
     let prevCube = prevCubeList[prevCubeList.length - 1];
     let prevColor = prevCube ? prevCube.color : "transparent";
     let cubeEle = document.getElementById(position.coor);
     if (!cubeEle) return;
-      cubeEle.style.backgroundColor = prevColor;
+    cubeEle.style.backgroundColor = prevColor;
   };
 
   const [offsetListForNext, setOffsetListForNext] = useState<coordinateData[]>(
@@ -1024,6 +1066,45 @@ export default () => {
     paintCubeSingle(erasedPoint[erasedPoint.length - 1]);
     erasedPoint.splice(erasedPoint.length - 1, 1);
     setOffsetListForNext(erasedPoint);
+  };
+
+  const drawAnimation = () => {
+    let previewCanvas: any;
+    const previousCanvas = document.getElementById("preview_canvas");
+    if (previousCanvas) {
+      previewCanvas = previousCanvas;
+    } else {
+      previewCanvas = document.createElement("canvas");
+      previewCanvas.id = "preview_canvas";
+    }
+
+    const canvaSize = 140;
+    previewCanvas.height = canvaSize;
+    previewCanvas.width = canvaSize;
+    let previewCtx = previewCanvas.getContext("2d");
+    if (!previewCtx) return;
+    let frameImageList = dataWithEachFrame[0].eachFrame.map((innerItem) => {
+      return innerItem.thumbnail;
+    });
+    const viewerEle = document.querySelector(".animation_viewer");
+    console.log("frameImageList", frameImageList);
+    frameImageList.forEach((item, index) => {
+      setTimeout(() => {
+        console.log("index", index);
+        if (!previewCtx) return;
+        let imgEle = new Image();
+        // console.log('__item', item)
+        imgEle.src = item;
+        // console.log('imgEle', imgEle)
+        previewCtx.drawImage(imgEle, 0, 0, 140, 140);
+      }, index * 1000);
+    });
+    viewerEle?.appendChild(previewCanvas);
+  };
+
+  const toPreview = () => {
+    setAnimationModalShow(true);
+    drawAnimation();
   };
 
   return (
@@ -1100,6 +1181,18 @@ export default () => {
                 Video
               </div>
             ) : null}
+            <div
+              className={`btn ${enable ? "" : "disable"}`}
+              onClick={() => saveThisFrame()}
+            >
+              存
+            </div>
+            <div
+              className={`btn ${enable ? "" : "disable"}`}
+              onClick={() => toPreview()}
+            >
+              預覽
+            </div>
           </div>
         </div>
         <div className="wrap_outer">
@@ -1115,11 +1208,23 @@ export default () => {
             {renderCube()}
           </div>
         </div>
-        <canvas
-          id="targetCanvas"
-          style={{ zIndex: "-1", opacity: "0" }}
-        ></canvas>
+        <div className="frame_container">
+          <div className="frame_inner_wrap" ref={frameWrapRef}>
+            {dataWithEachFrame.map((item, index) => {
+              return item.eachFrame.map((innerItem, innerIndex) => {
+                return (
+                  <div className="each_frame" key={innerIndex}>
+                    {/* <div className="frame_id">{innerItem.id}</div> */}
+                    <div className="frame_no">{innerIndex + 1}</div>
+                    <img src={innerItem.thumbnail} className="frame_image" />
+                  </div>
+                );
+              });
+            })}
+          </div>
+        </div>
       </div>
+
       {prevDataFromLocal.length && galleryModalShow ? (
         <ModalTool
           modalShow={galleryModalShow}
@@ -1230,6 +1335,32 @@ export default () => {
           </div>
         </ModalTool>
       ) : null}
+
+      {/* {animationModalShow ? ( */}
+      <ModalTool
+        modalShow={animationModalShow}
+        modalCloseFunction={() => setAnimationModalShow(false)}
+        modalWidth={"340px"}
+        modalHeight={"160px"}
+        modalInnerBackground={"#0c1a2a95"}
+        backgroundOpacity={0.5}
+        background={"#000000"}
+        zIndex={12}
+      >
+        <div className="animation_viewer">
+          {/* {drawAnimation()} */}
+          {/* {dataWithEachFrame.map((item, index)=>{
+              return item.eachFrame.map((innerItem, innerIndex)=>{
+                // setTimeout(() => {
+                  // return (<img className="animation_image" src={innerItem.thumbnail} key={innerIndex}/>)
+                  return (<img className="animation_image" src={innerItem.thumbnail} key={innerIndex}/>)
+                // }, innerIndex*2000);
+                
+              })
+            })} */}
+        </div>
+      </ModalTool>
+      {/* ) : null} */}
 
       {setupPanelShow ? (
         <DragPanel
